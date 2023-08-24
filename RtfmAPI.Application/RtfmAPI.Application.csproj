@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>false</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="12.1.1" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\RtfmAPI.Domain\RtfmAPI.Domain.csproj" />
+    </ItemGroup>
+
+
+
+
+
+</Project>

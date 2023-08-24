@@ -2,9 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Presentation", "RtfmAPI.Presentation\RtfmAPI.Presentation.csproj", "{C893206E-C6F4-406D-A6D5-9E0DC6986F45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RftmAPI.Domain", "RftmAPI.Domain\RftmAPI.Domain.csproj", "{0FA41AF8-EA38-43FE-BF04-11A55A7DECB2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Domain", "RtfmAPI.Domain\RtfmAPI.Domain.csproj", "{0FA41AF8-EA38-43FE-BF04-11A55A7DECB2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Infrastructure", "RtfmAPI.Infrastructure\RtfmAPI.Infrastructure.csproj", "{07E3FADB-1F80-4672-AB69-CF913F0CAC0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Application", "RtfmAPI.Application\RtfmAPI.Application.csproj", "{7DE32A02-13B4-4D4D-9562-DFD0BB064914}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +26,9 @@ Global
 		{07E3FADB-1F80-4672-AB69-CF913F0CAC0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07E3FADB-1F80-4672-AB69-CF913F0CAC0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07E3FADB-1F80-4672-AB69-CF913F0CAC0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
