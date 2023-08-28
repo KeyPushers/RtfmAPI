@@ -1,13 +1,17 @@
-﻿using RftmAPI.Domain.Primitives;
+﻿using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
+using RftmAPI.Domain.Aggregates.Bands.ValueObjects;
+using RftmAPI.Domain.Aggregates.Relations.TracksAlbums;
+using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
+using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Aggregates.Albums;
 
 /// <summary>
 /// Альбом
 /// </summary>
-public sealed class Album : AggregateRoot
+public sealed class Album : AggregateRoot<AlbumId, Guid>
 {
-    private readonly List<Guid> _tracks;
+    private readonly List<TracksAlbums> _tracks;
 
     /// <summary>
     /// Наименование альбома
@@ -19,29 +23,44 @@ public sealed class Album : AggregateRoot
     /// </summary>
     public DateTime ReleaseDate { get; private set; }
 
-    /// <summary>
-    /// Идентификатор музыкальной группы
-    /// </summary>
-    public Guid BandId { get; private set; }
+    // /// <summary>
+    // /// Идентификатор музыкальной группы
+    // /// </summary>
+    // public BandId BandId { get; private set; }
     
     /// <summary>
     /// Музыкальные треки
     /// </summary>
-    public IEnumerable<Guid> Tracks => _tracks;
+    public IEnumerable<TracksAlbums> Tracks => _tracks;
+    
+    /// <summary>
+    /// Альбом
+    /// </summary>
+#pragma warning disable CS8618
+    private Album() : base(AlbumId.Create())
+    {
+    }
+#pragma warning restore CS8618
     
     /// <summary>
     /// Альбом
     /// </summary>
     /// <param name="name">Наименование альбома</param>
     /// <param name="releaseDate">Дата выпуска альбома</param>
-    /// <param name="bandId">Идентификатор музыкальной группы</param>
-    /// <param name="tracks">Музыкальные треки</param>
-    public Album(string name, DateTime releaseDate, Guid bandId, IEnumerable<Guid> tracks)
+    public Album(string name, DateTime releaseDate) : base(AlbumId.Create())
     {
         Name = new AlbumName(name);
         ReleaseDate = releaseDate;
-        BandId = bandId;
-        
-        _tracks = tracks.ToList();
+
+        _tracks = new List<TracksAlbums>();
+    }
+    
+    /// <summary>
+    /// Добавление трека
+    /// </summary>
+    /// <param name="trackId">Идентификатор трека</param>
+    public void AddTrack(TrackId trackId)
+    {
+        // _tracks.Add(trackId);
     }
 }

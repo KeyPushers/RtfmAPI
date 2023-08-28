@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RftmAPI.Domain.Aggregates.Albums;
+using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
 using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
@@ -16,29 +19,57 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
     /// <exception cref="NotImplementedException"></exception>
     public void Configure(EntityTypeBuilder<Track> builder)
     {
-        // Id
-        builder.HasKey(entity => entity.Id);
-        builder.Property(entity => entity.Id);
+        ConfigureTracksTable(builder);
+        ConfigureTracksAlbumsTable(builder);
+    }
 
-        // Name
+    private static void ConfigureTracksTable(EntityTypeBuilder<Track> builder)
+    {
+        ConfigureId(builder);
+        ConfigureName(builder);
+        ConfigureData(builder);
+        ConfigureReleaseDate(builder);
+    }
+
+    private static void ConfigureTracksAlbumsTable(EntityTypeBuilder<Track> builder)
+    {
+        ConfigureAlbums(builder);
+    }
+
+    private static void ConfigureId(EntityTypeBuilder<Track> builder)
+    {
+        builder.HasKey(entity => entity.Id);
+        builder.Property(entity => entity.Id)
+            .ValueGeneratedNever()
+            .HasConversion(entity => entity.Value, value => TrackId.Create(value));
+    }
+
+    private static void ConfigureName(EntityTypeBuilder<Track> builder)
+    {
         builder
             .Property(entity => entity.Name)
             .HasMaxLength(TrackName.NameMaxLength)
             .HasConversion(entity => entity.Name,
                 name => new TrackName(name));
-
-        // Data
-        builder.Property(entity => entity.Data);
-
-        // Release Date
-        builder.Property(entity => entity.ReleaseDate);
-        
-        // Genres
-        builder.HasMany(entity => entity.Genres)
-            .WithOne(entity => entity.Value)
-            .HasConversion(entity => entity.);
-
-        // Albums
-        builder.Property(entity => entity.Albums);
     }
+
+    private static void ConfigureData(EntityTypeBuilder<Track> builder)
+    {
+        builder.Property(entity => entity.Data);
+    }
+
+    private static void ConfigureReleaseDate(EntityTypeBuilder<Track> builder)
+    {
+        builder.Property(entity => entity.ReleaseDate);
+    }
+
+    private static void ConfigureAlbums(EntityTypeBuilder<Track> builder)
+    {
+        builder
+            .HasMany(x => x.Albums)
+            .WithOne()
+            .HasForeignKey(x => x.TrackId)
+            .IsRequired();
+    }
+    
 }

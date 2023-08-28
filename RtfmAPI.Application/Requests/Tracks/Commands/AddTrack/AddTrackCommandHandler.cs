@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using RftmAPI.Domain.Aggregates.Albums;
+using RftmAPI.Domain.Aggregates.Albums.Repository;
 using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Aggregates.Tracks.Repository;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
@@ -12,15 +14,18 @@ namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 /// </summary>
 public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
 {
-    private readonly ITrackRepository _trackRepository;
+    private readonly ITracksRepository _tracksRepository;
+    private readonly IAlbumsRepository _albumsRepository;
 
     /// <summary>
     /// Обработчик команды добавления музыкального трека
     /// </summary>
-    /// <param name="trackRepository">Репозиторий музыкальных треков</param>
-    public AddTrackCommandHandler(ITrackRepository trackRepository)
+    /// <param name="tracksRepository">Репозиторий музыкальных треков</param>
+    /// <param name="albumsRepository">Репозиторий альбомов</param>
+    public AddTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository)
     {
-        _trackRepository = trackRepository;
+        _tracksRepository = tracksRepository;
+        _albumsRepository = albumsRepository;
     }
     
     /// <summary>
@@ -31,10 +36,18 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
     /// <returns>Музыкальный трек</returns>
     public async Task<Track> Handle(AddTrackCommand request, CancellationToken cancellationToken = default)
     {
-        var track = new Track(request.Name ?? "Не указано название", request.Data, request.ReleaseDate, Enumerable.Empty<GenreId>(), Enumerable.Empty<AlbumId>());
+        var track = new Track(request.Name ?? "Не указано название", request.Data, request.ReleaseDate);
 
-        await _trackRepository.AddAsync(track).ConfigureAwait(false);
+        var album = new Album(request.Name ?? "Не указано название", DateTime.Now);
+        
+        track.AddAlbum(album);
+        
+        await _albumsRepository.AddAsync(album).ConfigureAwait(false);
+        
+        await _tracksRepository.AddAsync(track).ConfigureAwait(false);
 
+        var albums = await _albumsRepository.GetAlbumsAsync().ConfigureAwait(false);
+        
         return track;
     }
 }

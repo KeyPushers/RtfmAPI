@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Aggregates.Albums.Repository;
+using RftmAPI.Domain.Aggregates.Tracks.Repository;
 using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Infrastructure.Persistence.Repositories;
 
@@ -20,8 +21,9 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("TestingDataBase"));
 
-        services.AddScoped<ITrackRepository, TrackRepository>();
-        
+        services.AddScoped<ITracksRepository, TracksRepository>();
+        services.AddScoped<IAlbumsRepository, AlbumsRepository>();
+
         return services;
     }
 }

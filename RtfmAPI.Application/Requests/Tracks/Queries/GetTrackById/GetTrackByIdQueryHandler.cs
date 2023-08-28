@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Aggregates.Tracks.Repository;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 
@@ -11,15 +12,15 @@ namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 /// </summary>
 public class GetTrackByIdQueryHandler : IRequestHandler<GetTrackByIdQuery, Track?>
 {
-    private readonly ITrackRepository _trackRepository;
+    private readonly ITracksRepository _tracksRepository;
 
     /// <summary>
     /// Обработчик запроса музыкального трека по идентификатору
     /// </summary>
-    /// <param name="trackRepository">Репозиторий музыкальных треков</param>
-    public GetTrackByIdQueryHandler(ITrackRepository trackRepository)
+    /// <param name="tracksRepository">Репозиторий музыкальных треков</param>
+    public GetTrackByIdQueryHandler(ITracksRepository tracksRepository)
     {
-        _trackRepository = trackRepository;
+        _tracksRepository = tracksRepository;
     }
     
     /// <summary>
@@ -31,6 +32,6 @@ public class GetTrackByIdQueryHandler : IRequestHandler<GetTrackByIdQuery, Track
     /// <exception cref="NotImplementedException"></exception>
     public Task<Track?> Handle(GetTrackByIdQuery request, CancellationToken cancellationToken = default)
     {
-        return _trackRepository.GetTrackByIdAsync(request.Id);
+        return _tracksRepository.GetTrackByIdAsync(request.Id);
     }
 }

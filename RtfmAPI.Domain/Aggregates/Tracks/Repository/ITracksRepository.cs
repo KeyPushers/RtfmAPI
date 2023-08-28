@@ -1,9 +1,9 @@
-﻿namespace RftmAPI.Domain.Aggregates.Tracks;
+﻿namespace RftmAPI.Domain.Aggregates.Tracks.Repository;
 
 /// <summary>
 /// Интерфейс репозитория музыкальных треков
 /// </summary>
-public interface ITrackRepository
+public interface ITracksRepository
 {
     /// <summary>
     /// Получение музыкальных треков

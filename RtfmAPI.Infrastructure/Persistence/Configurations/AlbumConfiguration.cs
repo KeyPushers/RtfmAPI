@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RftmAPI.Domain.Aggregates.Albums;
+using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
@@ -8,9 +9,17 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
 {
     public void Configure(EntityTypeBuilder<Album> builder)
     {
+        ConfigureAlbumsTable(builder);
+        ConfigureTracksAlbumsTable(builder);
+    }
+    
+    private static void ConfigureAlbumsTable(EntityTypeBuilder<Album> builder)
+    {
         // Id
         builder.HasKey(entity => entity.Id);
-        builder.Property(entity => entity.Id);
+        builder.Property(entity => entity.Id)
+            .ValueGeneratedNever()
+            .HasConversion(entity => entity.Value, id => AlbumId.Create(id));
 
         // Name
         builder.Property(entity => entity.Name)
@@ -20,11 +29,14 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         
         // Release Date
         builder.Property(entity => entity.ReleaseDate);
-        
-        // BandId
-        builder.Property(entity => entity.BandId);
-        
-        // Tracks
-        builder.Property(entity => entity.Tracks);
+    }
+    
+    private static void ConfigureTracksAlbumsTable(EntityTypeBuilder<Album> builder)
+    {
+        // builder
+        //     .HasMany(x => x.Tracks)
+        //     .WithOne()
+        //     .HasForeignKey(x => x.AlbumId)
+        //     .IsRequired();
     }
 }

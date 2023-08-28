@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Aggregates.Tracks.Repository;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 
@@ -11,25 +12,26 @@ namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 /// </summary>
 public class GetTracksQueryHandler : IRequestHandler<GetTracksQuery, List<Track>>
 {
-    private readonly ITrackRepository _trackRepository;
+    private readonly ITracksRepository _tracksRepository;
 
     /// <summary>
     /// Обработчик запроса музыкальных треков
     /// </summary>
-    /// <param name="trackRepository">Репозиторий треков</param>
-    public GetTracksQueryHandler(ITrackRepository trackRepository)
+    /// <param name="tracksRepository">Репозиторий треков</param>
+    public GetTracksQueryHandler(ITracksRepository tracksRepository)
     {
-        _trackRepository = trackRepository;
+        _tracksRepository = tracksRepository;
     }
-    
+
     /// <summary>
     /// Обработка запроса музыкальных треков
     /// </summary>
     /// <param name="request">Запрос музыкальных треков</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Музыкальные треки</returns>
-    public Task<List<Track>> Handle(GetTracksQuery request, CancellationToken cancellationToken = default)
+    public async Task<List<Track>> Handle(GetTracksQuery request, CancellationToken cancellationToken = default)
     {
-        return _trackRepository.GetTracksAsync();
+        var result = await _tracksRepository.GetTracksAsync().ConfigureAwait(false);
+        return result;
     }
 }

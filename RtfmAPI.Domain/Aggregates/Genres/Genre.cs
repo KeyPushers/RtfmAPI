@@ -1,14 +1,17 @@
-﻿using RftmAPI.Domain.Primitives;
+﻿using RftmAPI.Domain.Aggregates.Bands.ValueObjects;
+using RftmAPI.Domain.Aggregates.Genres.ValueObjects;
+using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
+using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Aggregates.Genres;
 
 /// <summary>
 /// Жанр музыки
 /// </summary>
-public sealed class Genre : AggregateRoot
+public sealed class Genre : AggregateRoot<GenreId, Guid>
 {
-    private readonly List<Guid> _tracks;
-    private readonly List<Guid> _bands;
+    private readonly List<TrackId> _tracks;
+    private readonly List<BandId> _bands;
 
     /// <summary>
     /// Название жанра музыки
@@ -18,24 +21,40 @@ public sealed class Genre : AggregateRoot
     /// <summary>
     /// Музыкальные треки, относящиеся к этому жанру
     /// </summary>
-    public IEnumerable<Guid> Tracks => _tracks;
+    public IEnumerable<TrackId> Tracks => _tracks;
     
     /// <summary>
     /// Музыкальные группы, относящиеся к этому жанру
     /// </summary>
-    public IEnumerable<Guid> Bands => _bands;
+    public IEnumerable<BandId> Bands => _bands;
 
     /// <summary>
     /// Жанр музыки
     /// </summary>
     /// <param name="name">Название жанра музыки</param>
-    /// <param name="tracks">Музыкальные треки</param>
-    /// <param name="bands">Музыкальные группы</param>
-    public Genre(string name, IEnumerable<Guid> tracks, IEnumerable<Guid> bands)
+    public Genre(string name) : base(GenreId.Create())
     {
         Name = new GenreName(name);
         
-        _tracks = tracks.ToList();
-        _bands = bands.ToList();
+        _tracks = new List<TrackId>();
+        _bands = new List<BandId>();
+    }
+    
+    /// <summary>
+    /// Добавление музыкального трека
+    /// </summary>
+    /// <param name="trackId">Идентификатор музыкального трека</param>
+    public void AddTrack(TrackId trackId)
+    {
+        _tracks.Add(trackId);
+    }
+    
+    /// <summary>
+    /// Добавление музыкальной группы
+    /// </summary>
+    /// <param name="bandId">Идентификатор музыкальной группы</param>
+    public void AddBand(BandId bandId)
+    {
+        _bands.Add(bandId);
     }
 }

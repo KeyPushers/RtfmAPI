@@ -1,4 +1,6 @@
-﻿using RftmAPI.Domain.Primitives;
+﻿using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
+using RftmAPI.Domain.Aggregates.Bands.ValueObjects;
+using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Aggregates.Bands;
 
@@ -6,14 +8,14 @@ namespace RftmAPI.Domain.Aggregates.Bands;
 /// Музыкальная группа.
 /// Может состоять из одного человека
 /// </summary>
-public sealed class Band : AggregateRoot
+public sealed class Band : AggregateRoot<BandId, Guid>
 {
-    private readonly List<Guid> _albums;
+    private readonly List<AlbumId> _albums;
 
     /// <summary>
     /// Альбомы
     /// </summary>
-    public IEnumerable<Guid> Albums => _albums;
+    public IEnumerable<AlbumId> Albums => _albums;
     
     /// <summary>
     /// Имя музыкальной группы
@@ -24,11 +26,19 @@ public sealed class Band : AggregateRoot
     /// Музыкальная группа
     /// </summary>
     /// <param name="name">Имя музыкальной группы</param>
-    /// <param name="albums">Альбомы</param>
-    public Band(string name, IEnumerable<Guid> albums)
+    public Band(string name) : base(BandId.Create())
     {
         Name = new BandName(name);
-        
-        _albums = albums.ToList();
+
+        _albums = new List<AlbumId>();
+    }
+    
+    /// <summary>
+    /// Добавление альбома
+    /// </summary>
+    /// <param name="albumId">Идентификатор альбома</param>
+    public void AddAlbum(AlbumId albumId)
+    {
+        _albums.Add(albumId);
     }
 }

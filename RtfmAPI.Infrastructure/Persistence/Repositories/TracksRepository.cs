@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Aggregates.Tracks.Repository;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
@@ -7,7 +8,7 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Репозиторий музыкальных треков
 /// </summary>
-public class TrackRepository : ITrackRepository
+public class TracksRepository : ITracksRepository
 {
     private readonly AppDbContext _context;
 
@@ -15,7 +16,7 @@ public class TrackRepository : ITrackRepository
     /// Репозиторий музыкальных треков
     /// </summary>
     /// <param name="context">Контекст базы данных</param>
-    public TrackRepository(AppDbContext context)
+    public TracksRepository(AppDbContext context)
     {
         _context = context;
     }
@@ -29,18 +30,14 @@ public class TrackRepository : ITrackRepository
     /// <inheritdoc/>
     public Task<Track?> GetTrackByIdAsync(Guid id)
     {
-        var track = _context.Find<Track>(id);
-        
-        return Task.FromResult(track);
+        return _context.Set<Track>().FirstOrDefaultAsync(entity => entity.Id.Value == id);
     }
 
     /// <inheritdoc/>
-    public Task AddAsync(Track track)
+    public async Task AddAsync(Track track)
     {
-        _context.AddAsync(track);
+        await _context.AddAsync(track).ConfigureAwait(false);
 
-        _context.SaveChanges();
-
-        return Task.CompletedTask;
+        await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

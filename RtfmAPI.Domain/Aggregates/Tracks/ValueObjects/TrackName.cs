@@ -1,11 +1,11 @@
 ﻿using RftmAPI.Domain.Primitives;
 
-namespace RftmAPI.Domain.Aggregates.Albums;
+namespace RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
 
 /// <summary>
 /// Наименование альбома
 /// </summary>
-public sealed class AlbumName: ValueObject
+public sealed class TrackName: ValueObject
 {
     private const int MinLength = 2;
     private const int MaxLength = 50;
@@ -14,7 +14,7 @@ public sealed class AlbumName: ValueObject
     /// Наименование альбома
     /// </summary>
     /// <param name="name">Имя</param>
-    public AlbumName(string name)
+    public TrackName(string name)
     {
         SetName(name);
     }
@@ -43,4 +43,15 @@ public sealed class AlbumName: ValueObject
 
         Name = name;
     }
+
+    /// <summary>
+    /// Максимальная длина наименования
+    /// </summary>
+    public static int NameMaxLength => MaxLength;
+    
+    /// <summary>
+    /// Минимальная длина наименования
+    /// </summary>
+    public static int NameMinLength => MinLength;
+
 }

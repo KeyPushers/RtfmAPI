@@ -24,11 +24,10 @@ public sealed class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        
         // modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-        modelBuilder.ApplyConfiguration(new TestConfiguration());
         modelBuilder.ApplyConfiguration(new TrackConfiguration());
-        // modelBuilder.ApplyConfiguration(new AlbumConfiguration());
+        modelBuilder.ApplyConfiguration(new AlbumConfiguration());
         // modelBuilder.ApplyConfiguration(new BandConfiguration());
         // modelBuilder.ApplyConfiguration(new GenreConfiguration());
     }
