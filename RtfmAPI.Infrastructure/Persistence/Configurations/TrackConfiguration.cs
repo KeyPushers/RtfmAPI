@@ -65,11 +65,12 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
 
     private static void ConfigureAlbums(EntityTypeBuilder<Track> builder)
     {
-        builder
-            .HasMany(x => x.Albums)
-            .WithOne()
-            .HasForeignKey(x => x.TrackId)
-            .IsRequired();
+        builder.OwnsMany(track => track.AlbumIds, albums =>
+        {
+            albums.WithOwner().HasForeignKey("AlbumId");
+            
+            albums.HasKey("Id");
+            albums.Property("Id");
+        });
     }
-    
 }

@@ -41,11 +41,14 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
         var album = new Album(request.Name ?? "Не указано название", DateTime.Now);
         
         track.AddAlbum(album);
+        album.AddTrack(track);
         
         await _albumsRepository.AddAsync(album).ConfigureAwait(false);
         
         await _tracksRepository.AddAsync(track).ConfigureAwait(false);
 
+        var tracks = await _tracksRepository.GetTracksAsync().ConfigureAwait(false);
+        
         var albums = await _albumsRepository.GetAlbumsAsync().ConfigureAwait(false);
         
         return track;

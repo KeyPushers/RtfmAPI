@@ -1,6 +1,7 @@
 ﻿using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
 using RftmAPI.Domain.Aggregates.Bands.ValueObjects;
 using RftmAPI.Domain.Aggregates.Relations.TracksAlbums;
+using RftmAPI.Domain.Aggregates.Tracks;
 using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
@@ -11,7 +12,7 @@ namespace RftmAPI.Domain.Aggregates.Albums;
 /// </summary>
 public sealed class Album : AggregateRoot<AlbumId, Guid>
 {
-    private readonly List<TracksAlbums> _tracks;
+    private readonly List<TrackId> _trackIds;
 
     /// <summary>
     /// Наименование альбома
@@ -31,7 +32,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// <summary>
     /// Музыкальные треки
     /// </summary>
-    public IEnumerable<TracksAlbums> Tracks => _tracks;
+    public IEnumerable<TrackId> TrackIds => _trackIds;
     
     /// <summary>
     /// Альбом
@@ -52,15 +53,18 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
         Name = new AlbumName(name);
         ReleaseDate = releaseDate;
 
-        _tracks = new List<TracksAlbums>();
+        _trackIds = new List<TrackId>();
     }
     
     /// <summary>
     /// Добавление трека
     /// </summary>
     /// <param name="trackId">Идентификатор трека</param>
-    public void AddTrack(TrackId trackId)
+    public void AddTrack(Track track)
     {
+        var trackId = TrackId.Create(track.Id.Value);
+        
+        _trackIds.Add(trackId);
         // _tracks.Add(trackId);
     }
 }

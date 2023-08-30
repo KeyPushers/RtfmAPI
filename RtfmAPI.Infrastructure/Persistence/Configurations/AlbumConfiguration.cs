@@ -33,10 +33,12 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
     
     private static void ConfigureTracksAlbumsTable(EntityTypeBuilder<Album> builder)
     {
-        // builder
-        //     .HasMany(x => x.Tracks)
-        //     .WithOne()
-        //     .HasForeignKey(x => x.AlbumId)
-        //     .IsRequired();
+        builder.OwnsMany(track => track.TrackIds, albums =>
+        {
+            albums.WithOwner().HasForeignKey("TrackId");
+            
+            albums.HasKey("Id");
+            albums.Property("Id");
+        });
     }
 }

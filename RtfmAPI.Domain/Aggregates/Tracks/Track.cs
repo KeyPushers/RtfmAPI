@@ -14,7 +14,7 @@ namespace RftmAPI.Domain.Aggregates.Tracks;
 public sealed class Track : AggregateRoot<TrackId, Guid>
 {
     private readonly List<GenreId> _genres;
-    private readonly List<TracksAlbums> _albums;
+    private readonly List<AlbumId> _albumIds;
 
     /// <summary>
     /// Наименование трека
@@ -39,7 +39,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <summary>
     /// Альбомы
     /// </summary>
-    public IEnumerable<TracksAlbums> Albums => _albums;
+    public IEnumerable<AlbumId> AlbumIds => _albumIds;
 
     /// <summary>
     /// Музыкальный трек
@@ -63,7 +63,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         ReleaseDate = releaseDate;
 
         _genres = new List<GenreId>();
-        _albums = new List<TracksAlbums>();
+        _albumIds = new List<AlbumId>();
     }
 
     /// <summary>
@@ -80,6 +80,6 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         var trackId = TrackId.Create(Id.Value);
         var albumId = AlbumId.Create(album.Id.Value);
         
-        _albums.Add(new TracksAlbums(trackId, albumId));
+        _albumIds.Add(albumId);
     }
 }
