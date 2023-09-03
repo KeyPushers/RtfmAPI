@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using RftmAPI.Domain.Aggregates.Albums.Repository;
 using RftmAPI.Domain.Aggregates.Tracks.Repository;
 using RtfmAPI.Infrastructure.Persistence.Context;
@@ -19,11 +20,42 @@ public static class DependencyInjection
     /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("TestingDataBase"));
-
+        services.AddInMemoryDatabase();
+        // services.AddPostgresDatabase();
+        
         services.AddScoped<ITracksRepository, TracksRepository>();
         services.AddScoped<IAlbumsRepository, AlbumsRepository>();
 
+        return services;
+    }
+
+    /// <summary>
+    /// Использование базы данных в памяти
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <returns>Коллекция сервисов</returns>
+    private static IServiceCollection AddInMemoryDatabase(this IServiceCollection services)
+    {
+        services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("TestingDataBase"));
+
+        return services;
+    }
+    
+    /// <summary>
+    /// Использование базы данных Postgres
+    /// </summary>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <returns>Коллекция сервисов</returns>
+    private static IServiceCollection AddPostgresDatabase(this IServiceCollection services)
+    {
+        var sqlConnectionBuilder = new NpgsqlConnectionStringBuilder
+        {
+            ConnectionString = "Host=localhost;Port=5432;Database=RtfmDb;UserId=postgres;Password=admin"
+        };
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(sqlConnectionBuilder.ConnectionString));
+        
         return services;
     }
 }
