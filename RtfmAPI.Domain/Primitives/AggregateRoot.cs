@@ -19,4 +19,12 @@ public abstract class AggregateRoot<TId, TIdType> : Entity<TId>
     {
         Id = id;
     }
+    
+    /// <summary>
+    /// Для EF Core
+    /// </summary>
+    protected AggregateRoot()
+    {
+        
+    }
 }

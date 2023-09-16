@@ -17,68 +17,44 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
     /// <exception cref="NotImplementedException"></exception>
     public void Configure(EntityTypeBuilder<Track> builder)
     {
-        ConfigureId(builder);
-        ConfigureName(builder);
-        ConfigureReleaseDate(builder);
-
-        ConfigureAlbums(builder);
+        ConfigureTracksTable(builder);
+        ConfigureTrackAlbumsIdsTable(builder);
     }
-
-
-    private static void ConfigureId(EntityTypeBuilder<Track> builder)
+    
+    private static void ConfigureTracksTable(EntityTypeBuilder<Track> builder)
     {
+        builder.ToTable("Tracks");
+        
         builder.HasKey(track => track.Id);
         builder.Property(track => track.Id)
             .ValueGeneratedNever()
-            .HasConversion(entity => entity.Value, value => TrackId.Create(value));
-    }
-
-    private static void ConfigureName(EntityTypeBuilder<Track> builder)
-    {
+            .HasConversion(entity => entity.Value, 
+                value => TrackId.Create(value));
+        
         builder
             .Property(track => track.Name)
             .HasMaxLength(TrackName.NameMaxLength)
             .HasConversion(entity => entity.Name,
                 name => new TrackName(name));
     }
-
-    private static void ConfigureReleaseDate(EntityTypeBuilder<Track> builder)
+    
+    private static void ConfigureTrackAlbumsIdsTable(EntityTypeBuilder<Track> builder)
     {
-        builder.Property(track => track.ReleaseDate);
-    }
+        builder.OwnsMany(track => track.AlbumIds, b =>
+        {
+            b.ToTable("TrackAlbumsIds");
 
-    private static void ConfigureAlbums(EntityTypeBuilder<Track> builder)
-    {
-        // builder
-        //     .HasMany(track => track.AlbumIds)
-        //     .WithMany()
-        //     .UsingEntity<TrackAlbum>(
-        //         right => right.HasOne<AlbumId>().WithMany().HasForeignKey(e => e.AlbumId),
-        //         left => left.HasOne<Track>().WithMany().HasForeignKey(e => e.AlbumId),
-        //         entity =>
-        //         {
-        //             entity.ToTable("TrackAlbum");
-        //             entity.HasKey(ur => new {ur.TrackId, ur.AlbumId});
-        //         });
+            b.WithOwner().HasForeignKey("TrackId");
+            
+            b.HasKey("Id");
         
-        // builder
-        //     .HasMany(track => track.AlbumIds)
-        //     .WithMany()
-        //     .UsingEntity<TrackAlbum>(
-        //         right => right.HasOne<AlbumId>().WithMany(),
-        //         left => left.HasOne<Track>().WithMany(),
-        //         entity =>
-        //         {
-        //             entity.ToTable("TrackAlbum");
-        //             entity.HasKey(ur => new {ur.TrackId, ur.AlbumId});
-        //         });
+            b.Property(albumId => albumId.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("AlbumId");
+        });
         
-        // builder.OwnsMany(track => track.AlbumIds, albums =>
-        // {
-        //     albums.WithOwner().HasForeignKey("AlbumId");
-        //     
-        //     albums.HasKey("Id");
-        //     albums.Property("Id");
-        // });
+        builder.Metadata
+            .FindNavigation(nameof(Track.AlbumIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

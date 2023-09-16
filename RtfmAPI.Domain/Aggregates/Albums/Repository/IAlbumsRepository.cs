@@ -1,4 +1,6 @@
-﻿namespace RftmAPI.Domain.Aggregates.Albums.Repository;
+﻿using RftmAPI.Domain.Primitives;
+
+namespace RftmAPI.Domain.Aggregates.Albums.Repository;
 
 /// <summary>
 /// Интерфейс репозитория альбома
@@ -21,6 +23,6 @@ public interface IAlbumsRepository
     /// <summary>
     /// Добавление альбома
     /// </summary>
-    /// <param name="track">Альбом</param>
-    Task AddAsync(Album track);
+    /// <param name="album">Альбом</param>
+    Task AddAsync(Album album);
 }

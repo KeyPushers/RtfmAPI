@@ -67,7 +67,6 @@ public class TracksController : ApiControllerBase
         var command = new AddTrackCommand
         {
             Name = name,
-            Data = default,
             ReleaseDate = releaseDate
         };
 

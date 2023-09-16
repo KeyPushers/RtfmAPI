@@ -9,42 +9,43 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
 {
     public void Configure(EntityTypeBuilder<Album> builder)
     {
-        ConfigureId(builder);
-        ConfigureName(builder);
-        ConfigureReleaseDate(builder);
-
-        ConfigureTracksAlbumsTable(builder);
+        ConfigureAlbumsTable(builder);
+        ConfigureAlbumTracksIds(builder);
     }
-    
-    private static void ConfigureId(EntityTypeBuilder<Album> builder)
+
+    private static void ConfigureAlbumsTable(EntityTypeBuilder<Album> builder)
     {
-        builder.HasKey(entity => entity.Id);
-        builder.Property(entity => entity.Id)
+        builder.ToTable("Albums");
+        
+        builder.HasKey(album => album.Id);
+        builder.Property(album => album.Id)
             .ValueGeneratedNever()
-            .HasConversion(entity => entity.Value, id => AlbumId.Create(id));
-    }
-
-    private static void ConfigureName(EntityTypeBuilder<Album> builder)
-    {
-        builder.Property(entity => entity.Name)
+            .HasConversion(id => id.Value, id => AlbumId.Create(id));
+        
+        builder.Property(album => album.Name)
             .HasMaxLength(100)
             .HasConversion(entity => entity.Name,
                 name => new AlbumName(name));
     }
 
-    private static void ConfigureReleaseDate(EntityTypeBuilder<Album> builder)
+    
+    private static void ConfigureAlbumTracksIds(EntityTypeBuilder<Album> builder)
     {
-        builder.Property(entity => entity.ReleaseDate);
-    }
-
-    private static void ConfigureTracksAlbumsTable(EntityTypeBuilder<Album> builder)
-    {
-        // builder.OwnsMany(track => track.TrackIds, albums =>
-        // {
-        //     albums.WithOwner().HasForeignKey("TrackId");
-        //     
-        //     albums.HasKey("Id");
-        //     albums.Property("Id");
-        // });
+        builder.OwnsMany(h => h.TrackIds, dib =>
+        {
+            dib.WithOwner().HasForeignKey("AlbumId");
+        
+            dib.ToTable("AlbumTracksIds");
+        
+            dib.HasKey("Id");
+        
+            dib.Property(trackId => trackId.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("TrackId");
+        });
+        
+        builder.Metadata
+            .FindNavigation(nameof(Album.TrackIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

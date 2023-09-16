@@ -34,10 +34,9 @@ public class AlbumsRepository : IAlbumsRepository
     }
 
     /// <inheritdoc/>
-    public async Task AddAsync(Album track)
+    public async Task AddAsync(Album album)
     {
-        await _context.AddAsync(track).ConfigureAwait(false);
-
-        await _context.SaveChangesAsync().ConfigureAwait(false);
+        await _context.AddAsync(album).ConfigureAwait(false);
     }
+
 }

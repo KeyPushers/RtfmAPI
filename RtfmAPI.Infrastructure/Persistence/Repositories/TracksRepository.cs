@@ -38,6 +38,5 @@ public class TracksRepository : ITracksRepository
     {
         await _context.AddAsync(track).ConfigureAwait(false);
 
-        await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

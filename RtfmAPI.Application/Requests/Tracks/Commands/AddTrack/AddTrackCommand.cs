@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection.Metadata;
 using MediatR;
 using RftmAPI.Domain.Aggregates.Tracks;
 
@@ -14,12 +13,7 @@ public class AddTrackCommand : IRequest<Track>
     /// Название трека
     /// </summary>
     public string? Name { get; init; }
-
-    /// <summary>
-    /// Данные
-    /// </summary>
-    public Blob Data { get; init; }
-
+    
     /// <summary>
     /// Дата релиза
     /// </summary>
