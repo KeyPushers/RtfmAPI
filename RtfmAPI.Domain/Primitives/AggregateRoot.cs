@@ -23,8 +23,10 @@ public abstract class AggregateRoot<TId, TIdType> : Entity<TId>
     /// <summary>
     /// Для EF Core
     /// </summary>
+#pragma warning disable CS8618
     protected AggregateRoot()
     {
-        
     }
+#pragma warning restore CS8618
+
 }

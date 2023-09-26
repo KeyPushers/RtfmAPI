@@ -5,7 +5,7 @@ using RftmAPI.Domain.Aggregates.Albums;
 using RftmAPI.Domain.Aggregates.Albums.Repository;
 using RftmAPI.Domain.Aggregates.Tracks;
 using RftmAPI.Domain.Aggregates.Tracks.Repository;
-using RftmAPI.Domain.DomainNeeds.TrackAlbum;
+using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
@@ -25,7 +25,8 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
     /// <param name="tracksRepository">Репозиторий музыкальных треков</param>
     /// <param name="albumsRepository">Репозиторий альбомов</param>
     /// <param name="unitOfWork">Единица работы</param>
-    public AddTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository, IUnitOfWork unitOfWork)
+    public AddTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository,
+        IUnitOfWork unitOfWork)
     {
         _tracksRepository = tracksRepository;
         _albumsRepository = albumsRepository;
@@ -42,18 +43,18 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
     {
         var track = new Track(request.Name ?? "Не указано название");
 
-        var album = new Album(request.Name ?? "Не указано название");
+        var album = new Album($"Альбом для трека {request.Name ?? "Не указано название"}");
 
         track.AddAlbum(album);
 
         await _albumsRepository.AddAsync(album).ConfigureAwait(false);
         await _tracksRepository.AddAsync(track).ConfigureAwait(false);
 
+        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
         var tracks = await _tracksRepository.GetTracksAsync().ConfigureAwait(false);
         var albums = await _albumsRepository.GetAlbumsAsync().ConfigureAwait(false);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        
         return track;
     }
 }

@@ -24,7 +24,7 @@ public class TracksRepository : ITracksRepository
     /// <inheritdoc/>
     public Task<List<Track>> GetTracksAsync()
     {
-        return _context.Set<Track>().ToListAsync();
+        return _context.Set<Track>().Include(entry => entry.AlbumIds).ToListAsync();
     }
 
     /// <inheritdoc/>

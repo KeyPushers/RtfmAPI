@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RftmAPI.Domain.DomainNeeds.TrackAlbum;
 using RtfmAPI.Infrastructure.Persistence.Configurations;
 
 namespace RtfmAPI.Infrastructure.Persistence.Context;
@@ -28,6 +27,5 @@ public sealed class AppDbContext : DbContext
         
         modelBuilder.ApplyConfiguration(new TrackConfiguration());
         modelBuilder.ApplyConfiguration(new AlbumConfiguration());
-        // modelBuilder.ApplyConfiguration(new TrackAlbumConfiguration());
     }
 }

@@ -43,4 +43,9 @@ public sealed class AlbumName: ValueObject
 
         Name = name;
     }
+
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Name;
+    }
 }

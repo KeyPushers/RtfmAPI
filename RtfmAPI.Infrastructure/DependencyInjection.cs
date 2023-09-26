@@ -21,8 +21,8 @@ public static class DependencyInjection
     /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddInMemoryDatabase();
-        // services.AddPostgresDatabase();
+        // services.AddInMemoryDatabase();
+        services.AddPostgresDatabase();
         
         services.AddScoped<ITracksRepository, TracksRepository>();
         services.AddScoped<IAlbumsRepository, AlbumsRepository>();

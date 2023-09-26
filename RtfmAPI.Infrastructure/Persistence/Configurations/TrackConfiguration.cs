@@ -42,15 +42,15 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
     {
         builder.OwnsMany(track => track.AlbumIds, b =>
         {
-            b.ToTable("TrackAlbumsIds");
-
+            b.ToTable("TrackAlbumIds");
+        
             b.WithOwner().HasForeignKey("TrackId");
             
             b.HasKey("Id");
         
             b.Property(albumId => albumId.Value)
-                .ValueGeneratedNever()
-                .HasColumnName("AlbumId");
+                // .ValueGeneratedNever()
+                .HasColumnName("TrackAlbumId");
         });
         
         builder.Metadata

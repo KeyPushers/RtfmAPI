@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RftmAPI.Domain.Aggregates.Albums;
 using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
+using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
@@ -35,13 +36,13 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         {
             dib.WithOwner().HasForeignKey("AlbumId");
         
-            dib.ToTable("AlbumTracksIds");
+            dib.ToTable("AlbumTrackIds");
         
             dib.HasKey("Id");
         
             dib.Property(trackId => trackId.Value)
                 .ValueGeneratedNever()
-                .HasColumnName("TrackId");
+                .HasColumnName("AlbumTrackId");
         });
         
         builder.Metadata

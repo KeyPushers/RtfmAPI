@@ -47,4 +47,9 @@ public sealed class AlbumId : AggregateRootId<Guid>
     {
         return new AlbumId(id);
     }
+
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Value;
+    }
 }

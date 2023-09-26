@@ -44,4 +44,9 @@ public sealed class TrackId : AggregateRootId<Guid>
     {
         return new TrackId(id);
     }
+
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Value;
+    }
 }

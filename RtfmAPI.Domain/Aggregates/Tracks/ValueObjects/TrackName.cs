@@ -7,7 +7,7 @@ namespace RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
 /// </summary>
 public sealed class TrackName: ValueObject
 {
-    private const int MinLength = 2;
+    private const int MinLength = 1;
     private const int MaxLength = 50;
     
     /// <summary>
@@ -54,4 +54,8 @@ public sealed class TrackName: ValueObject
     /// </summary>
     public static int NameMinLength => MinLength;
 
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Name;
+    }
 }
