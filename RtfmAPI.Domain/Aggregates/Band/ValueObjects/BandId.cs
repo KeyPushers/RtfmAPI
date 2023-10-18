@@ -7,10 +7,13 @@ namespace RftmAPI.Domain.Aggregates.Band.ValueObjects;
 /// </summary>
 public sealed class BandId : AggregateRootId<Guid>
 {
+    /// <summary>
+    /// Значение идентификатора.
+    /// </summary>
     public override Guid Value { get; }
 
     /// <summary>
-    /// Идентификатор музыкального трека
+    /// Идентификатор музыкальной группы.
     /// </summary>
     private BandId()
     {
@@ -18,7 +21,7 @@ public sealed class BandId : AggregateRootId<Guid>
     }
     
     /// <summary>
-    /// Идентификатор музыкального трека
+    /// Идентификатор музыкальной группы.
     /// </summary>
     /// <param name="value">Значение идентификатор</param>
     private BandId(Guid value)
@@ -27,19 +30,19 @@ public sealed class BandId : AggregateRootId<Guid>
     }
 
     /// <summary>
-    /// Создание идентификатора музыкального трека
+    /// Создание идентификатора музыкальной группы.
     /// </summary>
-    /// <returns>Идентификатор музыкального трека</returns>
+    /// <returns>Идентификатор музыкальной группы</returns>
     public static BandId Create()
     {
         return new BandId(Guid.NewGuid());
     }
 
     /// <summary>
-    /// Создание идентификатора музыкального трека
+    /// Создание идентификатора музыкальной группы.
     /// </summary>
     /// <param name="id">Идентификатор</param>
-    /// <returns>Идентификатор музыкального трека</returns>
+    /// <returns>Идентификатор музыкальной группы</returns>
     public static BandId Create(Guid id)
     {
         return new BandId(id);

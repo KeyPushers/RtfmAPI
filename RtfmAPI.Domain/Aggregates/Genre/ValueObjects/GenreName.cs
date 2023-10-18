@@ -1,20 +1,20 @@
 ﻿using RftmAPI.Domain.Primitives;
 
-namespace RftmAPI.Domain.Aggregates.Band.ValueObjects;
+namespace RftmAPI.Domain.Aggregates.Genre.ValueObjects;
 
 /// <summary>
-/// Название музыкальной группы.
+/// Название музыкального жанра.
 /// </summary>
-public sealed class BandName : ValueObject
+public class GenreName: ValueObject
 {
     private const int MinLength = 1;
     private const int MaxLength = 50;
     
     /// <summary>
-    /// Название музыкальной группы.
+    /// Название жанра.
     /// </summary>
     /// <param name="name">Имя.</param>
-    public BandName(string name)
+    public GenreName(string name)
     {
         SetName(name);
     }

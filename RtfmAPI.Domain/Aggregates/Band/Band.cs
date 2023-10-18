@@ -11,7 +11,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// <summary>
     /// Название музыкальной группы.
     /// </summary>
-    public BandName Name { get; set; }
+    public BandName Name { get; private set; }
 
     /// <summary>
     /// Музыкальная группа.
