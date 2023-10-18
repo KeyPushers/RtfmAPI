@@ -49,7 +49,7 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
             b.HasKey("Id");
         
             b.Property(albumId => albumId.Value)
-                // .ValueGeneratedNever()
+                .ValueGeneratedNever()
                 .HasColumnName("TrackAlbumId");
         });
         

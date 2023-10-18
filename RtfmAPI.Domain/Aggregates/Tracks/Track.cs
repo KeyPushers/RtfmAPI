@@ -6,24 +6,24 @@ using RftmAPI.Domain.Primitives;
 namespace RftmAPI.Domain.Aggregates.Tracks;
 
 /// <summary>
-/// Музыкальный трек
+/// Музыкальный трек.
 /// </summary>
 public sealed class Track : AggregateRoot<TrackId, Guid>
 {
     private readonly List<AlbumId> _albumIds = new();
     
     /// <summary>
-    /// Наименование трека
+    /// Наименование трека.
     /// </summary>
     public TrackName Name { get; private set; }
     
     /// <summary>
-    /// Альбомы
+    /// Альбомы.
     /// </summary>
     public IEnumerable<AlbumId> AlbumIds => _albumIds;
 
     /// <summary>
-    /// Музыкальный трек
+    /// Музыкальный трек.
     /// </summary>
 #pragma warning disable CS8618
     private Track()
@@ -32,14 +32,18 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
 #pragma warning restore CS8618
 
     /// <summary>
-    /// Музыкальный трек
+    /// Музыкальный трек.
     /// </summary>
-    /// <param name="name">Наименование музыкального трека</param>
+    /// <param name="name">Наименование музыкального трека.</param>
     public Track(string name) : base(TrackId.Create())
     {
         Name = new TrackName(name);
     }
 
+    /// <summary>
+    /// Добавление альбома.
+    /// </summary>
+    /// <param name="album">Альбом.</param>
     public void AddAlbum(Album album)
     {
         if (album.Id is not AlbumId albumId)

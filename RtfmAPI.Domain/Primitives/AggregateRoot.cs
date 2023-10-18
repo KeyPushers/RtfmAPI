@@ -3,8 +3,7 @@
 /// <summary>
 /// Примитив агрегата
 /// </summary>
-public abstract class AggregateRoot<TId, TIdType> : Entity<TId>
-    where TId : AggregateRootId<TIdType>
+public abstract class AggregateRoot<TId, TIdType> : Entity<TId> where TId : AggregateRootId<TIdType>
 {
     /// <summary>
     /// Идентификатор агрената
@@ -19,7 +18,7 @@ public abstract class AggregateRoot<TId, TIdType> : Entity<TId>
     {
         Id = id;
     }
-    
+
     /// <summary>
     /// Для EF Core
     /// </summary>
@@ -28,5 +27,4 @@ public abstract class AggregateRoot<TId, TIdType> : Entity<TId>
     {
     }
 #pragma warning restore CS8618
-
 }
