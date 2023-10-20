@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RftmAPI.Domain.Aggregates.Albums;
-using RftmAPI.Domain.Aggregates.Albums.Repository;
+using RftmAPI.Domain.Models.Albums;
+using RftmAPI.Domain.Models.Albums.Repository;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;

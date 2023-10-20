@@ -1,15 +1,19 @@
 ﻿namespace RftmAPI.Domain.Primitives;
 
 /// <summary>
-/// Примитив сущности
+/// Примитив сущности.
 /// </summary>
 public abstract class Entity<TId>
 {
     /// <summary>
-    /// Идентификатор
+    /// Идентификатор сущности.
     /// </summary>
     public TId Id { get; protected init; }
     
+    /// <summary>
+    /// Примитив сущности.
+    /// </summary>
+    /// <remarks>Требуется для EF Core.</remarks>
 #pragma warning disable CS8618
     protected Entity()
     {

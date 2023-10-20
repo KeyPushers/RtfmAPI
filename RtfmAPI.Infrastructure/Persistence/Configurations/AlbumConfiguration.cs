@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RftmAPI.Domain.Aggregates.Albums;
-using RftmAPI.Domain.Aggregates.Albums.ValueObjects;
-using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
+using RftmAPI.Domain.Models.Albums;
+using RftmAPI.Domain.Models.Albums.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
@@ -25,8 +24,8 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         
         builder.Property(album => album.Name)
             .HasMaxLength(100)
-            .HasConversion(entity => entity.Name,
-                name => new AlbumName(name));
+            .HasConversion(entity => entity.Value,
+                name => AlbumName.Create(name).Value);
     }
 
     

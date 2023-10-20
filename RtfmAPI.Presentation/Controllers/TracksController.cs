@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Models.Tracks;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;

@@ -2,8 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using RftmAPI.Domain.Aggregates.Tracks;
-using RftmAPI.Domain.Aggregates.Tracks.Repository;
+using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Models.Tracks.Repository;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 

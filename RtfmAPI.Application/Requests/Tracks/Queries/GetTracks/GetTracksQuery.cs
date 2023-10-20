@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using MediatR;
-using RftmAPI.Domain.Aggregates.Tracks;
+using RftmAPI.Domain.Models.Tracks;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 

@@ -1,17 +1,17 @@
 ﻿namespace RftmAPI.Domain.Primitives;
 
 /// <summary>
-/// Примитив агрегата
+/// Примитив агрегата.
 /// </summary>
 public abstract class AggregateRoot<TId, TIdType> : Entity<TId> where TId : AggregateRootId<TIdType>
 {
     /// <summary>
-    /// Идентификатор агрената
+    /// Идентификатор агрегата.
     /// </summary>
     public new AggregateRootId<TIdType> Id { get; }
 
     /// <summary>
-    /// Примитив агрегата
+    /// Примитив агрегата.
     /// </summary>
     /// <param name="id">Идентификатор агрената</param>
     protected AggregateRoot(TId id)
@@ -20,8 +20,9 @@ public abstract class AggregateRoot<TId, TIdType> : Entity<TId> where TId : Aggr
     }
 
     /// <summary>
-    /// Для EF Core
+    /// Примитив агрегата.
     /// </summary>
+    /// <remarks>Требуется для EF Core.</remarks>
 #pragma warning disable CS8618
     protected AggregateRoot()
     {

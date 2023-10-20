@@ -1,12 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using RftmAPI.Domain.Aggregates.Albums;
-using RftmAPI.Domain.Aggregates.Albums.Repository;
-using RftmAPI.Domain.Aggregates.Tracks;
-using RftmAPI.Domain.Aggregates.Tracks.Repository;
-using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
-using RftmAPI.Domain.Primitives;
+using RftmAPI.Domain.Models.Albums.Repository;
+using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Models.Tracks.Repository;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
@@ -41,19 +40,13 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
     /// <returns>Музыкальный трек</returns>
     public async Task<Track> Handle(AddTrackCommand request, CancellationToken cancellationToken = default)
     {
-        var track = new Track(request.Name ?? "Не указано название");
-
-        var album = new Album($"Альбом для трека {request.Name ?? "Не указано название"}");
-
-        track.AddAlbum(album);
-
-        await _albumsRepository.AddAsync(album).ConfigureAwait(false);
-        await _tracksRepository.AddAsync(track).ConfigureAwait(false);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-        var tracks = await _tracksRepository.GetTracksAsync().ConfigureAwait(false);
-        var albums = await _albumsRepository.GetAlbumsAsync().ConfigureAwait(false);
+        var trackNameResult = TrackName.Create(request.Name ?? "Не указано название");
+        if (trackNameResult.IsFailure)
+        {
+            throw new NotImplementedException();
+        }
+        
+        var track = new Track(trackNameResult.Value);
 
         return track;
     }

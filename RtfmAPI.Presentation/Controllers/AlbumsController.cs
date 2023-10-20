@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RftmAPI.Domain.Aggregates.Albums;
+using RftmAPI.Domain.Models.Albums;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbums;
 
 namespace RtfmAPI.Presentation.Controllers;

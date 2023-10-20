@@ -7,7 +7,7 @@
 public abstract class AggregateRootId<TId> : ValueObject
 {
     /// <summary>
-    /// Значение идентификатор
+    /// Значение идентификатора.
     /// </summary>
     public abstract TId Value { get; }
 }

@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using RftmAPI.Domain.Aggregates.Albums.Repository;
-using RftmAPI.Domain.Aggregates.Tracks.Repository;
-using RftmAPI.Domain.Primitives;
+using RftmAPI.Domain.Models.Albums.Repository;
+using RftmAPI.Domain.Models.Tracks.Repository;
 using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Infrastructure.Persistence.Repositories;
 
@@ -21,8 +20,8 @@ public static class DependencyInjection
     /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        // services.AddInMemoryDatabase();
-        services.AddPostgresDatabase();
+        services.AddInMemoryDatabase();
+        // services.AddPostgresDatabase();
         
         services.AddScoped<ITracksRepository, TracksRepository>();
         services.AddScoped<IAlbumsRepository, AlbumsRepository>();

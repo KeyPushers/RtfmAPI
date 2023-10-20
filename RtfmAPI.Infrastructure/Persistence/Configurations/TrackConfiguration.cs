@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RftmAPI.Domain.Aggregates.Tracks;
-using RftmAPI.Domain.Aggregates.Tracks.ValueObjects;
+using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
@@ -33,9 +33,9 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
         
         builder
             .Property(track => track.Name)
-            .HasMaxLength(TrackName.NameMaxLength)
-            .HasConversion(entity => entity.Name,
-                name => new TrackName(name));
+            .HasMaxLength(TrackName.MaxLength)
+            .HasConversion(entity => entity.Value,
+                name => TrackName.Create(name).Value);
     }
     
     private static void ConfigureTrackAlbumsIdsTable(EntityTypeBuilder<Track> builder)
