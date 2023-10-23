@@ -1,6 +1,5 @@
-﻿using RftmAPI.Domain.Errors.TrackErrors;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Primitives;
-using RftmAPI.Domain.Shared;
 
 namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
 
@@ -42,22 +41,22 @@ public class TrackFileName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<TrackFileName>.Failure(TrackErrors.TrackFileName.IsNullOrWhiteSpace);
+            return TrackExceptions.TrackFileNameExceptions.IsNullOrWhiteSpace;
         }
 
         if (value.Length < MinLength)
         {
-            return Result<TrackFileName>.Failure(TrackErrors.TrackFileName.IsTooShort);
+            return TrackExceptions.TrackFileNameExceptions.IsTooShort;
         }
 
         if (value.Length > MaxLength)
         {
-            return Result<TrackFileName>.Failure(TrackErrors.TrackFileName.IsTooLong);
+            return TrackExceptions.TrackFileNameExceptions.IsTooLong;
         }
 
         if (value.Trim().Any(sign => Path.GetInvalidFileNameChars().Contains(sign)))
         {
-            return Result<TrackFileName>.Failure(TrackErrors.TrackFileName.Invalid);
+            return TrackExceptions.TrackFileNameExceptions.Invalid;
         }
         
         return new TrackFileName(value);

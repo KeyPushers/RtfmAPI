@@ -1,6 +1,5 @@
-﻿using RftmAPI.Domain.Errors.AlbumErrors;
+﻿using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Primitives;
-using RftmAPI.Domain.Shared;
 
 namespace RftmAPI.Domain.Models.Albums.ValueObjects;
 
@@ -32,7 +31,7 @@ public class AlbumReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return Result<AlbumReleaseDate>.Failure(AlbumErrors.AlbumReleaseDate.InvalidDate);
+            return AlbumExceptions.AlbumReleaseDateExceptions.InvalidDate;
         }
 
         return new AlbumReleaseDate(value);

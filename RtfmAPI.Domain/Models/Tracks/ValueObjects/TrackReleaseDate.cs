@@ -1,6 +1,5 @@
-﻿using RftmAPI.Domain.Errors.TrackErrors;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Primitives;
-using RftmAPI.Domain.Shared;
 
 namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
 
@@ -32,7 +31,7 @@ public class TrackReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return Result<TrackReleaseDate>.Failure(TrackErrors.TrackReleaseDate.InvalidDate);
+            return TrackExceptions.TrackReleaseDateExceptions.InvalidDate;
         }
 
         return new TrackReleaseDate(value);

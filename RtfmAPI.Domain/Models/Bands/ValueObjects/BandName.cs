@@ -1,6 +1,5 @@
-﻿using RftmAPI.Domain.Errors.BandErrors;
+﻿using RftmAPI.Domain.Exceptions.BandExceptions;
 using RftmAPI.Domain.Primitives;
-using RftmAPI.Domain.Shared;
 
 namespace RftmAPI.Domain.Models.Bands.ValueObjects;
 
@@ -42,17 +41,17 @@ public sealed class BandName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<BandName>.Failure(BandErrors.BandName.IsNullOrWhiteSpace);
+            return BandExceptions.BandNameExceptions.IsNullOrWhiteSpace;
         }
 
         if (value.Length < MinLength)
         {
-            return Result<BandName>.Failure(BandErrors.BandName.IsTooShort);
+            return BandExceptions.BandNameExceptions.IsTooShort;
         }
 
         if (value.Length > MaxLength)
         {
-            return Result<BandName>.Failure(BandErrors.BandName.IsTooLong);
+            return BandExceptions.BandNameExceptions.IsTooLong;
         }
         
         return new BandName(value);
