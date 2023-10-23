@@ -5,14 +5,25 @@ using RftmAPI.Domain.Models.Albums.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
+/// <summary>
+/// Конфигурирование таблиц доменной модели <see cref="Album"/>.
+/// </summary>
 public class AlbumConfiguration : IEntityTypeConfiguration<Album>
 {
+    /// <summary>
+    /// Конфигурирование таблиц доменной модели <see cref="Album"/>.
+    /// </summary>
+    /// <param name="builder">Конструктор.</param>
     public void Configure(EntityTypeBuilder<Album> builder)
     {
         ConfigureAlbumsTable(builder);
-        ConfigureAlbumTracksIds(builder);
+        ConfigureAlbumTrackIdsTable(builder);
     }
 
+    /// <summary>
+    /// Конфигурирование таблицы "Albums".
+    /// </summary>
+    /// <param name="builder">Конструктор.</param>
     private static void ConfigureAlbumsTable(EntityTypeBuilder<Album> builder)
     {
         builder.ToTable("Albums");
@@ -25,11 +36,14 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         builder.Property(album => album.Name)
             .HasMaxLength(100)
             .HasConversion(entity => entity.Value,
-                name => AlbumName.Create(name).Value);
+                name => AlbumName.Create(name).ValueOrDefault);
     }
 
-    
-    private static void ConfigureAlbumTracksIds(EntityTypeBuilder<Album> builder)
+    /// <summary>
+    /// Конфигурирование таблицы "AlbumTrackIds".
+    /// </summary>
+    /// <param name="builder">Конструктор.</param>
+    private static void ConfigureAlbumTrackIdsTable(EntityTypeBuilder<Album> builder)
     {
         builder.OwnsMany(h => h.TrackIds, dib =>
         {

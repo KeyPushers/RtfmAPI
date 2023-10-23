@@ -28,7 +28,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <summary>
     /// Содержимое файла музыкального трека.
     /// </summary>
-    public TrackFile Content { get; private set; }
+    public TrackFile TrackFile { get; private set; }
 
     /// <summary>
     /// Музыкальный альбом.
@@ -54,15 +54,15 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// </summary>
     /// <param name="name">Название музыкального трека.</param>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
-    /// <param name="content">Содержимое файла музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="genres">Музыкальные жанры.</param>
-    public Track(TrackName name, TrackReleaseDate releaseDate, TrackFile content, Album album,
+    public Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album album,
         IEnumerable<Genre> genres) : base(TrackId.Create())
     {
         Name = name;
         ReleaseDate = releaseDate;
-        Content = content;
+        TrackFile = trackFile;
         AlbumId = (AlbumId) album.Id;
         _genreIds = genres.Select(genre => (GenreId) genre.Id).ToList();
     }
