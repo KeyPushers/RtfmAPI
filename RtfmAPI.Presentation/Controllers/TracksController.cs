@@ -12,25 +12,25 @@ using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 namespace RtfmAPI.Presentation.Controllers;
 
 /// <summary>
-/// Контроллер музыкальных треков
+/// Контроллер музыкальных треков.
 /// </summary>
 public class TracksController : ApiControllerBase
 {
     /// <summary>
-    /// Контроллер музыкальных треков
+    /// Создание контроллера музыкальных треков.
     /// </summary>
-    /// <param name="mediator">Медиатор</param>
+    /// <param name="mediator">Медиатор.</param>
     public TracksController(IMediator mediator) : base(mediator)
     {
     }
 
     /// <summary>
-    /// Получение музыкальных треков
+    /// Получение музыкальных треков.
     /// </summary>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Музыкальные треки</returns>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Музыкальные треки.</returns>
     [HttpGet]
-    public Task<List<Track>> GetTracksAsync(CancellationToken cancellationToken =default)
+    public Task<List<Track>> GetTracksAsync(CancellationToken cancellationToken = default)
     {
         var query = new GetTracksQuery();
 
@@ -38,11 +38,11 @@ public class TracksController : ApiControllerBase
     }
 
     /// <summary>
-    /// Получение музыкального трека по идентификатору
+    /// Получение музыкального трека по идентификатору.
     /// </summary>
-    /// <param name="id">Идентификатор</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Музыкальный трек</returns>
+    /// <param name="id">Идентификатор.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Музыкальный трек.</returns>
     [HttpGet("{id}")]
     public Task<Track?> GetTrackByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
@@ -55,14 +55,15 @@ public class TracksController : ApiControllerBase
     }
 
     /// <summary>
-    /// Добавление музыкального трека
+    /// Добавление музыкального трека.
     /// </summary>
-    /// <param name="name">Название музыкального трека</param>
-    /// <param name="releaseDate">Дата выпуска</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Добавленный музыкальный трек</returns>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Добавленный музыкальный трек.</returns>
     [HttpPost]
-    public Task<Track> AddTrackAsync([FromQuery] string name, [FromQuery] DateTime releaseDate, CancellationToken cancellationToken = default)
+    public Task<Track> AddTrackAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
+        CancellationToken cancellationToken = default)
     {
         var command = new AddTrackCommand
         {
