@@ -19,4 +19,9 @@ public class Result<TValue> : FluentResults.Result<TValue>
     /// <param name="value">Значение результата.</param>
     /// <returns>Результат.</returns>
     public static implicit operator Result<TValue>(TValue value) => (Result<TValue>) FluentResults.Result.Ok(value);
+
+    /// <summary>
+    /// Получение значения результата.
+    /// </summary>
+    public new TValue Value => base.Value;
 }
