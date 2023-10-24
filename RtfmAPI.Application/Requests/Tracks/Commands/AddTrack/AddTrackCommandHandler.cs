@@ -5,7 +5,6 @@ using MediatR;
 using RftmAPI.Domain.Models.Albums.Repository;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.Repository;
-using RftmAPI.Domain.Models.Tracks.ValueObjects;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
@@ -40,14 +39,6 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Track>
     /// <returns>Музыкальный трек</returns>
     public async Task<Track> Handle(AddTrackCommand request, CancellationToken cancellationToken = default)
     {
-        var trackNameResult = TrackName.Create(request.Name ?? "Не указано название");
-        if (trackNameResult.IsFailure)
-        {
-            throw new NotImplementedException();
-        }
-        
-        var track = new Track(trackNameResult.Value);
-
-        return track;
+        throw new NotImplementedException();
     }
 }

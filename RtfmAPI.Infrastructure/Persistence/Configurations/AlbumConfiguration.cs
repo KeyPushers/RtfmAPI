@@ -18,48 +18,92 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
     {
         ConfigureAlbumsTable(builder);
         ConfigureAlbumTrackIdsTable(builder);
+        ConfigureAlbumBandIdsTable(builder);
     }
 
     /// <summary>
-    /// Конфигурирование таблицы "Albums".
+    /// Создание таблицы музыкальных альбомов.
     /// </summary>
     /// <param name="builder">Конструктор.</param>
     private static void ConfigureAlbumsTable(EntityTypeBuilder<Album> builder)
     {
+        // Определение названия таблицы музыкальных альбомов.
         builder.ToTable("Albums");
-        
+
+        // Определение идентификатора музыкального альбома.
         builder.HasKey(album => album.Id);
         builder.Property(album => album.Id)
             .ValueGeneratedNever()
             .HasConversion(id => id.Value, id => AlbumId.Create(id));
-        
+
+        // Определение названия музыкального альбома.
         builder.Property(album => album.Name)
             .HasMaxLength(100)
             .HasConversion(entity => entity.Value,
-                name => AlbumName.Create(name).ValueOrDefault);
+                name => AlbumName.Create(name).Value);
+
+        // Определение даты выпуска музыкального альбома.
+        builder
+            .Property(track => track.ReleaseDate)
+            .HasConversion(entity => entity.Value,
+                name => AlbumReleaseDate.Create(name).Value);
     }
 
     /// <summary>
-    /// Конфигурирование таблицы "AlbumTrackIds".
+    /// Создание таблицы для связи музыкальных альбомов и музыкальных треков.
     /// </summary>
     /// <param name="builder">Конструктор.</param>
     private static void ConfigureAlbumTrackIdsTable(EntityTypeBuilder<Album> builder)
     {
+        // Создание таблицы для связи музыкальных альбомов и музыкальных треков.
         builder.OwnsMany(h => h.TrackIds, dib =>
         {
-            dib.WithOwner().HasForeignKey("AlbumId");
-        
+            // Определение названия таблицы связи музыкальных альбомов и музыкальных треков.
             dib.ToTable("AlbumTrackIds");
-        
+
+            // Определение идентификатора музыкального альбома в музыкальном треке.
+            dib.WithOwner().HasForeignKey("AlbumId");
+
+            // Определение идентификатора таблицы.
             dib.HasKey("Id");
-        
+
+            // Определение идентификатора музыкального трека в таблице "AlbumTrackIds".
             dib.Property(trackId => trackId.Value)
                 .ValueGeneratedNever()
                 .HasColumnName("AlbumTrackId");
         });
-        
+
         builder.Metadata
             .FindNavigation(nameof(Album.TrackIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    
+    /// <summary>
+    /// Создание таблицы для связи музыкальных альбомов и музыкальных треков.
+    /// </summary>
+    /// <param name="builder">Конструктор.</param>
+    private static void ConfigureAlbumBandIdsTable(EntityTypeBuilder<Album> builder)
+    {
+        // Создание таблицы для связи музыкальных альбомов и музыкальных групп.
+        builder.OwnsMany(h => h.BandIds, dib =>
+        {
+            // Определение названия таблицы связи музыкальных альбомов и музыкальных групп.
+            dib.ToTable("AlbumBandIds");
+
+            // Определение идентификатора музыкального альбома в музыкальной группе.
+            dib.WithOwner().HasForeignKey("AlbumId");
+
+            // Определение идентификатора таблицы.
+            dib.HasKey("Id");
+
+            // Определение идентификатора музыкальной группы в таблице "AlbumTrackIds".
+            dib.Property(trackId => trackId.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("AlbumBandId");
+        });
+
+        builder.Metadata
+            .FindNavigation(nameof(Album.BandIds))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
