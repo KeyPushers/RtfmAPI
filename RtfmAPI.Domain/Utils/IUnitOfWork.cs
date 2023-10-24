@@ -1,4 +1,4 @@
-﻿namespace RftmAPI.Domain.Models.Albums.Repository;
+﻿namespace RftmAPI.Domain.Utils;
 
 /// <summary>
 /// Интерфейс единицы работы.

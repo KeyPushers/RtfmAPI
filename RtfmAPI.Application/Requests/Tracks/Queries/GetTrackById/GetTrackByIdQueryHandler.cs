@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.Repository;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 
@@ -32,6 +33,6 @@ public class GetTrackByIdQueryHandler : IRequestHandler<GetTrackByIdQuery, Track
     /// <exception cref="NotImplementedException"></exception>
     public Task<Track?> Handle(GetTrackByIdQuery request, CancellationToken cancellationToken = default)
     {
-        return _tracksRepository.GetTrackByIdAsync(request.Id);
+        return _tracksRepository.GetTrackByIdAsync(TrackId.Create(request.Id));
     }
 }

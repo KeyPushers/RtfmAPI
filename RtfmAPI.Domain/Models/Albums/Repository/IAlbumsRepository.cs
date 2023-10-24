@@ -1,26 +1,28 @@
-﻿namespace RftmAPI.Domain.Models.Albums.Repository;
+﻿using RftmAPI.Domain.Models.Albums.ValueObjects;
+
+namespace RftmAPI.Domain.Models.Albums.Repository;
 
 /// <summary>
-/// Интерфейс репозитория альбома
+/// Интерфейс репозитория доменной модели <see cref="Album"/>.
 /// </summary>
 public interface IAlbumsRepository
 {
     /// <summary>
-    /// Получение альбомов
+    /// Получение музыкальных альбомов.
     /// </summary>
-    /// <returns>Список альбомов</returns>
+    /// <returns>Список музыкальных альбомов.</returns>
     Task<List<Album>> GetAlbumsAsync();
 
     /// <summary>
-    /// Получение альбома по идентификатору
+    /// Получение музыкального альбома по идентификатору.
     /// </summary>
-    /// <param name="id">Идентифиактор</param>
-    /// <returns>Альбом</returns>
-    Task<Album?> GetAlbumByIdAsync(Guid id);
+    /// <param name="albumId">Идентифиактор музыкального альбома.</param>
+    /// <returns>Музыкальный альбом.</returns>
+    Task<Album?> GetAlbumByIdAsync(AlbumId albumId);
     
     /// <summary>
-    /// Добавление альбома
+    /// Добавление музыкального альбома.
     /// </summary>
-    /// <param name="album">Альбом</param>
+    /// <param name="album">Музыкальный альбом.</param>
     Task AddAsync(Album album);
 }

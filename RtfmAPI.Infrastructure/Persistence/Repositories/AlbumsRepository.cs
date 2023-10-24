@@ -1,42 +1,43 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.Repository;
+using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
 
 /// <summary>
-/// Репозиторий альбомов
+/// Репозиторий доменной модели <see cref="Album"/>.
 /// </summary>
 public class AlbumsRepository : IAlbumsRepository
 {
     private readonly AppDbContext _context;
 
     /// <summary>
-    /// Репозиторий альбомов
+    /// Репозиторий доменной модели <see cref="Album"/>.
     /// </summary>
-    /// <param name="context">Контекст базы данных</param>
+    /// <param name="context">Контекст базы данных</param>.
     public AlbumsRepository(AppDbContext context)
     {
         _context = context;
     }
     
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IAlbumsRepository.GetAlbumsAsync"/>
     public Task<List<Album>> GetAlbumsAsync()
     {
         return _context.Set<Album>().ToListAsync();
     }
 
-    /// <inheritdoc/>
-    public Task<Album?> GetAlbumByIdAsync(Guid id)
+    /// <inheritdoc cref="IAlbumsRepository.GetAlbumByIdAsync"/>
+    public Task<Album?> GetAlbumByIdAsync(AlbumId albumId)
     {
-        return _context.Set<Album>().FirstOrDefaultAsync(entity => entity.Id.Value == id);
+        return _context.Set<Album>().FirstOrDefaultAsync(entity => entity.Id == albumId);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IAlbumsRepository.AddAsync"/>
     public async Task AddAsync(Album album)
     {
-        await _context.AddAsync(album).ConfigureAwait(false);
+        await _context.AddAsync(album);
     }
 
 }

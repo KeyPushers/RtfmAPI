@@ -5,6 +5,7 @@ using MediatR;
 using RftmAPI.Domain.Models.Albums.Repository;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.Repository;
+using RftmAPI.Domain.Utils;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
