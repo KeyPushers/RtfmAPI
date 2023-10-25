@@ -1,5 +1,7 @@
-﻿using RftmAPI.Domain.Models.Bands.ValueObjects;
+﻿using RftmAPI.Domain.Models.Bands;
+using RftmAPI.Domain.Models.Bands.ValueObjects;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
+using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
@@ -10,8 +12,8 @@ namespace RftmAPI.Domain.Models.Genres;
 /// </summary>
 public sealed class Genre : AggregateRoot<GenreId, Guid>
 {
-    private readonly List<TrackId> _trackIds;
-    private readonly List<BandId> _bandIds;
+    private readonly List<TrackId> _trackIds = new();
+    private readonly List<BandId> _bandIds = new();
 
     /// <summary>
     /// Название музыкального жанра.
@@ -29,7 +31,7 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     public IReadOnlyCollection<BandId> BandIds => _bandIds.ToList();
 
     /// <summary>
-    /// Музыкальный жанр.
+    /// Создание музыкального жанра.
     /// </summary>
 #pragma warning disable CS8618
     private Genre()
@@ -38,14 +40,46 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
 #pragma warning restore CS8618
 
     /// <summary>
-    /// Музыкальный жанр.
+    /// Создание музыкального жанра.
     /// </summary>
     /// <param name="name">Название музыкального жанра.</param>
-    public Genre(GenreName name) : base(GenreId.Create())
+    private Genre(GenreName name) : base(GenreId.Create())
     {
         Name = name;
+    }
 
-        _trackIds = new();
-        _bandIds = new();
+    /// <summary>
+    /// Создание музыкального жанра.
+    /// </summary>
+    /// <param name="name">Название музыкального жанра.</param>
+    /// <param name="tracks">Музыкальные треки.</param>
+    /// <param name="bands">Музыкальные группы.</param>
+    private Genre(GenreName name, IEnumerable<Track> tracks, IEnumerable<Band> bands) : base(GenreId.Create())
+    {
+        Name = name;
+        _trackIds = tracks.Select(track => (TrackId) track.Id).ToList();
+        _bandIds = bands.Select(band => (BandId) band.Id).ToList();
+    }
+
+    /// <summary>
+    /// Создание музыкального жанра.
+    /// </summary>
+    /// <param name="name">Название музыкального жанра.</param>
+    /// <returns>Музыкальный жанр.</returns>
+    public static Result<Genre> Create(GenreName name)
+    {
+        return new Genre(name);
+    }
+
+    /// <summary>
+    /// Создание музыкального жанра.
+    /// </summary>
+    /// <param name="name">Название музыкального жанра.</param>
+    /// <param name="tracks">Музыкальные треки.</param>
+    /// <param name="bands">Музыкальные группы.</param>
+    /// <returns>Музыкальный жанр.</returns>
+    public static Result<Genre> Create(GenreName name, IEnumerable<Track> tracks, IEnumerable<Band> bands)
+    {
+        return new Genre(name, tracks, bands);
     }
 }

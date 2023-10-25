@@ -13,7 +13,7 @@ namespace RftmAPI.Domain.Models.Tracks;
 /// </summary>
 public sealed class Track : AggregateRoot<TrackId, Guid>
 {
-    private List<GenreId> _genreIds;
+    private List<GenreId> _genreIds = new();
 
     /// <summary>
     /// Название музыкального трека.
@@ -33,7 +33,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <summary>
     /// Музыкальный альбом.
     /// </summary>
-    public AlbumId AlbumId { get; private set; }
+    public AlbumId? AlbumId { get; private set; }
 
     /// <summary>
     /// Музыкальные жанры.
@@ -41,7 +41,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public IReadOnlyCollection<GenreId> GenreIds => _genreIds;
 
     /// <summary>
-    /// Музыкальный трек.
+    /// Создание музыкального трека.
     /// </summary>
 #pragma warning disable CS8618
     private Track()
@@ -50,14 +50,27 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
 #pragma warning restore CS8618
 
     /// <summary>
-    /// Музыкальный трек.
+    /// Создание музыкального трека.
+    /// </summary>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
+    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile) : base(TrackId.Create())
+    {
+        Name = name;
+        ReleaseDate = releaseDate;
+        TrackFile = trackFile;
+    }
+    
+    /// <summary>
+    /// Создание музыкального трека.
     /// </summary>
     /// <param name="name">Название музыкального трека.</param>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFile">Содержимое файла музыкального трека.</param>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="genres">Музыкальные жанры.</param>
-    public Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album album,
+    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album album,
         IEnumerable<Genre> genres) : base(TrackId.Create())
     {
         Name = name;
@@ -65,5 +78,31 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         TrackFile = trackFile;
         AlbumId = (AlbumId) album.Id;
         _genreIds = genres.Select(genre => (GenreId) genre.Id).ToList();
+    }
+
+    /// <summary>
+    /// Создание музыкального трека.
+    /// </summary>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
+    /// <returns>Музыкальный трек.</returns>
+    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
+    {
+        return new Track(name, releaseDate, trackFile);
+    }
+    
+    /// <summary>
+    /// Создание музыкального трека.
+    /// </summary>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
+    /// <param name="album">Музыкальный альбом.</param>
+    /// <param name="genres">Музыкальные жанры.</param>
+    /// <returns>Музыкальный трек.</returns>
+    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album album, IEnumerable<Genre> genres)
+    {
+        return new Track(name, releaseDate, trackFile, album, genres);
     }
 }

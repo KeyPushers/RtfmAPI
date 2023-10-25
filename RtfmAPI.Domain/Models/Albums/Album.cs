@@ -1,6 +1,7 @@
 ﻿using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Bands;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
+using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
@@ -11,8 +12,8 @@ namespace RftmAPI.Domain.Models.Albums;
 /// </summary>
 public sealed class Album : AggregateRoot<AlbumId, Guid>
 {
-    private readonly List<TrackId> _trackIds;
-    private readonly List<BandId> _bandIds;
+    private readonly List<TrackId> _trackIds = new();
+    private readonly List<BandId> _bandIds = new();
 
     /// <summary>
     /// Название музыкального альбома.
@@ -35,7 +36,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     public IReadOnlyCollection<BandId> BandIds => _bandIds;
 
     /// <summary>
-    /// Музыкальный альбом.
+    /// Создание музыкального альбома.
     /// </summary>
 #pragma warning disable CS8618
     private Album()
@@ -44,17 +45,54 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
 #pragma warning restore CS8618
 
     /// <summary>
+    /// Создание музыкального альбома.
+    /// </summary>
+    /// <param name="name">Название музыкального альбома.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
+    private Album(AlbumName name, AlbumReleaseDate releaseDate) : base(AlbumId.Create())
+    {
+        Name = name;
+        ReleaseDate = releaseDate;
+    }
+
+    /// <summary>
     /// Музыкальный альбом.
     /// </summary>
     /// <param name="name">Название музыкального альбома.</param>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
-    /// <param name="band">Музыкальная группа</param>
-    public Album(AlbumName name, AlbumReleaseDate releaseDate, Band band) : base(AlbumId.Create())
+    /// <param name="bands">Музыкальные группы.</param>
+    /// <param name="tracks">Музыкальные треки.</param>
+    private Album(AlbumName name, AlbumReleaseDate releaseDate, IEnumerable<Band> bands, IEnumerable<Track> tracks) :
+        base(AlbumId.Create())
     {
         Name = name;
         ReleaseDate = releaseDate;
+        _bandIds = bands.Select(band => (BandId) band.Id).ToList();
+        _trackIds = tracks.Select(track => (TrackId) track.Id).ToList();
+    }
 
-        _trackIds = new();
-        _bandIds = new() {(BandId) band.Id};
+    /// <summary>
+    /// Создание музыкального альбома.
+    /// </summary>
+    /// <param name="name">Название музыкального альбома.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
+    /// <returns>Музыкальный альбом.</returns>
+    public static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate)
+    {
+        return new Album(name, releaseDate);
+    }
+
+    /// <summary>
+    /// Создание музыкального альбома.
+    /// </summary>
+    /// <param name="name">Название музыкального альбома.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
+    /// <param name="bands">Музыкальные группы.</param>
+    /// <param name="tracks">Музыкальные треки.</param>
+    /// <returns>Музыкальный альбом.</returns>
+    public static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate, IEnumerable<Band> bands,
+        IEnumerable<Track> tracks)
+    {
+        return new Album(name, releaseDate, bands, tracks);
     }
 }
