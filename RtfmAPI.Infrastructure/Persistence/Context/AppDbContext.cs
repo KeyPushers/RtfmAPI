@@ -27,5 +27,7 @@ public sealed class AppDbContext : DbContext
         
         modelBuilder.ApplyConfiguration(new TrackConfiguration());
         modelBuilder.ApplyConfiguration(new AlbumConfiguration());
+        modelBuilder.ApplyConfiguration(new BandConfiguration());
+        modelBuilder.ApplyConfiguration(new GenreConfiguration());
     }
 }
