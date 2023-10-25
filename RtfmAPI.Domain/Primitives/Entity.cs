@@ -11,7 +11,7 @@ public abstract class Entity<TId>
     public TId Id { get; protected init; }
     
     /// <summary>
-    /// Примитив сущности.
+    /// Создание примитива сущности.
     /// </summary>
     /// <remarks>Требуется для EF Core.</remarks>
 #pragma warning disable CS8618
@@ -20,4 +20,12 @@ public abstract class Entity<TId>
     }
 #pragma warning restore CS8618
 
+    /// <summary>
+    /// Создание примитива сущности.
+    /// </summary>
+    /// <param name="id">Идентификатор сущности.</param>
+    protected Entity(TId id)
+    {
+        Id = id;
+    }
 }

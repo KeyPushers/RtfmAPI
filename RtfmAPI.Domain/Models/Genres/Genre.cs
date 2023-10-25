@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Models.Bands;
+﻿using FluentResults;
+using RftmAPI.Domain.Models.Bands;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;

@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Exceptions.GenreExceptions;
+﻿using FluentResults;
+using RftmAPI.Domain.Exceptions.GenreExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Genres.ValueObjects;
@@ -41,17 +42,17 @@ public class GenreName: ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return GenreExceptions.GenreNameExceptions.IsNullOrWhiteSpace;
+            return new ExceptionalError(GenreExceptions.GenreNameExceptions.IsNullOrWhiteSpace);
         }
 
         if (value.Length < MinLength)
         {
-            return GenreExceptions.GenreNameExceptions.IsTooShort;
+            return new ExceptionalError(GenreExceptions.GenreNameExceptions.IsTooShort);
         }
 
         if (value.Length > MaxLength)
         {
-            return GenreExceptions.GenreNameExceptions.IsTooLong;
+            return new ExceptionalError(GenreExceptions.GenreNameExceptions.IsTooLong);
         }
         
         return new GenreName(value);

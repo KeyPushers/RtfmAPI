@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RftmAPI.Domain.Models.Tracks;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
+using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
+using RtfmAPI.Presentation.Dtos.Tracks;
 
 namespace RtfmAPI.Presentation.Controllers;
 
@@ -57,20 +60,33 @@ public class TracksController : ApiControllerBase
     /// <summary>
     /// Добавление музыкального трека.
     /// </summary>
-    /// <param name="name">Название музыкального трека.</param>
-    /// <param name="releaseDate">Дата выпуска.</param>
+    /// <param name="request">Объект переноса команды добавления музыкального трека.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Добавленный музыкальный трек.</returns>
     [HttpPost]
-    public Task<Track> AddTrackAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
-        CancellationToken cancellationToken = default)
+    public async Task<Track> AddTrackAsync([FromForm] AddTrack request, CancellationToken cancellationToken = default)
     {
+        using var memoryStream = new MemoryStream();
+        if (request.File is null)
+        {
+            throw new Exception($"{nameof(request.File)}");
+        }
+
+        await request.File.CopyToAsync(memoryStream, cancellationToken);
+
         var command = new AddTrackCommand
         {
-            Name = name,
-            ReleaseDate = releaseDate
+            Name = request.Name,
+            ReleaseDate = request.ReleaseDate,
+            TrackFile = new TrackFile
+            {
+                File = memoryStream,
+                FileName = request.File.FileName,
+                Extension = Path.GetExtension(request.File.FileName),
+                MimeType = request.File.ContentType
+            }
         };
 
-        return Mediator.Send(command, cancellationToken);
+        return await Mediator.Send(command, cancellationToken);
     }
 }

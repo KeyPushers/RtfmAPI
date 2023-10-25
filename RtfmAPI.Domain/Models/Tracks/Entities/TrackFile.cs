@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Models.Tracks.ValueObjects;
+﻿using FluentResults;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Tracks.Entities;
@@ -49,7 +50,7 @@ public class TrackFile : Entity<TrackFileId>
     /// <param name="extension">Расширение файла музыкального трека.</param>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
     /// <param name="data">Содержимое файла музыкального трека.</param>
-    private TrackFile(TrackFileName name, TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileData data)
+    private TrackFile(TrackFileName name, TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileData data) : base(TrackFileId.Create())
     {
         Name = name;
         Extension = extension;
