@@ -1,5 +1,4 @@
-﻿using RftmAPI.Domain.Models.Albums.Repository;
-using RftmAPI.Domain.Utils;
+﻿using RftmAPI.Domain.Utils;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
