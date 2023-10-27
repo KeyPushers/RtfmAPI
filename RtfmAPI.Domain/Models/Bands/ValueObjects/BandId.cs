@@ -11,7 +11,7 @@ public sealed class BandId : AggregateRootId<Guid>
     /// Значение идентификатора.
     /// </summary>
     public override Guid Value { get; }
-    
+
     /// <summary>
     /// Идентификатор музыкальной группы.
     /// </summary>

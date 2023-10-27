@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Exceptions.TrackExceptions;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
@@ -27,7 +26,7 @@ public class TrackFileMimeType : ValueObject
         "audio/vnd.wave",
         "audio/webm"
     };
-    
+
     /// <summary>
     /// Создание MIME-тип файла музыкального трека.
     /// </summary>
@@ -51,20 +50,20 @@ public class TrackFileMimeType : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ExceptionalError(TrackExceptions.TrackFileMimeTypeExceptions.IsNullOrWhiteSpace);
+            return TrackExceptions.TrackFileMimeTypeExceptions.IsNullOrWhiteSpace;
         }
 
         if (!AudioMediaTypes.Contains(value))
         {
-            return new ExceptionalError(TrackExceptions.TrackFileMimeTypeExceptions.Invalid);
+            return TrackExceptions.TrackFileMimeTypeExceptions.Invalid;
         }
-        
+
         return new TrackFileMimeType(value);
     }
-    
+
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
     protected override IEnumerable<object> GetEqualityComponents()
     {
-        throw new NotImplementedException();
+        yield return Value;
     }
 }

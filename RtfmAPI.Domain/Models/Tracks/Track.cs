@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Models.Albums;
+﻿using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
@@ -62,7 +61,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         ReleaseDate = releaseDate;
         TrackFile = trackFile;
     }
-    
+
     /// <summary>
     /// Создание музыкального трека.
     /// </summary>
@@ -92,7 +91,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     {
         return new Track(name, releaseDate, trackFile);
     }
-    
+
     /// <summary>
     /// Создание музыкального трека.
     /// </summary>
@@ -102,7 +101,8 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="genres">Музыкальные жанры.</param>
     /// <returns>Музыкальный трек.</returns>
-    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album album, IEnumerable<Genre> genres)
+    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
+        Album album, IEnumerable<Genre> genres)
     {
         return new Track(name, releaseDate, trackFile, album, genres);
     }

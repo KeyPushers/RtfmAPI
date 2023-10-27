@@ -11,7 +11,7 @@ public sealed class TrackFileId : ValueObject
     /// Значение идентификатора.
     /// </summary>
     public Guid Value { get; }
-    
+
     /// <summary>
     /// Идентификатор файла музыкального трека.
     /// </summary>
@@ -39,7 +39,7 @@ public sealed class TrackFileId : ValueObject
     {
         return new TrackFileId(id);
     }
-    
+
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
     protected override IEnumerable<object> GetEqualityComponents()
     {

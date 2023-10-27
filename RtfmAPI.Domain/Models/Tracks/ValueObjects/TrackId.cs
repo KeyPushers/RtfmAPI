@@ -11,7 +11,7 @@ public sealed class TrackId : AggregateRootId<Guid>
     /// Значение идентификатора.
     /// </summary>
     public override Guid Value { get; }
-    
+
     /// <summary>
     /// Идентификатор музыкального трека.
     /// </summary>
@@ -39,7 +39,7 @@ public sealed class TrackId : AggregateRootId<Guid>
     {
         return new TrackId(id);
     }
-    
+
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
     protected override IEnumerable<object> GetEqualityComponents()
     {

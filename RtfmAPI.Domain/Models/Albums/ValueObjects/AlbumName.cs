@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Exceptions.AlbumExceptions;
+﻿using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Albums.ValueObjects;
@@ -42,17 +41,17 @@ public sealed class AlbumName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ExceptionalError(AlbumExceptions.AlbumNameExceptions.IsNullOrWhiteSpace);
+            return AlbumExceptions.AlbumNameExceptions.IsNullOrWhiteSpace;
         }
 
         if (value.Length < MinLength)
         {
-            return new ExceptionalError(AlbumExceptions.AlbumNameExceptions.IsTooShort);
+            return AlbumExceptions.AlbumNameExceptions.IsTooShort;
         }
 
         if (value.Length > MaxLength)
         {
-            return new ExceptionalError(AlbumExceptions.AlbumNameExceptions.IsTooLong);
+            return AlbumExceptions.AlbumNameExceptions.IsTooLong;
         }
 
         return new AlbumName(value);

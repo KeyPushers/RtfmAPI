@@ -11,7 +11,7 @@ public sealed class GenreId : AggregateRootId<Guid>
     /// Значение идентификатора.
     /// </summary>
     public override Guid Value { get; }
-    
+
     /// <summary>
     /// Идентификатор музыкального жанра.
     /// </summary>
@@ -39,7 +39,7 @@ public sealed class GenreId : AggregateRootId<Guid>
     {
         return new GenreId(id);
     }
-    
+
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
     protected override IEnumerable<object> GetEqualityComponents()
     {

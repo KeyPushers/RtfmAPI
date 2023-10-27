@@ -4,7 +4,6 @@ using Microsoft.Extensions.Hosting;
 using RtfmAPI.Application;
 using RtfmAPI.Infrastructure;
 using RtfmAPI.Presentation.Extensions;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

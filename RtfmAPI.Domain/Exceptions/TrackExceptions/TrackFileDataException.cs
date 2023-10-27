@@ -3,13 +3,13 @@
 /// <summary>
 /// Исключение содержимого файла доменной модели музыкального трека.
 /// </summary>
-public class TrackFileDataException : TrackException
+public sealed class TrackFileDataException : TrackException
 {
     /// <summary>
     /// Создание исключения содержимого файла доменной модели музыкального трека.
     /// </summary>
     /// <param name="message">Сообщение.</param>
-    public TrackFileDataException(string message) : base(message)
+    public TrackFileDataException(string message) : base($"{nameof(TrackFileDataException)}. {message}")
     {
     }
 }

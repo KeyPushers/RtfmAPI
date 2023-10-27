@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Exceptions.TrackExceptions;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
@@ -42,17 +41,17 @@ public class TrackName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ExceptionalError(TrackExceptions.TrackNameExceptions.IsNullOrWhiteSpace);
+            return TrackExceptions.TrackNameExceptions.IsNullOrWhiteSpace;
         }
 
         if (value.Length < MinLength)
         {
-            return new ExceptionalError(TrackExceptions.TrackNameExceptions.IsTooShort);
+            return TrackExceptions.TrackNameExceptions.IsTooShort;
         }
 
         if (value.Length > MaxLength)
         {
-            return new ExceptionalError(TrackExceptions.TrackNameExceptions.IsTooLong);
+            return TrackExceptions.TrackNameExceptions.IsTooLong;
         }
 
         return new TrackName(value);

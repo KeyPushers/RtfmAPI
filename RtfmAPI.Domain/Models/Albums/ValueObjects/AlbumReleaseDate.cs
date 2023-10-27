@@ -1,4 +1,4 @@
-﻿using FluentResults;
+﻿
 using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Primitives;
 
@@ -32,7 +32,7 @@ public class AlbumReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return new ExceptionalError(AlbumExceptions.AlbumReleaseDateExceptions.InvalidDate);
+            return AlbumExceptions.AlbumReleaseDateExceptions.InvalidDate;
         }
 
         return new AlbumReleaseDate(value);

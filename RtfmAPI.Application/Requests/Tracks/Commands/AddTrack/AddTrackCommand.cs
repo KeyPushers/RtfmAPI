@@ -1,6 +1,7 @@
 ﻿using System;
 using MediatR;
 using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
@@ -8,7 +9,7 @@ namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 /// <summary>
 /// Команда добавления музыкального трека
 /// </summary>
-public class AddTrackCommand : IRequest<Track>
+public class AddTrackCommand : IRequest<Result<Track>>
 {
     /// <summary>
     /// Название трека

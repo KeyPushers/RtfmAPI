@@ -43,19 +43,19 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
             .Property(track => track.Name)
             .HasMaxLength(TrackName.MaxLength)
             .HasConversion(entity => entity.Value,
-                name => TrackName.Create(name).ValueOrDefault);
+                name => TrackName.Create(name).Value);
 
         // Определение даты выпуска музыкального трека.
         builder
             .Property(track => track.ReleaseDate)
             .HasConversion(entity => entity.Value,
-                name => TrackReleaseDate.Create(name).ValueOrDefault);
+                name => TrackReleaseDate.Create(name).Value);
 
         // Определение идентификатора музыкального альбома.
         builder
             .Property(track => track.AlbumId)
             .ValueGeneratedNever()
-            .HasConversion(entity => entity.Value,
+            .HasConversion(entity => entity!.Value,
                 value => AlbumId.Create(value));
     }
 

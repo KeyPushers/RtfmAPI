@@ -64,7 +64,7 @@ public class TracksController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Добавленный музыкальный трек.</returns>
     [HttpPost]
-    public async Task<Track> AddTrackAsync([FromForm] AddTrack request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddTrackAsync([FromForm] AddTrack request, CancellationToken cancellationToken = default)
     {
         using var memoryStream = new MemoryStream();
         if (request.File is null)
@@ -87,6 +87,12 @@ public class TracksController : ApiControllerBase
             }
         };
 
-        return await Mediator.Send(command, cancellationToken);
+        var result = await Mediator.Send(command, cancellationToken);
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Error);
+        }
+        
+        return Ok(result.Value);
     }
 }

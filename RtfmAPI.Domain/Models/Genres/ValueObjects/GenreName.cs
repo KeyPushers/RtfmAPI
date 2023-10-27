@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Exceptions.GenreExceptions;
+﻿using RftmAPI.Domain.Exceptions.GenreExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Genres.ValueObjects;
@@ -7,7 +6,7 @@ namespace RftmAPI.Domain.Models.Genres.ValueObjects;
 /// <summary>
 /// Название музыкального жанра.
 /// </summary>
-public class GenreName: ValueObject
+public class GenreName : ValueObject
 {
     /// <summary>
     /// Минимальная длина названия.
@@ -18,7 +17,7 @@ public class GenreName: ValueObject
     /// Максимальная длина названия.
     /// </summary>
     public const int MaxLength = 50;
-    
+
     /// <summary>
     /// Название музыкального жанра.
     /// </summary>
@@ -32,7 +31,7 @@ public class GenreName: ValueObject
     /// Название.
     /// </summary>
     public string Value { get; }
-    
+
     /// <summary>
     /// Создание названия музыкального жанра.
     /// </summary>
@@ -42,22 +41,22 @@ public class GenreName: ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ExceptionalError(GenreExceptions.GenreNameExceptions.IsNullOrWhiteSpace);
+            return GenreExceptions.GenreNameExceptions.IsNullOrWhiteSpace;
         }
 
         if (value.Length < MinLength)
         {
-            return new ExceptionalError(GenreExceptions.GenreNameExceptions.IsTooShort);
+            return GenreExceptions.GenreNameExceptions.IsTooShort;
         }
 
         if (value.Length > MaxLength)
         {
-            return new ExceptionalError(GenreExceptions.GenreNameExceptions.IsTooLong);
+            return GenreExceptions.GenreNameExceptions.IsTooLong;
         }
-        
+
         return new GenreName(value);
     }
-    
+
     /// <summary>
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
     /// </summary>

@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Models.Albums;
+﻿using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
 using RftmAPI.Domain.Models.Genres;

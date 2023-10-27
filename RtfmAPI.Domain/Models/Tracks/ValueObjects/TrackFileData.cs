@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RftmAPI.Domain.Exceptions.TrackExceptions;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
@@ -32,9 +31,9 @@ public class TrackFileData : ValueObject
     {
         if (!value.Any())
         {
-            return new ExceptionalError(TrackExceptions.TrackFileDataExceptions.IsEmpty);
+            return TrackExceptions.TrackFileDataExceptions.IsEmpty;
         }
-        
+
         return new TrackFileData(value);
     }
 
