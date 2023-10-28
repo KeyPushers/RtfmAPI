@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace RftmAPI.Domain.Primitives;
+﻿namespace RftmAPI.Domain.Primitives;
 
 /// <summary>
 /// Представление ошибки доменной операции.

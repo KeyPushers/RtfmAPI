@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using MediatR;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.Albums.Repository;
@@ -49,30 +47,30 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
         var trackNameResult = TrackName.Create(request.Name ?? string.Empty);
         if (trackNameResult.IsFailed)
         {
-            return Result<Track>.Create(trackNameResult.Error);
+            return trackNameResult.Error;
         }
 
         var trackReleaseDateResult = TrackReleaseDate.Create(request.ReleaseDate);
         if (trackReleaseDateResult.IsFailed)
         {
-            return Result<Track>.Create(trackReleaseDateResult.Error);
+            return trackReleaseDateResult.Error;
         }
 
         if (request.TrackFile is null)
         {
-            return Result<Track>.Create(TrackExceptions.TrackFileDataExceptions.IsEmpty);
+            return TrackExceptions.TrackFileDataExceptions.IsEmpty;
         }
 
         var trackFileResult = CreateTrackFile(request.TrackFile);
         if (trackFileResult.IsFailed)
         {
-            return Result<Track>.Create(trackFileResult.Error);
+            return trackFileResult.Error;
         }
 
         var trackResult = Track.Create(trackNameResult.Value, trackReleaseDateResult.Value, trackFileResult.Value);
         if (trackResult.IsFailed)
         {
-            return Result<Track>.Create(trackResult.Error);
+            return trackResult.Error;
         }
 
         await _tracksRepository.AddAsync(trackResult.Value);
@@ -91,29 +89,28 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
         var trackFileNameResult = TrackFileName.Create(trackFile.FileName ?? string.Empty);
         if (trackFileNameResult.IsFailed)
         {
-            return Result<TrackFile>.Create(trackFileNameResult.Error);
+            return trackFileNameResult.Error;
         }
 
         var trackFileExtensionResult = TrackFileExtension.Create(trackFile.Extension ?? string.Empty);
         if (trackFileExtensionResult.IsFailed)
         {
-            return Result<TrackFile>.Create(trackFileExtensionResult.Error);
+            return trackFileExtensionResult.Error;
         }
 
         var trackFileMimeTypeResult = TrackFileMimeType.Create(trackFile.MimeType ?? string.Empty);
         if (trackFileMimeTypeResult.IsFailed)
         {
-            return Result<TrackFile>.Create(trackFileMimeTypeResult.Error);
+            return trackFileMimeTypeResult.Error;
         }
 
         var trackFileDataResult = TrackFileData.Create(trackFile.File?.ToArray() ?? Array.Empty<byte>());
         if (trackFileDataResult.IsFailed)
         {
-            return Result<TrackFile>.Create(trackFileDataResult.Error);
+            return trackFileDataResult.Error;
         }
 
         return TrackFile.Create(trackFileNameResult.Value, trackFileExtensionResult.Value,
-            trackFileMimeTypeResult.Value,
-            trackFileDataResult.Value);
+            trackFileMimeTypeResult.Value, trackFileDataResult.Value);
     }
 }

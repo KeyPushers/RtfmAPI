@@ -57,4 +57,11 @@ public sealed class Result<TValue> : BaseResult
     /// <param name="exception">Исключение.</param>
     /// <returns>Представления результата с ошибкой.</returns>
     public static implicit operator Result<TValue>(Exception exception) => Create(exception);
+    
+    /// <summary>
+    /// Перегрузка оператора неявного приведения типа к <see cref="Result{TValue}"/>.
+    /// </summary>
+    /// <param name="error">Ошибка типа <see cref="Error"/>.</param>
+    /// <returns>Представления результата с ошибкой.</returns>
+    public static implicit operator Result<TValue>(Error error) => Create(error);
 }
