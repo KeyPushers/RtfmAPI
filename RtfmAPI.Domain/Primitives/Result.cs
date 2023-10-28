@@ -57,18 +57,4 @@ public sealed class Result<TValue> : BaseResult
     /// <param name="exception">Исключение.</param>
     /// <returns>Представления результата с ошибкой.</returns>
     public static implicit operator Result<TValue>(Exception exception) => Create(exception);
-
-    // /// <summary>
-    // /// Создание представление результата успешной операции.
-    // /// </summary>
-    // /// <param name="value">Значение результата.</param>
-    // /// <returns>Представление результата операции.</returns>
-    // private static Result<TValue> Success(TValue value) => new(value, Error.None);
-    //
-    // /// <summary>
-    // /// Создание представление результата операции с ошибкой.
-    // /// </summary>
-    // /// <param name="exception">Исключение.</param>
-    // /// <returns>Представление результата операции.</returns>
-    // private static Result<TValue> Failure(Exception exception) => new(default!, exception);
 }
