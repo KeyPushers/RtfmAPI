@@ -19,12 +19,12 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="LoggingPipelineBehaviorStartingRequestInformation" xml:space="preserve">
-        <value>Начало запроса {Request}, {Date}</value>
+        <value>Начало запроса {0}, {1}</value>
     </data>
     <data name="LoggingPipelineBehaviorCompletedRequestInformation" xml:space="preserve">
-        <value>Завершение запроса {Request}, {Date}</value>
+        <value>Завершение запроса {0}, {1}</value>
     </data>
     <data name="LoggingPipelineBehaviorCompletedRequestFailureError" xml:space="preserve">
-        <value>Ошибка запроса {Request}, {Error}, {Date}</value>
+        <value>Ошибка запроса {0}, {1}, {2}</value>
     </data>
 </root>

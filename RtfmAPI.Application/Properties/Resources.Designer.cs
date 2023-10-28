@@ -60,7 +60,7 @@ namespace RtfmAPI.Application.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ошибка запроса {Request}, {Error}, {Date}.
+        ///   Looks up a localized string similar to Ошибка запроса {0}, {1}, {2}.
         /// </summary>
         internal static string LoggingPipelineBehaviorCompletedRequestFailureError {
             get {
@@ -69,7 +69,7 @@ namespace RtfmAPI.Application.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Завершение запроса {Request}, {Date}.
+        ///   Looks up a localized string similar to Завершение запроса {0}, {1}.
         /// </summary>
         internal static string LoggingPipelineBehaviorCompletedRequestInformation {
             get {
@@ -78,7 +78,7 @@ namespace RtfmAPI.Application.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Начало запроса {Request}, {Date}.
+        ///   Looks up a localized string similar to Начало запроса {0}, {1}.
         /// </summary>
         internal static string LoggingPipelineBehaviorStartingRequestInformation {
             get {

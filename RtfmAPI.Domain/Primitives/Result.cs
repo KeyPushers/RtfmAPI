@@ -1,64 +1,74 @@
 ﻿namespace RftmAPI.Domain.Primitives;
 
 /// <summary>
-/// Представления результата.
+/// Представление результата операции.
 /// </summary>
-/// <typeparam name="TValue">Значение результата.</typeparam>
-public class Result<TValue> : FluentResults.Result<TValue>
+/// <typeparam name="TValue">Тип результирующего значения.</typeparam>
+public sealed class Result<TValue> : BaseResult
 {
-    /// <summary>
-    /// Значение результата.
-    /// </summary>
-    public new TValue Value => base.Value;
+    private readonly TValue _value;
 
     /// <summary>
-    /// Сообщение об ошибке.
+    /// Создание представление результата операции.
     /// </summary>
-    public string Error => string.Join(";\n", Errors);
+    /// <param name="value">Значение результата операции.</param>
+    /// <param name="error">Ошибка операции.</param>
+    private Result(TValue value, Error error) : base(error)
+    {
+        _value = value;
+    }
+
+    /// <summary>
+    /// Создание представление результата операции.
+    /// </summary>
+    /// <param name="value">Значение результата операции.</param>
+    public static Result<TValue> Create(TValue value)
+    {
+        return new(value, Error.None);
+    }
+
+    /// <summary>
+    /// Создание представление результата операции.
+    /// </summary>
+    /// <param name="error">Ошибка операции.</param>
+    public static Result<TValue> Create(Error error)
+    {
+        return new(default!, error);
+    }
     
+    /// <summary>
+    /// Получение значения результата операции.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Невозможно получить значение результата операции с ошибкой.</exception>
+    public TValue Value => IsSuccess
+        ? _value
+        : throw new InvalidOperationException("Невозможно получить значение результата операции с ошибкой.");
+
     /// <summary>
     /// Перегрузка оператора неявного приведения типа к <see cref="Result{TValue}"/>.
     /// </summary>
     /// <param name="value">Значение.</param>
     /// <returns>Представления успешного результата.</returns>
-    public static implicit operator Result<TValue>(TValue value) => Success(value);
+    public static implicit operator Result<TValue>(TValue value) => Create(value);
 
     /// <summary>
     /// Перегрузка оператора неявного приведения типа к <see cref="Result{TValue}"/>.
     /// </summary>
     /// <param name="exception">Исключение.</param>
     /// <returns>Представления результата с ошибкой.</returns>
-    public static implicit operator Result<TValue>(Exception exception) => Failure(exception);
+    public static implicit operator Result<TValue>(Exception exception) => Create(exception);
 
-    /// <summary>
-    /// Создание представления успешного результата.
-    /// </summary>
-    /// <param name="value">Значение.</param>
-    /// <returns>Представления успешного результата.</returns>
-    private static Result<TValue> Success(TValue value)
-    {
-        return Create(new Result<TValue>().WithValue(value));
-    }
-    
-    /// <summary>
-    /// Создание представления результата с ошибкой.
-    /// </summary>
-    /// <param name="exception">Исключение.</param>
-    /// <returns>Представления результата с ошибкой.</returns>
-    private static Result<TValue> Failure(Exception exception)
-    {
-        Error error = exception;
-        
-        return Create(new Result<TValue>().WithError(error));
-    }
-    
-    /// <summary>
-    /// Создание представления результата.
-    /// </summary>
-    /// <param name="result">Результата типа <see cref="FluentResults.Result{TValue}"/>.</param>
-    /// <returns>Представления результата.</returns>
-    private static Result<TValue> Create(FluentResults.Result<TValue> result)
-    {
-        return (Result<TValue>) result;
-    }
+    // /// <summary>
+    // /// Создание представление результата успешной операции.
+    // /// </summary>
+    // /// <param name="value">Значение результата.</param>
+    // /// <returns>Представление результата операции.</returns>
+    // private static Result<TValue> Success(TValue value) => new(value, Error.None);
+    //
+    // /// <summary>
+    // /// Создание представление результата операции с ошибкой.
+    // /// </summary>
+    // /// <param name="exception">Исключение.</param>
+    // /// <returns>Представление результата операции.</returns>
+    // private static Result<TValue> Failure(Exception exception) => new(default!, exception);
 }

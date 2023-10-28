@@ -16,7 +16,6 @@ namespace RtfmAPI.Application.PipelineBehaviors;
 /// <typeparam name="TResponse">Ответ.</typeparam>
 public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
-    where TResponse : Result<TResponse>
 {
     private readonly ILogger<LoggingPipelineBehavior<TRequest, TResponse>> _logger;
 
@@ -43,11 +42,17 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
             typeof(TRequest).Name, DateTime.UtcNow);
         _logger.LogInformation("{Message}", startingRequestMessage);
 
-        var result = await next();
-        if (result.IsFailed)
+        var response = await next();
+
+        if (response is not Result<TResponse> responseResult)
+        {
+            return response;
+        }
+        
+        if (responseResult.IsFailed)
         {
             var failureRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestFailureError,
-                typeof(TRequest).Name, result.Errors, DateTime.UtcNow);
+                typeof(TRequest).Name, responseResult.Error.Message, DateTime.UtcNow);
             _logger.LogError("{Message}", failureRequestMessage);
         }
 
@@ -55,6 +60,6 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
             typeof(TRequest).Name, DateTime.UtcNow);
         _logger.LogInformation("{Message}", completedRequestMessage);
 
-        return result;
+        return responseResult.Value;
     }
 }

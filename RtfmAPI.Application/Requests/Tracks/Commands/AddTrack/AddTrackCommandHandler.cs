@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MediatR;
+using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.Albums.Repository;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.Entities;
@@ -48,30 +49,30 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
         var trackNameResult = TrackName.Create(request.Name ?? string.Empty);
         if (trackNameResult.IsFailed)
         {
-            throw new Exception(trackNameResult.Errors.FirstOrDefault()?.Message);
+            return Result<Track>.Create(trackNameResult.Error);
         }
 
         var trackReleaseDateResult = TrackReleaseDate.Create(request.ReleaseDate);
         if (trackReleaseDateResult.IsFailed)
         {
-            throw new Exception(trackReleaseDateResult.Errors.FirstOrDefault()?.Message);
+            return Result<Track>.Create(trackReleaseDateResult.Error);
         }
 
         if (request.TrackFile is null)
         {
-            throw new Exception(nameof(request.TrackFile));
+            return Result<Track>.Create(TrackExceptions.TrackFileDataExceptions.IsEmpty);
         }
 
         var trackFileResult = CreateTrackFile(request.TrackFile);
-        if (trackFileResult is null || trackFileResult.IsFailed)
+        if (trackFileResult.IsFailed)
         {
-            throw new Exception(nameof(request.TrackFile));
+            return Result<Track>.Create(trackFileResult.Error);
         }
 
         var trackResult = Track.Create(trackNameResult.Value, trackReleaseDateResult.Value, trackFileResult.Value);
         if (trackResult.IsFailed)
         {
-            throw new Exception(nameof(request.TrackFile));
+            return Result<Track>.Create(trackResult.Error);
         }
 
         await _tracksRepository.AddAsync(trackResult.Value);
@@ -85,30 +86,30 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
     /// </summary>
     /// <param name="trackFile">Объект переноса данных файла музыкального трека.</param>
     /// <returns>Представление данных файла музыкального трека.</returns>
-    private static Result<TrackFile>? CreateTrackFile(Dtos.TrackFile trackFile)
+    private static Result<TrackFile> CreateTrackFile(Dtos.TrackFile trackFile)
     {
         var trackFileNameResult = TrackFileName.Create(trackFile.FileName ?? string.Empty);
         if (trackFileNameResult.IsFailed)
         {
-            return null;
+            return Result<TrackFile>.Create(trackFileNameResult.Error);
         }
 
         var trackFileExtensionResult = TrackFileExtension.Create(trackFile.Extension ?? string.Empty);
         if (trackFileExtensionResult.IsFailed)
         {
-            return null;
+            return Result<TrackFile>.Create(trackFileExtensionResult.Error);
         }
 
         var trackFileMimeTypeResult = TrackFileMimeType.Create(trackFile.MimeType ?? string.Empty);
         if (trackFileMimeTypeResult.IsFailed)
         {
-            return null;
+            return Result<TrackFile>.Create(trackFileMimeTypeResult.Error);
         }
 
         var trackFileDataResult = TrackFileData.Create(trackFile.File?.ToArray() ?? Array.Empty<byte>());
         if (trackFileDataResult.IsFailed)
         {
-            return null;
+            return Result<TrackFile>.Create(trackFileDataResult.Error);
         }
 
         return TrackFile.Create(trackFileNameResult.Value, trackFileExtensionResult.Value,
