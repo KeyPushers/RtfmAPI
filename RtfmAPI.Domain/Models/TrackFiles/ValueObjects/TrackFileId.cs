@@ -1,16 +1,16 @@
 ﻿using RftmAPI.Domain.Primitives;
 
-namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
+namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 
 /// <summary>
 /// Идентификатор файла музыкального трека.
 /// </summary>
-public sealed class TrackFileId : ValueObject
+public class TrackFileId : AggregateRootId<Guid>
 {
     /// <summary>
     /// Значение идентификатора.
     /// </summary>
-    public Guid Value { get; }
+    public override Guid Value { get; }
 
     /// <summary>
     /// Идентификатор файла музыкального трека.

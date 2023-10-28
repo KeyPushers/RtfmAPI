@@ -3,9 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
-using RftmAPI.Domain.Models.Albums.Repository;
+using RftmAPI.Domain.Models.TrackFiles;
+using RftmAPI.Domain.Models.TrackFiles.Repository;
+using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
-using RftmAPI.Domain.Models.Tracks.Entities;
 using RftmAPI.Domain.Models.Tracks.Repository;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
@@ -19,20 +20,20 @@ namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Track>>
 {
     private readonly ITracksRepository _tracksRepository;
-    private readonly IAlbumsRepository _albumsRepository;
+    private readonly ITrackFilesRepository _trackFilesRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
     /// Обработчик команды добавления музыкального трека.
     /// </summary>
     /// <param name="tracksRepository">Репозиторий музыкальных треков.</param>
-    /// <param name="albumsRepository">Репозиторий альбомов.</param>
+    /// <param name="trackFilesRepository">Репозиторий файлов музыкальных треков.</param>
     /// <param name="unitOfWork">Единица работы.</param>
-    public AddTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository,
+    public AddTrackCommandHandler(ITracksRepository tracksRepository, ITrackFilesRepository trackFilesRepository,
         IUnitOfWork unitOfWork)
     {
         _tracksRepository = tracksRepository;
-        _albumsRepository = albumsRepository;
+        _trackFilesRepository = trackFilesRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -66,13 +67,14 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
         {
             return trackFileResult.Error;
         }
-
+        
         var trackResult = Track.Create(trackNameResult.Value, trackReleaseDateResult.Value, trackFileResult.Value);
         if (trackResult.IsFailed)
         {
             return trackResult.Error;
         }
 
+        await _trackFilesRepository.AddAsync(trackFileResult.Value);
         await _tracksRepository.AddAsync(trackResult.Value);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -110,7 +112,7 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
             return trackFileDataResult.Error;
         }
 
-        return TrackFile.Create(trackFileNameResult.Value, trackFileExtensionResult.Value,
-            trackFileMimeTypeResult.Value, trackFileDataResult.Value);
+        return TrackFile.Create(trackFileNameResult.Value, trackFileDataResult.Value, trackFileExtensionResult.Value,
+            trackFileMimeTypeResult.Value);
     }
 }

@@ -26,6 +26,7 @@ public sealed class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.ApplyConfiguration(new TrackConfiguration());
+        modelBuilder.ApplyConfiguration(new TrackFileConfiguration());
         modelBuilder.ApplyConfiguration(new AlbumConfiguration());
         modelBuilder.ApplyConfiguration(new BandConfiguration());
         modelBuilder.ApplyConfiguration(new GenreConfiguration());

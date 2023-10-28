@@ -2,7 +2,8 @@
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
-using RftmAPI.Domain.Models.Tracks.Entities;
+using RftmAPI.Domain.Models.TrackFiles;
+using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
@@ -26,9 +27,9 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public TrackReleaseDate ReleaseDate { get; private set; }
 
     /// <summary>
-    /// Содержимое файла музыкального трека.
+    /// Файл музыкального трека.
     /// </summary>
-    public TrackFile TrackFile { get; private set; }
+    public TrackFileId TrackFileId { get; private set; }
 
     /// <summary>
     /// Музыкальный альбом.
@@ -59,7 +60,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     {
         Name = name;
         ReleaseDate = releaseDate;
-        TrackFile = trackFile;
+        TrackFileId = (TrackFileId) trackFile.Id;
     }
 
     /// <summary>
@@ -75,7 +76,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     {
         Name = name;
         ReleaseDate = releaseDate;
-        TrackFile = trackFile;
+        TrackFileId = (TrackFileId) trackFile.Id;
         AlbumId = (AlbumId) album.Id;
         _genreIds = genres.Select(genre => (GenreId) genre.Id).ToList();
     }

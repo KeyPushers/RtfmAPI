@@ -7,9 +7,5 @@
         <RootNamespace>RftmAPI.Domain</RootNamespace>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Folder Include="Models\" />
-    </ItemGroup>
     
 </Project>

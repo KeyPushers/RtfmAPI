@@ -1,7 +1,7 @@
 ﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Primitives;
 
-namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
+namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 
 /// <summary>
 /// Название файла музыкального трека.

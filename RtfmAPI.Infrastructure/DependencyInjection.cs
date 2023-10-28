@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using RftmAPI.Domain.Models.Albums.Repository;
 using RftmAPI.Domain.Models.Bands.Repository;
+using RftmAPI.Domain.Models.TrackFiles.Repository;
 using RftmAPI.Domain.Models.Tracks.Repository;
 using RftmAPI.Domain.Utils;
 using RtfmAPI.Infrastructure.Persistence.Context;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         // services.AddPostgresDatabase();
         
         services.AddScoped<ITracksRepository, TracksRepository>();
+        services.AddScoped<ITrackFilesRepository, TrackFilesRepository>();
         services.AddScoped<IAlbumsRepository, AlbumsRepository>();
         services.AddScoped<IBandsRepository, BandsRepository>();
 
