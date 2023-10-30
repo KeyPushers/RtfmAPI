@@ -1,4 +1,4 @@
-﻿using RftmAPI.Domain.Utils;
+﻿using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;

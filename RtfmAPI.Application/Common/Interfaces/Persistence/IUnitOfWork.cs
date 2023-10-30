@@ -1,4 +1,7 @@
-﻿namespace RftmAPI.Domain.Utils;
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace RtfmAPI.Application.Common.Interfaces.Persistence;
 
 /// <summary>
 /// Интерфейс единицы работы.

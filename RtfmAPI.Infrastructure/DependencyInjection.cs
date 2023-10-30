@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using RftmAPI.Domain.Utils;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Persistence.Context;
+using RtfmAPI.Infrastructure.Persistence.Interceptors;
 using RtfmAPI.Infrastructure.Persistence.Repositories;
 
 namespace RtfmAPI.Infrastructure;
@@ -22,6 +22,8 @@ public static class DependencyInjection
     {
         services.AddInMemoryDatabase();
         // services.AddPostgresDatabase();
+
+        services.AddScoped<PublishDomainEventsInterceptor>();
         
         services.AddScoped<ITracksRepository, TracksRepository>();
         services.AddScoped<ITrackFilesRepository, TrackFilesRepository>();

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RftmAPI.Domain.Primitives;
 using RtfmAPI.Infrastructure.Persistence.Configurations;
+using RtfmAPI.Infrastructure.Persistence.Interceptors;
 
 namespace RtfmAPI.Infrastructure.Persistence.Context;
 
@@ -8,13 +10,16 @@ namespace RtfmAPI.Infrastructure.Persistence.Context;
 /// </summary>
 public sealed class AppDbContext : DbContext
 {
+    private readonly PublishDomainEventsInterceptor _publishDomainEventsInterceptor;
 
     /// <summary>
     /// Основной контекст базы данных
     /// </summary>
-    /// <param name="dbContextOptions">Настройки базы данных</param>
-    public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : base(dbContextOptions)
+    /// <param name="dbContextOptions">Настройки базы данных: <see cref="DbContextOptions{AppDbContext}"/>.</param>
+    /// <param name="publishDomainEventsInterceptor">Перехватчик доменных событий: <see cref="PublishDomainEventsInterceptor"/>.</param>
+    public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions, PublishDomainEventsInterceptor publishDomainEventsInterceptor) : base(dbContextOptions)
     {
+        _publishDomainEventsInterceptor = publishDomainEventsInterceptor;
     }
     
     /// <summary>
@@ -23,12 +28,34 @@ public sealed class AppDbContext : DbContext
     /// <param name="modelBuilder"></param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        
+        IgnoreDomainEventsInDataBase(modelBuilder);
         modelBuilder.ApplyConfiguration(new TrackConfiguration());
         modelBuilder.ApplyConfiguration(new TrackFileConfiguration());
         modelBuilder.ApplyConfiguration(new AlbumConfiguration());
         modelBuilder.ApplyConfiguration(new BandConfiguration());
         modelBuilder.ApplyConfiguration(new GenreConfiguration());
+        
+        base.OnModelCreating(modelBuilder);
+    }
+
+    /// <summary>
+    /// Обработчик события изменения конфигурации.
+    /// </summary>
+    /// <param name="optionsBuilder">Конструктор.</param>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(_publishDomainEventsInterceptor);
+        base.OnConfiguring(optionsBuilder);
+    }
+
+    /// <summary>
+    /// Исключить доменные события из базы данных.
+    /// </summary>
+    /// <param name="modelBuilder">Конструктор.</param>
+    private static void IgnoreDomainEventsInDataBase(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .Ignore<List<IDomainEvent>>()
+            .ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }

@@ -4,6 +4,7 @@ using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
 using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
+using RftmAPI.Domain.Models.Tracks.Events;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
@@ -50,6 +51,8 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     }
 #pragma warning restore CS8618
 
+    #region Создание музыкального трека.
+
     /// <summary>
     /// Создание музыкального трека.
     /// </summary>
@@ -77,7 +80,9 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <returns>Музыкальный трек.</returns>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
     {
-        return new Track(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
+        var track = new Track(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
+        track.AddDomainEvent(new TrackCreated(track));
+        return track;
     }
 
     /// <summary>
@@ -91,7 +96,9 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album)
     {
-        return new Track(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
+        var track = new Track(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
+        track.AddDomainEvent(new TrackCreated(track));
+        return track;
     }
 
     /// <summary>
@@ -105,7 +112,9 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         IEnumerable<Genre> genres)
     {
-        return new Track(name, releaseDate, trackFile, null, genres);
+        var track = new Track(name, releaseDate, trackFile, null, genres);
+        track.AddDomainEvent(new TrackCreated(track));
+        return track;
     }
 
     /// <summary>
@@ -120,6 +129,10 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album, IEnumerable<Genre> genres)
     {
-        return new Track(name, releaseDate, trackFile, album, genres);
+        var track = new Track(name, releaseDate, trackFile, album, genres);
+        track.AddDomainEvent(new TrackCreated(track));
+        return track;
     }
+
+    #endregion
 }
