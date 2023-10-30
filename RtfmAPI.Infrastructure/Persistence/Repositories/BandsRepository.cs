@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Bands;
-using RftmAPI.Domain.Models.Bands.Repository;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;

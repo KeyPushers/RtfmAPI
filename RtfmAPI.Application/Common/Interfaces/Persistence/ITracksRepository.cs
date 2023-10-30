@@ -1,6 +1,9 @@
-﻿using RftmAPI.Domain.Models.Tracks.ValueObjects;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 
-namespace RftmAPI.Domain.Models.Tracks.Repository;
+namespace RtfmAPI.Application.Common.Interfaces.Persistence;
 
 /// <summary>
 /// Интерфейс репозитория доменной модели <see cref="Track"/>.

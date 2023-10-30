@@ -1,6 +1,9 @@
-﻿using RftmAPI.Domain.Models.Albums.ValueObjects;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using RftmAPI.Domain.Models.Albums;
+using RftmAPI.Domain.Models.Albums.ValueObjects;
 
-namespace RftmAPI.Domain.Models.Albums.Repository;
+namespace RtfmAPI.Application.Common.Interfaces.Persistence;
 
 /// <summary>
 /// Интерфейс репозитория доменной модели <see cref="Album"/>.

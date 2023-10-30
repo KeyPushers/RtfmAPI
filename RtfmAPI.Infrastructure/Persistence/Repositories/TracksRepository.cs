@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.Tracks;
-using RftmAPI.Domain.Models.Tracks.Repository;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;

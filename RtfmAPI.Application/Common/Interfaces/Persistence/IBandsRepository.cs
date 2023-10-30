@@ -1,6 +1,9 @@
-﻿using RftmAPI.Domain.Models.Bands.ValueObjects;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using RftmAPI.Domain.Models.Bands;
+using RftmAPI.Domain.Models.Bands.ValueObjects;
 
-namespace RftmAPI.Domain.Models.Bands.Repository;
+namespace RtfmAPI.Application.Common.Interfaces.Persistence;
 
 /// <summary>
 /// Интерфейс репозитория доменной модели <see cref="Band"/>.

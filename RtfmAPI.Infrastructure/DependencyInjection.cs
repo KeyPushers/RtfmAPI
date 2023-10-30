@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using RftmAPI.Domain.Models.Albums.Repository;
-using RftmAPI.Domain.Models.Bands.Repository;
-using RftmAPI.Domain.Models.TrackFiles.Repository;
-using RftmAPI.Domain.Models.Tracks.Repository;
 using RftmAPI.Domain.Utils;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Infrastructure.Persistence.Repositories;
 

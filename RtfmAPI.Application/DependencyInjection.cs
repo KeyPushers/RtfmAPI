@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using RtfmAPI.Application.PipelineBehaviors;
+using RtfmAPI.Application.Common.PipelineBehaviors;
 
 namespace RtfmAPI.Application;
 

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Properties;
 
-namespace RtfmAPI.Application.PipelineBehaviors;
+namespace RtfmAPI.Application.Common.PipelineBehaviors;
 
 /// <summary>
 /// Конвейер логирования.

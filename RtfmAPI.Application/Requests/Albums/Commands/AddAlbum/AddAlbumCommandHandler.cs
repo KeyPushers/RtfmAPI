@@ -3,8 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Models.Albums;
-using RftmAPI.Domain.Models.Albums.Repository;
 using RftmAPI.Domain.Utils;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 

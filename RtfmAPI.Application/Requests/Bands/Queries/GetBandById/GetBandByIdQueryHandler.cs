@@ -3,8 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Models.Bands;
-using RftmAPI.Domain.Models.Bands.Repository;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 
 namespace RtfmAPI.Application.Requests.Bands.Queries.GetBandById;
 

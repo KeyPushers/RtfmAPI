@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Models.Tracks;
-using RftmAPI.Domain.Models.Tracks.Repository;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 

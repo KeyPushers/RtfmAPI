@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.TrackFiles;
-using RftmAPI.Domain.Models.TrackFiles.Repository;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
-using RftmAPI.Domain.Models.Tracks.Repository;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 using RftmAPI.Domain.Utils;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
