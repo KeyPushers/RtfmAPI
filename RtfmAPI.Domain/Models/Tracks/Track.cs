@@ -56,28 +56,15 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="name">Название музыкального трека.</param>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFile">Содержимое файла музыкального трека.</param>
-    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile) : base(TrackId.Create())
-    {
-        Name = name;
-        ReleaseDate = releaseDate;
-        TrackFileId = (TrackFileId) trackFile.Id;
-    }
-
-    /// <summary>
-    /// Создание музыкального трека.
-    /// </summary>
-    /// <param name="name">Название музыкального трека.</param>
-    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
-    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="genres">Музыкальные жанры.</param>
-    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album album,
+    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album? album,
         IEnumerable<Genre> genres) : base(TrackId.Create())
     {
         Name = name;
         ReleaseDate = releaseDate;
         TrackFileId = (TrackFileId) trackFile.Id;
-        AlbumId = (AlbumId) album.Id;
+        AlbumId = album?.Id as AlbumId;
         _genreIds = genres.Select(genre => (GenreId) genre.Id).ToList();
     }
 
@@ -90,7 +77,35 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <returns>Музыкальный трек.</returns>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
     {
-        return new Track(name, releaseDate, trackFile);
+        return new Track(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
+    }
+
+    /// <summary>
+    /// Создание музыкального трека.
+    /// </summary>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
+    /// <param name="album">Музыкальный альбом.</param>
+    /// <returns>Музыкальный трек.</returns>
+    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
+        Album album)
+    {
+        return new Track(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
+    }
+
+    /// <summary>
+    /// Создание музыкального трека.
+    /// </summary>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
+    /// <param name="genres">Музыкальные жанры.</param>
+    /// <returns>Музыкальный трек.</returns>
+    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
+        IEnumerable<Genre> genres)
+    {
+        return new Track(name, releaseDate, trackFile, null, genres);
     }
 
     /// <summary>
