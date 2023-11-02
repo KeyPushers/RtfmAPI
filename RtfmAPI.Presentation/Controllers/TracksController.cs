@@ -47,14 +47,28 @@ public class TracksController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальный трек.</returns>
     [HttpGet("{id}")]
-    public Task<Track?> GetTrackByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetTrackByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         var query = new GetTrackByIdQuery
         {
             Id = id
         };
 
-        return Mediator.Send(query, cancellationToken);
+        var result = await Mediator.Send(query, cancellationToken);
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Error);
+        }
+
+        if (result.Value?.Stream is null)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return new FileStreamResult(result.Value.Stream, result.Value?.MediaType ?? string.Empty)
+        {
+            EnableRangeProcessing = true
+        };
     }
 
     /// <summary>

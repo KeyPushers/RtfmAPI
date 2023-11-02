@@ -1,13 +1,15 @@
 ﻿using System;
 using MediatR;
 using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Primitives;
+using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById.Dtos;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 
 /// <summary>
 /// Запрос музыкального трека по идентификатору
 /// </summary>
-public class GetTrackByIdQuery : IRequest<Track?>
+public class GetTrackByIdQuery : IRequest<Result<GetTrackByIdResponse?>>
 {
     /// <summary>
     /// Идентификатор музыкального трека
