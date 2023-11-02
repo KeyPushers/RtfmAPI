@@ -42,13 +42,9 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
         _logger.LogInformation("{Message}", startingRequestMessage);
 
         var response = await next();
-
-        if (response is not Result<TResponse> responseResult)
-        {
-            return response;
-        }
         
-        if (responseResult.IsFailed)
+        var responseResult = response as BaseResult;
+        if (responseResult?.IsFailed is true)
         {
             var failureRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestFailureError,
                 typeof(TRequest).Name, responseResult.Error.Message, DateTime.UtcNow);
@@ -59,6 +55,6 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
             typeof(TRequest).Name, DateTime.UtcNow);
         _logger.LogInformation("{Message}", completedRequestMessage);
 
-        return responseResult.Value;
+        return response;
     }
 }
