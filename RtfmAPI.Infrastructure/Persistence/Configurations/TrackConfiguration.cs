@@ -19,7 +19,6 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
     public void Configure(EntityTypeBuilder<Track> builder)
     {
         ConfigureTracksTable(builder);
-        // ConfigureTrackTrackFilesTable(builder);
         ConfigureTrackGenreIdsTable(builder);
     }
 

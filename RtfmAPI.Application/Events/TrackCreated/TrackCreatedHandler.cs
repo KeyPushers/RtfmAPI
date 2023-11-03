@@ -2,24 +2,29 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using TrackCreatedEvent = RftmAPI.Domain.Models.Tracks.Events.TrackCreated;
+using RftmAPI.Domain.Models.Tracks.Events;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
+using RtfmAPI.Application.Common.Interfaces.Persistence;
 
-namespace RtfmAPI.Application.Requests.Tracks.Events.TrackCreated;
+namespace RtfmAPI.Application.Events.TrackCreated;
 
 /// <summary>
 /// Обработчик события создания музыкального трека.
 /// </summary>
-public class TrackCreatedHandler : INotificationHandler<TrackCreatedEvent>
+public class TrackCreatedHandler : INotificationHandler<TrackCreatedDomainEvent>
 {
     private readonly ILogger<TrackCreatedHandler> _logger;
+    private readonly ITracksRepository _repository;
 
     /// <summary>
     /// Создание обработчика события создания музыкального трека.
     /// </summary>
     /// <param name="logger"></param>
-    public TrackCreatedHandler(ILogger<TrackCreatedHandler> logger)
+    /// <param name="repository">Репозиторий музыкальных треков.</param>
+    public TrackCreatedHandler(ILogger<TrackCreatedHandler> logger, ITracksRepository repository)
     {
         _logger = logger;
+        _repository = repository;
     }
     
     /// <summary>
@@ -27,10 +32,12 @@ public class TrackCreatedHandler : INotificationHandler<TrackCreatedEvent>
     /// </summary>
     /// <param name="notification">Событие</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    public Task Handle(TrackCreatedEvent notification, CancellationToken cancellationToken = default)
+    public async Task Handle(TrackCreatedDomainEvent notification, CancellationToken cancellationToken = default)
     {
         _logger.LogTrace("Обработка события создания музыкального трека: {IdValue}", notification.Track.Id.Value);
+
+        var track = await _repository.GetTrackByIdAsync((TrackId) notification.Track.Id);
         
-        return Task.CompletedTask;
+        return;
     }
 }

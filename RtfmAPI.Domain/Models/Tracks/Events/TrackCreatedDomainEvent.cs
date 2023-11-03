@@ -5,4 +5,4 @@ namespace RftmAPI.Domain.Models.Tracks.Events;
 /// <summary>
 /// Событие создания музыкального трека.
 /// </summary>
-public record TrackCreated(Track Track) : IDomainEvent;
+public record TrackCreatedDomainEvent(Track Track) : IDomainEvent;

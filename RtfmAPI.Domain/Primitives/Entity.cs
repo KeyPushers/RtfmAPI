@@ -16,6 +16,15 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvents
     /// <inheritdoc cref="IHasDomainEvents.DomainEvents"/>
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
+    /// <summary>
+    /// Добавление доменного события.
+    /// </summary>
+    /// <param name="domainEvent">Доменное событие.</param>
+    public void AddDomainEvent(IDomainEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+    }
+    
     /// <inheritdoc cref="IHasDomainEvents.ClearDomainEvents"/>
     public void ClearDomainEvents()
     {
@@ -90,14 +99,5 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvents
     public override int GetHashCode()
     {
         return Id.GetHashCode();
-    }
-
-    /// <summary>
-    /// Добавление доменного события.
-    /// </summary>
-    /// <param name="domainEvent">Доменное событие.</param>
-    public void AddDomainEvent(IDomainEvent domainEvent)
-    {
-        _domainEvents.Add(domainEvent);
     }
 }

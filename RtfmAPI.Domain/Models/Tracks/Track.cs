@@ -69,6 +69,8 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         TrackFileId = (TrackFileId) trackFile.Id;
         AlbumId = album?.Id as AlbumId;
         _genreIds = genres.Select(genre => (GenreId) genre.Id).ToList();
+
+        AddDomainEvent(new TrackCreatedDomainEvent(this));
     }
 
     /// <summary>
@@ -80,9 +82,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <returns>Музыкальный трек.</returns>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
     {
-        var track = new Track(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
-        track.AddDomainEvent(new TrackCreated(track));
-        return track;
+        return new Track(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
     }
 
     /// <summary>
@@ -96,9 +96,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album)
     {
-        var track = new Track(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
-        track.AddDomainEvent(new TrackCreated(track));
-        return track;
+        return new Track(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
     }
 
     /// <summary>
@@ -112,9 +110,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         IEnumerable<Genre> genres)
     {
-        var track = new Track(name, releaseDate, trackFile, null, genres);
-        track.AddDomainEvent(new TrackCreated(track));
-        return track;
+        return new Track(name, releaseDate, trackFile, null, genres);
     }
 
     /// <summary>
@@ -129,9 +125,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album, IEnumerable<Genre> genres)
     {
-        var track = new Track(name, releaseDate, trackFile, album, genres);
-        track.AddDomainEvent(new TrackCreated(track));
-        return track;
+        return new Track(name, releaseDate, trackFile, album, genres);
     }
 
     #endregion

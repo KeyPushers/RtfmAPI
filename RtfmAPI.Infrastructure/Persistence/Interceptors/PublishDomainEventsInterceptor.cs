@@ -25,17 +25,30 @@ public class PublishDomainEventsInterceptor : SaveChangesInterceptor
     [Obsolete($"Применитять асинхронную реализацию: {nameof(SavingChangesAsync)}")]
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        PublishDomainEventsAsync(eventData.Context).GetAwaiter().GetResult();
         return base.SavingChanges(eventData, result);
     }
 
     /// <inheritdoc cref="SaveChangesInterceptor.SavingChangesAsync"/>
-    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
-        CancellationToken cancellationToken = new CancellationToken())
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
+    {
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+
+    /// <inheritdoc cref="SaveChangesInterceptor.SavedChanges"/>
+    [Obsolete($"Применитять асинхронную реализацию: {nameof(SavedChangesAsync)}")]
+    public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
+    {
+        PublishDomainEventsAsync(eventData.Context).GetAwaiter().GetResult();
+        return base.SavedChanges(eventData, result);
+    }
+
+    /// <inheritdoc cref="SaveChangesInterceptor.SavedChangesAsync"/>
+    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
+        CancellationToken cancellationToken = default)
     {
         await PublishDomainEventsAsync(eventData.Context);
-        
-        return await base.SavingChangesAsync(eventData, result, cancellationToken);
+        return await base.SavedChangesAsync(eventData, result, cancellationToken);
     }
 
     /// <summary>

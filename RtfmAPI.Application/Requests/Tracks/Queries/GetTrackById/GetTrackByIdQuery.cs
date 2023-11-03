@@ -1,6 +1,5 @@
 ﻿using System;
 using MediatR;
-using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById.Dtos;
 

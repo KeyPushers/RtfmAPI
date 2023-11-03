@@ -33,8 +33,11 @@ public class TrackReleaseDate : ValueObject
         {
             return TrackExceptions.TrackReleaseDateExceptions.InvalidDate;
         }
-
-        return new TrackReleaseDate(value);
+        
+        var date = value.Kind is DateTimeKind.Unspecified 
+            ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            : value.ToUniversalTime();
+        return new TrackReleaseDate(date);
     }
 
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
