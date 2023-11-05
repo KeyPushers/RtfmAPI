@@ -126,4 +126,12 @@ public sealed class Error : IEquatable<Error>
     {
         return !Equals(left, right);
     }
+
+    /// <summary>
+    /// <inheritdoc cref="ToString"/>
+    /// </summary>
+    public override string ToString()
+    {
+        return Message;
+    }
 }

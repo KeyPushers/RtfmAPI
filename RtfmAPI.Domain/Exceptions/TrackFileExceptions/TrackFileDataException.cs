@@ -1,4 +1,6 @@
-﻿namespace RftmAPI.Domain.Exceptions.TrackExceptions;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
+
+namespace RftmAPI.Domain.Exceptions.TrackFileExceptions;
 
 /// <summary>
 /// Исключение содержимого файла доменной модели музыкального трека.

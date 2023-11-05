@@ -11,9 +11,9 @@ namespace RtfmAPI.Application.Events.TrackCreated;
 /// <summary>
 /// Обработчик события создания музыкального трека.
 /// </summary>
-public class TrackCreatedHandler : INotificationHandler<TrackCreatedDomainEvent>
+public class TrackCreatedDomainEventHandler : INotificationHandler<TrackCreatedDomainEvent>
 {
-    private readonly ILogger<TrackCreatedHandler> _logger;
+    private readonly ILogger<TrackCreatedDomainEventHandler> _logger;
     private readonly ITracksRepository _repository;
 
     /// <summary>
@@ -21,7 +21,7 @@ public class TrackCreatedHandler : INotificationHandler<TrackCreatedDomainEvent>
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="repository">Репозиторий музыкальных треков.</param>
-    public TrackCreatedHandler(ILogger<TrackCreatedHandler> logger, ITracksRepository repository)
+    public TrackCreatedDomainEventHandler(ILogger<TrackCreatedDomainEventHandler> logger, ITracksRepository repository)
     {
         _logger = logger;
         _repository = repository;

@@ -35,7 +35,10 @@ public class AlbumReleaseDate : ValueObject
             return AlbumExceptions.AlbumReleaseDateExceptions.InvalidDate;
         }
 
-        return new AlbumReleaseDate(value);
+        var date = value.Kind is DateTimeKind.Unspecified 
+            ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            : value.ToUniversalTime();
+        return new AlbumReleaseDate(date);
     }
 
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>

@@ -39,5 +39,4 @@ public class AlbumsRepository : IAlbumsRepository
     {
         await _context.AddAsync(album);
     }
-
 }

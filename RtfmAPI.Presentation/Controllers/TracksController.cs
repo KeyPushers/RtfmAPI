@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RftmAPI.Domain.Models.Tracks;
+using RtfmAPI.Application.Requests.Tracks.Commands.AddAlbumToTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
@@ -108,5 +109,30 @@ public class TracksController : ApiControllerBase
         }
         
         return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Добавленеи музыкального альбома к музыкальному треку.
+    /// </summary>
+    /// <param name="trackId">Идентификатор музыкального трека.</param>
+    /// <param name="albumId">Идентификатор музыкального альбома.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    [HttpPost("[action]")]
+    public async Task<IActionResult> AddAlbumToTrackAsync([FromQuery] Guid trackId, [FromQuery] Guid albumId,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new AddAlbumToTrackCommand
+        {
+            TrackId = trackId,
+            AlbumId = albumId
+        };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return BadRequest(commandResult.Error);
+        }
+
+        return Ok(commandResult.Value);
     }
 }

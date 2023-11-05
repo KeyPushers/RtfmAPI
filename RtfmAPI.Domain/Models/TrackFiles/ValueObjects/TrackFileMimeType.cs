@@ -1,4 +1,4 @@
-﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
+﻿using RftmAPI.Domain.Exceptions.TrackFileExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -50,12 +50,12 @@ public class TrackFileMimeType : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return TrackExceptions.TrackFileMimeTypeExceptions.IsNullOrWhiteSpace;
+            return TrackFileExceptions.TrackFileMimeTypeExceptions.IsNullOrWhiteSpace;
         }
 
         if (!AudioMediaTypes.Contains(value))
         {
-            return TrackExceptions.TrackFileMimeTypeExceptions.Invalid;
+            return TrackFileExceptions.TrackFileMimeTypeExceptions.Invalid;
         }
 
         return new TrackFileMimeType(value);

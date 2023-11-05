@@ -8,7 +8,7 @@ public sealed class TrackNameException : TrackException
     /// <summary>
     /// Создание исключения названия доменной модели музыкального трека.
     /// </summary>
-    /// <param name="message">Сообщение</param>
+    /// <param name="message">Сообщение.</param>
     public TrackNameException(string message) : base($"{nameof(TrackNameException)}. {message}")
     {
     }

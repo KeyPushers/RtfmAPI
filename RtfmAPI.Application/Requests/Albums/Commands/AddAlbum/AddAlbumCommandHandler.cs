@@ -1,8 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Models.Albums;
+using RftmAPI.Domain.Models.Albums.ValueObjects;
+using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
@@ -10,7 +11,7 @@ namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 /// <summary>
 /// Обработчик команды добавления музыкального альбома.
 /// </summary>
-public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Album>
+public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<Album>>
 {
     private readonly IAlbumsRepository _albumsRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -32,8 +33,29 @@ public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Album>
     /// <param name="request">Команда добавления музыкального альбома.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальный трек.</returns>
-    public async Task<Album> Handle(AddAlbumCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<Album>> Handle(AddAlbumCommand request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var albumNameResult = AlbumName.Create(request.Name ?? string.Empty);
+        if (albumNameResult.IsFailed)
+        {
+            return albumNameResult.Error;
+        }
+
+        var albumReleaseDateResult = AlbumReleaseDate.Create(request.ReleaseDate);
+        if (albumReleaseDateResult.IsFailed)
+        {
+            return albumReleaseDateResult.Error;
+        }
+
+        var albumResult = Album.Create(albumNameResult.Value, albumReleaseDateResult.Value);
+        if (albumResult.IsFailed)
+        {
+            return albumResult.Error;
+        }
+
+        await _albumsRepository.AddAsync(albumResult.Value);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return albumResult;
     }
 }

@@ -36,7 +36,7 @@ public class AlbumsController : ApiControllerBase
 
         return Mediator.Send(query, cancellationToken);
     }
-    
+
     /// <summary>
     /// Получение музыкального альбома по идентификатору
     /// </summary>
@@ -53,7 +53,7 @@ public class AlbumsController : ApiControllerBase
 
         return Mediator.Send(query, cancellationToken);
     }
-    
+
     /// <summary>
     /// Добавление музыкального альбома
     /// </summary>
@@ -62,7 +62,8 @@ public class AlbumsController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Добавленный музыкальный альбом</returns>
     [HttpPost]
-    public Task<Album> AddAlbumAsync([FromQuery] string name, [FromQuery] DateTime releaseDate, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> AddAlbumAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
+        CancellationToken cancellationToken = default)
     {
         var command = new AddAlbumCommand
         {
@@ -70,6 +71,12 @@ public class AlbumsController : ApiControllerBase
             ReleaseDate = releaseDate
         };
 
-        return Mediator.Send(command, cancellationToken);
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return BadRequest(commandResult.Error);
+        }
+
+        return Ok(commandResult.Value);
     }
 }

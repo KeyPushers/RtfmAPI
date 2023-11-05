@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Models.Albums;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
+using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
@@ -15,7 +16,7 @@ namespace RftmAPI.Domain.Models.Tracks;
 /// </summary>
 public sealed class Track : AggregateRoot<TrackId, Guid>
 {
-    private List<GenreId> _genreIds = new();
+    private HashSet<GenreId> _genreIds = new();
 
     /// <summary>
     /// Название музыкального трека.
@@ -67,10 +68,14 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         Name = name;
         ReleaseDate = releaseDate;
         TrackFileId = (TrackFileId) trackFile.Id;
-        AlbumId = album?.Id as AlbumId;
-        _genreIds = genres.Select(genre => (GenreId) genre.Id).ToList();
+        AlbumId = album?.Id is not null ? AlbumId.Create(album.Id.Value) : null;
+        _genreIds = genres.Select(genre => (GenreId) genre.Id).ToHashSet();
 
         AddDomainEvent(new TrackCreatedDomainEvent(this));
+        if (album is not null)
+        {
+            AddDomainEvent(new AlbumAddedToTrackDomainEvent(this, album));
+        }
     }
 
     /// <summary>
@@ -129,4 +134,40 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     }
 
     #endregion
+
+    /// <summary>
+    /// Добавление музыкального альбома.
+    /// </summary>
+    /// <param name="album">Музыкальный трек.</param>
+    /// <returns>Результат операции.</returns>
+    public BaseResult AddAlbum(Album album)
+    {
+        if (AlbumId?.Value == album.Id.Value)
+        {
+            return BaseResult.Success();
+        }
+        
+        AlbumId = AlbumId.Create(album.Id.Value);
+
+        AddDomainEvent(new AlbumAddedToTrackDomainEvent(this, album));
+
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Удаление музыкального альбома.
+    /// </summary>
+    /// <returns>Результат операции.</returns>
+    public BaseResult RemoveAlbum()
+    {
+        if (AlbumId is null)
+        {
+            return BaseResult.Success();
+        }
+
+        var albumId = AlbumId;
+        AlbumId = null;
+        AddDomainEvent(new AlbumRemovedFromTrackDomainEvent(this, albumId));
+        return BaseResult.Success();
+    }
 }

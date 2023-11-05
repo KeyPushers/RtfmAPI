@@ -21,13 +21,13 @@ public class TracksRepository : ITracksRepository
     {
         _context = context;
     }
-    
+
     /// <inheritdoc cref="ITracksRepository.GetTracksAsync"/>
     public Task<List<Track>> GetTracksAsync()
     {
         return _context.Set<Track>().ToListAsync();
     }
-    
+
     /// <inheritdoc cref="ITracksRepository.GetTrackByIdAsync"/>
     public Task<Track?> GetTrackByIdAsync(TrackId trackId)
     {

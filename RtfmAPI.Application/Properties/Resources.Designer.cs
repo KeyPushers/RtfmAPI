@@ -60,6 +60,24 @@ namespace RtfmAPI.Application.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Доминное событие успешно обработано..
+        /// </summary>
+        internal static string DomainEventHandledSuccesfully {
+            get {
+                return ResourceManager.GetString("DomainEventHandledSuccesfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Доменное событие обработано с ошибкой..
+        /// </summary>
+        internal static string DomainEventHandledWithError {
+            get {
+                return ResourceManager.GetString("DomainEventHandledWithError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ошибка запроса {0}, {1}, {2}.
         /// </summary>
         internal static string LoggingPipelineBehaviorCompletedRequestFailureError {

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using RftmAPI.Domain.Exceptions.TrackExceptions;
+using RftmAPI.Domain.Exceptions.TrackFileExceptions;
 using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
@@ -57,7 +57,7 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
 
         if (request.TrackFile is null)
         {
-            return TrackExceptions.TrackFileDataExceptions.IsEmpty;
+            return TrackFileExceptions.TrackFileDataExceptions.IsEmpty;
         }
 
         var trackFileResult = CreateTrackFile(request.TrackFile);

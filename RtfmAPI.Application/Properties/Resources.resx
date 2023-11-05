@@ -27,4 +27,10 @@
     <data name="LoggingPipelineBehaviorCompletedRequestFailureError" xml:space="preserve">
         <value>Ошибка запроса {0}, {1}, {2}</value>
     </data>
+    <data name="DomainEventHandledWithError" xml:space="preserve">
+        <value>Доменное событие обработано с ошибкой.</value>
+    </data>
+    <data name="DomainEventHandledSuccesfully" xml:space="preserve">
+        <value>Доминное событие успешно обработано.</value>
+    </data>
 </root>

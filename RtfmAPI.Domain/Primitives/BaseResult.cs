@@ -34,11 +34,25 @@ public class BaseResult
     /// Создание представления результата успешной операции.
     /// </summary>
     /// <returns>Представление результата операции.</returns>
-    protected static BaseResult Success() => new(Error.None);
+    public static BaseResult Success() => new(Error.None);
 
     /// <summary>
     /// Создание представления результата операции, закончившейся ошибкой.
     /// </summary>
     /// <returns>Представление результата операции.</returns>
-    protected static BaseResult Failure(Error error) => new(error);
+    public static BaseResult Failure(Error error) => new(error);
+    
+    /// <summary>
+    /// Перегрузка оператора неявного приведения типа к <see cref="BaseResult"/>
+    /// </summary>
+    /// <param name="error">Ошибка операции.</param>
+    /// <returns>Представление результата доменной операции.</returns>
+    public static implicit operator BaseResult(Error error) => new(error);
+    
+    /// <summary>
+    /// Перегрузка оператора неявного приведения типа к <see cref="BaseResult"/>
+    /// </summary>
+    /// <param name="exception">Исключение.</param>
+    /// <returns>Представление результата доменной операции.</returns>
+    public static implicit operator BaseResult(Exception exception) => new(exception);
 }
