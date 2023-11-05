@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using RftmAPI.Domain.Exceptions.AlbumExceptions;
+using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
@@ -33,16 +35,18 @@ public class AddAlbumToTrackCommandHandler : IRequestHandler<AddAlbumToTrackComm
     /// <returns><see cref="Unit"/>.</returns>
     public async Task<Result<Unit>> Handle(AddAlbumToTrackCommand request, CancellationToken cancellationToken = default)
     {
-        var track = await _tracksRepository.GetTrackByIdAsync(TrackId.Create(request.TrackId));
+        var trackId = TrackId.Create(request.TrackId);
+        var track = await _tracksRepository.GetTrackByIdAsync(trackId);
         if (track is null)
         {
-            return new NullReferenceException(nameof(track));
+            return TrackExceptions.NotFound(trackId);
         }
 
+        var albumId = AlbumId.Create(request.AlbumId);
         var album = await _albumsRepository.GetAlbumByIdAsync(AlbumId.Create(request.AlbumId));
         if (album is null)
         {
-            return new NullReferenceException(nameof(album));
+            return AlbumExceptions.NotFound(albumId);
         }
 
         var addAlbumToTrackResult = track.AddAlbum(album);

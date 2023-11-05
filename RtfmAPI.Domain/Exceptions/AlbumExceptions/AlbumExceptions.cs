@@ -17,6 +17,13 @@ public static class AlbumExceptions
         new($"Музыкальный альбом [{albumId}] не содержит музыкальный трек [{trackId}].");
 
     /// <summary>
+    /// Создание "<inheritdoc cref="AlbumNotFoundException"/>".
+    /// </summary>
+    /// <param name="albumId">Идентификатор музыкального альбома.</param>
+    public static AlbumNotFoundException NotFound(AlbumId albumId) =>
+        new($"Не удалось найти музыкальный альбом с идентификатором [{albumId.Value}].");
+
+    /// <summary>
     /// Создание "<inheritdoc cref="TrackRemovingFromAlbumFailedException"/>".
     /// </summary>
     /// <param name="albumId">Идентификатор музыкального альбома.</param>

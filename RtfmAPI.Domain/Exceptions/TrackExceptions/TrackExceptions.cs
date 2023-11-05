@@ -1,4 +1,6 @@
-﻿namespace RftmAPI.Domain.Exceptions.TrackExceptions;
+﻿using RftmAPI.Domain.Models.Tracks.ValueObjects;
+
+namespace RftmAPI.Domain.Exceptions.TrackExceptions;
 
 /// <summary>
 /// Исключения доменной модели музыкального трека.
@@ -6,22 +8,29 @@
 public static class TrackExceptions
 {
     /// <summary>
-    /// Исключение добавления музыкального альбома к треку.
+    /// Создание "<inheritdoc cref="TrackNotFoundException"/>".
     /// </summary>
-    public static AlbumIsAlreadyAddedToTrackException AlbumIsAlreadyAddedToTrackException => new("К треку уже привязан альбом.");
+    /// <param name="trackId">Идентификатор музыкального трека.</param>
+    public static TrackNotFoundException NotFound(TrackId trackId) => new($"Не удалось найти музыкальный трек с идентификатором [{trackId.Value}].");
     
     /// <summary>
     /// Исключения названия доменной модели музыкального трека.
     /// </summary>
     public static class TrackNameExceptions
     {
-        /// <inheritdoc cref="TrackNameException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackNameException"/>".
+        /// </summary>
         public static TrackNameException IsNullOrWhiteSpace => new("Название музыкального трека не задано.");
 
-        /// <inheritdoc cref="TrackNameException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackNameException"/>".
+        /// </summary>
         public static TrackNameException IsTooShort => new("Название музыкального трека слишком короткое.");
 
-        /// <inheritdoc cref="TrackNameException"/>
+        /// <summary>
+        /// <inheritdoc cref="TrackNameException"/>.
+        /// </summary>
         public static TrackNameException IsTooLong => new("Название музыкального трека слишком длинное.");
     }
 
@@ -30,7 +39,9 @@ public static class TrackExceptions
     /// </summary>
     public static class TrackReleaseDateExceptions
     {
-        /// <inheritdoc cref="TrackReleaseDateException"/>
+        /// <summary>
+        /// <inheritdoc cref="TrackReleaseDateException"/>.
+        /// </summary>
         public static TrackReleaseDateException InvalidDate => new("Некорректная дата выпуска музыкального трека.");
     }
 }
