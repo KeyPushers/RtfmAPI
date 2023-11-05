@@ -50,6 +50,12 @@ public class AddAlbumToTrackCommandHandler : IRequestHandler<AddAlbumToTrackComm
         {
             return addAlbumToTrackResult.Error;
         }
+
+        var addTrackToAlbumResult = album.AddTrack(track);
+        if (addTrackToAlbumResult.IsFailed)
+        {
+            return addTrackToAlbumResult.Error;
+        }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

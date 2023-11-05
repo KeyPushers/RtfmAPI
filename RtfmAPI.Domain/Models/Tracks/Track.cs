@@ -1,5 +1,4 @@
-﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
-using RftmAPI.Domain.Models.Albums;
+﻿using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
