@@ -6,7 +6,7 @@ namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 /// <summary>
 /// MIME-тип файла музыкального трека.
 /// </summary>
-public class TrackFileMimeType : ValueObject
+public sealed class TrackFileMimeType : ValueObject
 {
     /// <summary>
     /// MIME-типы аудио.

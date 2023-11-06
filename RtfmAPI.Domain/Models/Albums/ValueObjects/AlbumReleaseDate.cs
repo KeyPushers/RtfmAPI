@@ -1,5 +1,4 @@
-﻿
-using RftmAPI.Domain.Exceptions.AlbumExceptions;
+﻿using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.Albums.ValueObjects;
@@ -7,7 +6,7 @@ namespace RftmAPI.Domain.Models.Albums.ValueObjects;
 /// <summary>
 /// Дата выпуска музыкального альбома.
 /// </summary>
-public class AlbumReleaseDate : ValueObject
+public sealed class AlbumReleaseDate : ValueObject
 {
     /// <summary>
     /// Дата выпуска музыкального альбома.
@@ -35,7 +34,7 @@ public class AlbumReleaseDate : ValueObject
             return AlbumExceptions.AlbumReleaseDateExceptions.InvalidDate;
         }
 
-        var date = value.Kind is DateTimeKind.Unspecified 
+        var date = value.Kind is DateTimeKind.Unspecified
             ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
             : value.ToUniversalTime();
         return new AlbumReleaseDate(date);

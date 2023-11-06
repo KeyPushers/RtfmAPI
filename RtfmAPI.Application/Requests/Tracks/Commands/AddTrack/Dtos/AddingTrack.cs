@@ -3,14 +3,23 @@
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 
 /// <summary>
-/// Объект переноса данных файла музыкального трека.
+/// Объект переноса данных добавляемого музыкального трека.
 /// </summary>
-public class TrackFile
+public class AddingTrack
 {
+    /// <summary>
+    /// Создание объекта переноса данных добавляемого музыкального трека.
+    /// </summary>
+    /// <param name="memoryStream">Потока файла музыкального трека.</param>
+    public AddingTrack(MemoryStream memoryStream)
+    {
+        File = memoryStream;
+    }
+    
     /// <summary>
     /// Файл музыкального трека.
     /// </summary>
-    public MemoryStream? File { get; init; }
+    public MemoryStream File { get; }
 
     /// <summary>
     /// Название файла музыкального трека.

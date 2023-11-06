@@ -58,5 +58,12 @@ public class TrackFileConfiguration : IEntityTypeConfiguration<TrackFile>
             .HasConversion(entity => entity.Value,
                 value => TrackFileMimeType.Create(value).Value)
             .HasMaxLength(TrackFileName.MaxLength);
+        
+        // Определение продолжительности файла музыкального трека.
+        builder
+            .Property(trackFile => trackFile.Duration)
+            .ValueGeneratedNever()
+            .HasConversion(entity => entity.Value,
+                value => TrackFileDuration.Create(value).Value);
     }
 }

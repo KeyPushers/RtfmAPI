@@ -58,6 +58,13 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
             .HasConversion(entity => entity!.Value,
                 value => AlbumId.Create(value));
         
+        // Определение продолжительности музыкального трека.
+        builder
+            .Property(track => track.Duration)
+            .ValueGeneratedNever()
+            .HasConversion(entity => entity.Value,
+                value => TrackDuration.Create(value).Value);
+        
         // Определение идентификатора файла музыкального трека.
         builder
             .Property(track => track.TrackFileId)

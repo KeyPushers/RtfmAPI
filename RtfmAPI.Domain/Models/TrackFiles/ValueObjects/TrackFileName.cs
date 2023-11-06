@@ -6,7 +6,7 @@ namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 /// <summary>
 /// Название файла музыкального трека.
 /// </summary>
-public class TrackFileName : ValueObject
+public sealed class TrackFileName : ValueObject
 {
     /// <summary>
     /// Минимальная длина названия.

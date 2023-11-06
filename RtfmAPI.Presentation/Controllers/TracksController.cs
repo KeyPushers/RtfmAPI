@@ -12,6 +12,7 @@ using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 using RtfmAPI.Presentation.Dtos.Tracks;
+using File = TagLib.File;
 
 namespace RtfmAPI.Presentation.Controllers;
 
@@ -47,8 +48,9 @@ public class TracksController : ApiControllerBase
     /// <param name="id">Идентификатор.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальный трек.</returns>
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetTrackByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    [HttpGet("{id}", Name = nameof(GetTrackByIdAsync))]
+    public async Task<IActionResult> GetTrackByIdAsync([FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
     {
         var query = new GetTrackByIdQuery
         {
@@ -79,12 +81,13 @@ public class TracksController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Добавленный музыкальный трек.</returns>
     [HttpPost]
-    public async Task<IActionResult> AddTrackAsync([FromForm] AddTrack request, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<AddedTrack>> AddTrackAsync([FromForm] AddTrack request,
+        CancellationToken cancellationToken = default)
     {
         using var memoryStream = new MemoryStream();
         if (request.File is null)
         {
-            throw new Exception($"{nameof(request.File)}");
+            return BadRequest(nameof(request.File));
         }
 
         await request.File.CopyToAsync(memoryStream, cancellationToken);
@@ -93,9 +96,8 @@ public class TracksController : ApiControllerBase
         {
             Name = request.Name,
             ReleaseDate = request.ReleaseDate,
-            TrackFile = new TrackFile
+            TrackFile = new AddingTrack(memoryStream)
             {
-                File = memoryStream,
                 FileName = request.File.FileName,
                 Extension = Path.GetExtension(request.File.FileName),
                 MimeType = request.File.ContentType
@@ -107,8 +109,8 @@ public class TracksController : ApiControllerBase
         {
             return BadRequest(result.Error);
         }
-        
-        return Ok(result.Value);
+
+        return CreatedAtRoute(nameof(GetTrackByIdAsync), new {result.Value.Id}, result.Value);
     }
 
     /// <summary>

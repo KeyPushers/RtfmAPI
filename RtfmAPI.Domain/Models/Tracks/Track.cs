@@ -38,6 +38,11 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public AlbumId? AlbumId { get; private set; }
 
     /// <summary>
+    /// Продолжительность.
+    /// </summary>
+    public TrackDuration Duration { get; private set; }
+
+    /// <summary>
     /// Музыкальные жанры.
     /// </summary>
     public IReadOnlyCollection<GenreId> GenreIds => _genreIds;
@@ -60,14 +65,17 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFile">Содержимое файла музыкального трека.</param>
     /// <param name="album">Музыкальный альбом.</param>
+    /// <param name="duration">Продолжительность музыкального трека.</param>
     /// <param name="genres">Музыкальные жанры.</param>
     private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album? album,
+        TrackDuration duration,
         IEnumerable<Genre> genres) : base(TrackId.Create())
     {
         Name = name;
         ReleaseDate = releaseDate;
-        TrackFileId = (TrackFileId) trackFile.Id;
+        TrackFileId = TrackFileId.Create(trackFile.Id.Value);
         AlbumId = album?.Id is not null ? AlbumId.Create(album.Id.Value) : null;
+        Duration = duration;
         _genreIds = genres.Select(genre => (GenreId) genre.Id).ToHashSet();
 
         AddDomainEvent(new TrackCreatedDomainEvent(this));
@@ -86,7 +94,13 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <returns>Музыкальный трек.</returns>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
     {
-        return new Track(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
+        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
+        if (trackDurationResult.IsFailed)
+        {
+            return trackDurationResult.Error;
+        }
+
+        return new Track(name, releaseDate, trackFile, null, trackDurationResult.Value, Enumerable.Empty<Genre>());
     }
 
     /// <summary>
@@ -100,7 +114,13 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album)
     {
-        return new Track(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
+        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
+        if (trackDurationResult.IsFailed)
+        {
+            return trackDurationResult.Error;
+        }
+
+        return new Track(name, releaseDate, trackFile, album, trackDurationResult.Value, Enumerable.Empty<Genre>());
     }
 
     /// <summary>
@@ -114,7 +134,13 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         IEnumerable<Genre> genres)
     {
-        return new Track(name, releaseDate, trackFile, null, genres);
+        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
+        if (trackDurationResult.IsFailed)
+        {
+            return trackDurationResult.Error;
+        }
+
+        return new Track(name, releaseDate, trackFile, null, trackDurationResult.Value, genres);
     }
 
     /// <summary>
@@ -129,7 +155,13 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album, IEnumerable<Genre> genres)
     {
-        return new Track(name, releaseDate, trackFile, album, genres);
+        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
+        if (trackDurationResult.IsFailed)
+        {
+            return trackDurationResult.Error;
+        }
+
+        return new Track(name, releaseDate, trackFile, album, trackDurationResult.Value, genres);
     }
 
     #endregion
@@ -145,7 +177,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         {
             return BaseResult.Success();
         }
-        
+
         AlbumId = AlbumId.Create(album.Id.Value);
 
         AddDomainEvent(new AlbumAddedToTrackDomainEvent(this, album));

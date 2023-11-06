@@ -6,7 +6,7 @@ namespace RftmAPI.Domain.Models.Tracks.ValueObjects;
 /// <summary>
 /// Дата выпуска музыкального трека.
 /// </summary>
-public class TrackReleaseDate : ValueObject
+public sealed class TrackReleaseDate : ValueObject
 {
     /// <summary>
     /// Дата выпуска музыкального альбома.

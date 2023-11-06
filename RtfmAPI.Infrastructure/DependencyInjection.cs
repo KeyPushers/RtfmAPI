@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using RtfmAPI.Application.Common.Interfaces.AudioHandlers;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Infrastructure.Persistence.Interceptors;
 using RtfmAPI.Infrastructure.Persistence.Repositories;
+using RtfmAPI.Infrastructure.Shared.Services;
 
 namespace RtfmAPI.Infrastructure;
 
@@ -31,6 +33,8 @@ public static class DependencyInjection
         services.AddScoped<IBandsRepository, BandsRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped<IAudioHandlerFactory, AudioHandlerFactory>();
         
         return services;
     }

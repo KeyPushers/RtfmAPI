@@ -6,7 +6,7 @@ namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 /// <summary>
 /// Содержимое файла музыкального трека.
 /// </summary>
-public class TrackFileData : ValueObject
+public sealed class TrackFileData : ValueObject
 {
     /// <summary>
     /// Создание содержимого файла музыкального трека.

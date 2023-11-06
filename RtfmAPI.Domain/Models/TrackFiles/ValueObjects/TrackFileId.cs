@@ -5,7 +5,7 @@ namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 /// <summary>
 /// Идентификатор файла музыкального трека.
 /// </summary>
-public class TrackFileId : AggregateRootId<Guid>
+public sealed class TrackFileId : AggregateRootId<Guid>
 {
     /// <summary>
     /// Значение идентификатора.

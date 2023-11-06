@@ -9,7 +9,7 @@ namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 /// <summary>
 /// Команда добавления музыкального трека
 /// </summary>
-public class AddTrackCommand : IRequest<Result<Track>>
+public class AddTrackCommand : IRequest<Result<AddedTrack>>
 {
     /// <summary>
     /// Название трека
@@ -24,5 +24,5 @@ public class AddTrackCommand : IRequest<Result<Track>>
     /// <summary>
     /// Файл музыкального трека.
     /// </summary>
-    public TrackFile? TrackFile { get; init; }
+    public AddingTrack? TrackFile { get; init; }
 }

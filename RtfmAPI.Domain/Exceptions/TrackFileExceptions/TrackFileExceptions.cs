@@ -10,16 +10,24 @@ public static class TrackFileExceptions
     /// </summary>
     public static class TrackFileNameExceptions
     {
-        /// <inheritdoc cref="TrackFileNameException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileNameException"/>".
+        /// </summary>
         public static TrackFileNameException IsNullOrWhiteSpace => new("Название файла музыкального трека не задано.");
 
-        /// <inheritdoc cref="TrackFileNameException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileNameException"/>".
+        /// </summary>
         public static TrackFileNameException IsTooShort => new("Название файла музыкального трека слишком короткое.");
 
-        /// <inheritdoc cref="TrackFileNameException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileNameException"/>".
+        /// </summary>
         public static TrackFileNameException IsTooLong => new("Название файла музыкального трека слишком длинное.");
 
-        /// <inheritdoc cref="TrackFileNameException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileNameException"/>".
+        /// </summary>
         public static TrackFileNameException Invalid => new("Некорректное название файла музыкального трека.");
     }
 
@@ -28,11 +36,15 @@ public static class TrackFileExceptions
     /// </summary>
     public static class TrackFileMimeTypeExceptions
     {
-        /// <inheritdoc cref="TrackFileMimeTypeException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileMimeTypeException"/>".
+        /// </summary>
         public static TrackFileMimeTypeException IsNullOrWhiteSpace =>
             new("MIME-тип файла музыкального трека не задан.");
 
-        /// <inheritdoc cref="TrackFileMimeTypeException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileExtensionException"/>".
+        /// </summary>
         public static TrackFileMimeTypeException Invalid => new("Некорректный MIME-тип файла музыкального трека.");
     }
 
@@ -41,11 +53,15 @@ public static class TrackFileExceptions
     /// </summary>
     public static class TrackFileExtensionExceptions
     {
-        /// <inheritdoc cref="TrackFileExtensionException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileExtensionException"/>".
+        /// </summary>
         public static TrackFileExtensionException IsNullOrWhiteSpace =>
             new("Расширение файла музыкального трека не задано.");
 
-        /// <inheritdoc cref="TrackFileExtensionException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileExtensionException"/>".
+        /// </summary>
         public static TrackFileExtensionException Invalid => new("Некорректное расширение файла музыкального трека.");
     }
 
@@ -54,7 +70,20 @@ public static class TrackFileExceptions
     /// </summary>
     public static class TrackFileDataExceptions
     {
-        /// <inheritdoc cref="TrackFileDataException"/>
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileDataException"/>".
+        /// </summary>
         public static TrackFileDataException IsEmpty => new("Файл музыкального трека пуст.");
+    }
+    
+    /// <summary>
+    /// Исключения продолжительности доменной модели файла музыкального трека.
+    /// </summary>
+    public static class TrackFileDurationExceptions
+    {
+        /// <summary>
+        /// Создание "<inheritdoc cref="TrackFileDurationException"/>".
+        /// </summary>
+        public static TrackFileDurationException IncorrectDuration => new("Некорректная продолжительность файла музыкального трека.");
     }
 }

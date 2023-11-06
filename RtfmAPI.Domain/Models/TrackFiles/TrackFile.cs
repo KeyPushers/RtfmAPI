@@ -29,11 +29,17 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     public TrackFileMimeType MimeType { get; private set; }
 
     /// <summary>
+    /// Продолжительность файла музыкального трека.
+    /// </summary>
+    public TrackFileDuration Duration { get; private set; }
+    
+    /// <summary>
     /// Создание файла музыкального трека.
     /// </summary>
 #pragma warning disable CS8618
-    private TrackFile()
+    private TrackFile(TrackFileDuration duration)
     {
+        Duration = duration;
     }
 #pragma warning restore CS8618
 
@@ -44,13 +50,15 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <param name="data">Содержимое файла музыкального трека.</param>
     /// <param name="extension">Расширение файла музыкального трека.</param>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
-    private TrackFile(TrackFileName name, TrackFileData data, TrackFileExtension extension, TrackFileMimeType mimeType)
+    /// <param name="duration">Продолжительность файла музыкального трека.</param>
+    private TrackFile(TrackFileName name, TrackFileData data, TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileDuration duration)
         : base(TrackFileId.Create())
     {
         Name = name;
         Data = data;
         Extension = extension;
         MimeType = mimeType;
+        Duration = duration;
     }
 
     /// <summary>
@@ -60,10 +68,11 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <param name="data">Содержимое файла музыкального трека.</param>
     /// <param name="extension">Расширение файла музыкального трека.</param>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
+    /// <param name="duration">Продолжительность файла музыкального трека.</param>
     /// <returns>Файл музыкального трека.</returns>
     public static Result<TrackFile> Create(TrackFileName name, TrackFileData data,
-        TrackFileExtension extension, TrackFileMimeType mimeType)
+        TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileDuration duration)
     {
-        return new TrackFile(name, data, extension, mimeType);
+        return new TrackFile(name, data, extension, mimeType, duration);
     }
 }

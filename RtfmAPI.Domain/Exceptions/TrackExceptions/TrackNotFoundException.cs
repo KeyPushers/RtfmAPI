@@ -3,7 +3,7 @@
 /// <summary>
 /// Исключение неудачного поиска музыкального трека.
 /// </summary>
-public class TrackNotFoundException : TrackException
+public sealed class TrackNotFoundException : TrackException
 {
     /// <summary>
     /// Создание исключения неудачного поиска музыкального трека.

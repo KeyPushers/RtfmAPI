@@ -6,7 +6,7 @@ namespace RftmAPI.Domain.Models.Genres.ValueObjects;
 /// <summary>
 /// Название музыкального жанра.
 /// </summary>
-public class GenreName : ValueObject
+public sealed class GenreName : ValueObject
 {
     /// <summary>
     /// Минимальная длина названия.

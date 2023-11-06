@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Exceptions.TrackFileExceptions;
@@ -8,18 +7,21 @@ using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
+using RtfmAPI.Application.Common.Interfaces.AudioHandlers;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
+using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
 /// <summary>
 /// Обработчик команды добавления музыкального трека
 /// </summary>
-public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Track>>
+public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<AddedTrack>>
 {
     private readonly ITracksRepository _tracksRepository;
     private readonly ITrackFilesRepository _trackFilesRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IAudioHandlerFactory _audioHandlerFactory;
 
     /// <summary>
     /// Обработчик команды добавления музыкального трека.
@@ -27,12 +29,14 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
     /// <param name="tracksRepository">Репозиторий музыкальных треков.</param>
     /// <param name="trackFilesRepository">Репозиторий файлов музыкальных треков.</param>
     /// <param name="unitOfWork">Единица работы.</param>
+    /// <param name="audioHandlerFactory">Интерфейс фабрики обработчика аудиофайлов.</param>
     public AddTrackCommandHandler(ITracksRepository tracksRepository, ITrackFilesRepository trackFilesRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork, IAudioHandlerFactory audioHandlerFactory)
     {
         _tracksRepository = tracksRepository;
         _trackFilesRepository = trackFilesRepository;
         _unitOfWork = unitOfWork;
+        _audioHandlerFactory = audioHandlerFactory;
     }
 
     /// <summary>
@@ -41,7 +45,7 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
     /// <param name="request">Команда добавления музыкального трека.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальный трек.</returns>
-    public async Task<Result<Track>> Handle(AddTrackCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<AddedTrack>> Handle(AddTrackCommand request, CancellationToken cancellationToken = default)
     {
         var trackNameResult = TrackName.Create(request.Name ?? string.Empty);
         if (trackNameResult.IsFailed)
@@ -65,7 +69,7 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
         {
             return trackFileResult.Error;
         }
-        
+
         var trackResult = Track.Create(trackNameResult.Value, trackReleaseDateResult.Value, trackFileResult.Value);
         if (trackResult.IsFailed)
         {
@@ -76,7 +80,16 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
         await _tracksRepository.AddAsync(trackResult.Value);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return trackResult.Value;
+        var track = trackResult.Value;
+
+        return new AddedTrack
+        {
+            Id = track.Id.Value,
+            Name = track.Name.Value,
+            Duration = track.Duration.Value,
+            FileId = track.TrackFileId.Value,
+            ReleaseDate = track.ReleaseDate.Value
+        };
     }
 
     /// <summary>
@@ -84,8 +97,14 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
     /// </summary>
     /// <param name="trackFile">Объект переноса данных файла музыкального трека.</param>
     /// <returns>Представление данных файла музыкального трека.</returns>
-    private static Result<TrackFile> CreateTrackFile(Dtos.TrackFile trackFile)
+    private Result<TrackFile> CreateTrackFile(AddingTrack trackFile)
     {
+        var trackFileDataResult = TrackFileData.Create(trackFile.File.ToArray());
+        if (trackFileDataResult.IsFailed)
+        {
+            return trackFileDataResult.Error;
+        }
+
         var trackFileNameResult = TrackFileName.Create(trackFile.FileName ?? string.Empty);
         if (trackFileNameResult.IsFailed)
         {
@@ -104,13 +123,14 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Tr
             return trackFileMimeTypeResult.Error;
         }
 
-        var trackFileDataResult = TrackFileData.Create(trackFile.File?.ToArray() ?? Array.Empty<byte>());
-        if (trackFileDataResult.IsFailed)
+        var audioHandler = _audioHandlerFactory.Create(trackFile.File, trackFileMimeTypeResult.Value.Value);
+        var trackFileDurationResult = TrackFileDuration.Create(audioHandler?.GetDuration() ?? int.MinValue);
+        if (trackFileDurationResult.IsFailed)
         {
-            return trackFileDataResult.Error;
+            return trackFileDurationResult.Error;
         }
 
         return TrackFile.Create(trackFileNameResult.Value, trackFileDataResult.Value, trackFileExtensionResult.Value,
-            trackFileMimeTypeResult.Value);
+            trackFileMimeTypeResult.Value, trackFileDurationResult.Value);
     }
 }

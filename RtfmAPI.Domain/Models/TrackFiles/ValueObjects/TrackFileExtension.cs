@@ -6,7 +6,7 @@ namespace RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 /// <summary>
 /// Расширение файла музыкального трека.
 /// </summary>
-public class TrackFileExtension : ValueObject
+public sealed class TrackFileExtension : ValueObject
 {
     /// <summary>
     /// Создание расширения файла музыкального трека.
