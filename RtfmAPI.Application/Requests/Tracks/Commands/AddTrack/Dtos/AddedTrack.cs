@@ -21,12 +21,7 @@ public class AddedTrack
     /// Продолжительность музыкального трека.
     /// </summary>
     public double Duration { get; init; }
-
-    /// <summary>
-    /// Идентификатор файла.
-    /// </summary>
-    public Guid FileId { get; init; }
-
+    
     /// <summary>
     /// Дата выпуска музыкального трека.
     /// </summary>

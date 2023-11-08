@@ -87,7 +87,6 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Ad
             Id = track.Id.Value,
             Name = track.Name.Value,
             Duration = track.Duration.Value,
-            FileId = track.TrackFileId.Value,
             ReleaseDate = track.ReleaseDate.Value
         };
     }
