@@ -3,27 +3,29 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using RftmAPI.Domain.Exceptions.TrackExceptions;
+using RftmAPI.Domain.Exceptions.TrackFileExceptions;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
-using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById.Dtos;
+using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackStream.Dtos;
 
-namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
+namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackStream;
 
 /// <summary>
-/// Обработчик запроса музыкального трека по идентификатору
+/// Обработчик запроса потока музыкального трека.
 /// </summary>
-public class GetTrackByIdQueryHandler : IRequestHandler<GetTrackByIdQuery, Result<GetTrackByIdResponse?>>
+public class GetTrackStreamQueryHandler : IRequestHandler<GetTrackStreamQuery, Result<TrackStream>>
 {
     private readonly ITracksRepository _tracksRepository;
     private readonly ITrackFilesRepository _trackFilesRepository;
 
     /// <summary>
-    /// Обработчик запроса музыкального трека по идентификатору
+    /// Создание обработчика запроса потока музыкального трека.
     /// </summary>
     /// <param name="tracksRepository">Репозиторий музыкальных треков.</param>
     /// <param name="trackFilesRepository">Репозиторий файлов музыкальных треков.</param>
-    public GetTrackByIdQueryHandler(ITracksRepository tracksRepository, ITrackFilesRepository trackFilesRepository)
+    public GetTrackStreamQueryHandler(ITracksRepository tracksRepository, ITrackFilesRepository trackFilesRepository)
     {
         _tracksRepository = tracksRepository;
         _trackFilesRepository = trackFilesRepository;
@@ -36,24 +38,24 @@ public class GetTrackByIdQueryHandler : IRequestHandler<GetTrackByIdQuery, Resul
     /// <param name="cancellationToken">Токен отменеы</param>
     /// <returns>Музыкальный трек</returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task<Result<GetTrackByIdResponse?>> Handle(GetTrackByIdQuery request, CancellationToken cancellationToken = default)
+    public async Task<Result<TrackStream>> Handle(GetTrackStreamQuery request, CancellationToken cancellationToken = default)
     {
-        var track = await _tracksRepository.GetTrackByIdAsync(TrackId.Create(request.Id));
+        var trackId = TrackId.Create(request.Id);
+        var track = await _tracksRepository.GetTrackByIdAsync(trackId);
         if (track is null)
         {
-            throw new ArgumentNullException();
+            return TrackExceptions.NotFound(trackId);
         }
         
         var trackFile = await _trackFilesRepository.GetTrackFileByIdAsync(track.TrackFileId);
         if (trackFile is null)
         {
-            throw new ArgumentNullException();
+            return TrackFileExceptions.NotFound(track.TrackFileId);
         }
+
+        var stream = new MemoryStream(trackFile.Data.Value);
+        var mediaType = trackFile.MimeType.Value;
         
-        return new GetTrackByIdResponse
-        {
-            Stream = new MemoryStream(trackFile.Data.Value),
-            MediaType = trackFile.MimeType.Value
-        };
+        return new TrackStream(stream, mediaType);
     }
 }

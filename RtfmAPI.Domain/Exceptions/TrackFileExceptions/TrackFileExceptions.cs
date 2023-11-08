@@ -1,10 +1,19 @@
-﻿namespace RftmAPI.Domain.Exceptions.TrackFileExceptions;
+﻿using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
+
+namespace RftmAPI.Domain.Exceptions.TrackFileExceptions;
 
 /// <summary>
 /// Исключения доменной модели файла музыкального трека.
 /// </summary>
 public static class TrackFileExceptions
 {
+    /// <summary>
+    /// Создание "<inheritdoc cref="TrackFileNotFoundException"/>".
+    /// </summary>
+    /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
+    public static TrackFileNotFoundException NotFound(TrackFileId trackFileId) =>
+        new($"Не удалось найти музыкальный трек с идентификатором [{trackFileId.Value}].");
+    
     /// <summary>
     /// Исключения названия файла доменной модели музыкального трека.
     /// </summary>

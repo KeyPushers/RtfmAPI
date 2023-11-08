@@ -10,9 +10,10 @@ using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrack;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrack.Dtos;
-using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks.Dtos;
+using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackStream;
+using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackStream.Dtos;
 using RtfmAPI.Presentation.Dtos.Tracks;
 
 namespace RtfmAPI.Presentation.Controllers;
@@ -51,31 +52,25 @@ public class TracksController : ApiControllerBase
     /// <summary>
     /// Получение потока музыкального трека по идентификатору.
     /// </summary>
-    /// <param name="id">Идентификатор.</param>
+    /// <param name="id">Идентификатор музыкального трека..</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <returns>Музыкальный трек.</returns>
+    /// <returns>Поток музыкального трек.</returns>
     [HttpGet("{id:guid}/stream", Name = nameof(GetTrackStreamByIdAsync))]
-    public async Task<IActionResult> GetTrackStreamByIdAsync([FromRoute] Guid id,
+    public async Task<ActionResult<TrackStream>> GetTrackStreamByIdAsync([FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        // TODO: Переработать.
-        var query = new GetTrackByIdQuery
+        var query = new GetTrackStreamQuery
         {
             Id = id
         };
 
-        var result = await Mediator.Send(query, cancellationToken);
-        if (result.IsFailed)
+        var queryResult = await Mediator.Send(query, cancellationToken);
+        if (queryResult.IsFailed)
         {
-            return BadRequest(result.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
         }
-
-        if (result.Value?.Stream is null)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return new FileStreamResult(result.Value.Stream, result.Value?.MediaType ?? string.Empty)
+        
+        return new FileStreamResult(queryResult.Value.Stream, queryResult.Value.MediaType)
         {
             EnableRangeProcessing = true
         };
@@ -84,7 +79,7 @@ public class TracksController : ApiControllerBase
     /// <summary>
     /// Получение инофрмации о музыкальном треке по идентификатору.
     /// </summary>
-    /// <param name="id">Идентификатор.</param>
+    /// <param name="id">Идентификатор музыкального трека..</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальный трек.</returns>
     [HttpGet("{id:guid}", Name = nameof(GetTrackInfoAsync))]
