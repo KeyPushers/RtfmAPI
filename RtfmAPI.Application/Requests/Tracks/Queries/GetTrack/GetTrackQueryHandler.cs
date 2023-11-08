@@ -7,8 +7,6 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
-using RftmAPI.Domain.Models.Genres;
-using RftmAPI.Domain.Models.Genres.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;

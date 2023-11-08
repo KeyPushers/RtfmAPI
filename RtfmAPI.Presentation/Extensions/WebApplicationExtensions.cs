@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using RtfmAPI.Presentation.Settings;
 using Serilog;
 
 namespace RtfmAPI.Presentation.Extensions;
@@ -13,9 +15,17 @@ public static class WebApplicationExtensions
     /// </summary>
     /// <param name="webApplication"><see cref="WebApplication"/>.</param>
     /// <returns><see cref="WebApplication"/>.</returns>
-    public static WebApplication UseWebApplicationExtensions(this WebApplication webApplication)
+    public static WebApplication UseWebApplicationExtension(this WebApplication webApplication)
     {
+        if (webApplication.Environment.IsDevelopment())
+        {
+            webApplication.UseOpenApi();
+            webApplication.UseSwaggerUi3();
+            webApplication.UseReDoc(ReDocSettings.Apply);
+        }
+
         webApplication.UseSerilogRequestLogging();
+        webApplication.MapControllers();
 
         return webApplication;
     }

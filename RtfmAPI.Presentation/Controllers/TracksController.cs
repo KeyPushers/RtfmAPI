@@ -77,7 +77,7 @@ public class TracksController : ApiControllerBase
     }
 
     /// <summary>
-    /// Получение инофрмации о музыкальном треке по идентификатору.
+    /// Получение информации о музыкальном треке по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор музыкального трека..</param>
     /// <param name="cancellationToken">Токен отмены.</param>
@@ -147,7 +147,7 @@ public class TracksController : ApiControllerBase
     }
 
     /// <summary>
-    /// Добавленеи музыкального альбома к музыкальному треку.
+    /// Добавление музыкального альбома к музыкальному треку.
     /// </summary>
     /// <param name="trackId">Идентификатор музыкального трека.</param>
     /// <param name="albumId">Идентификатор музыкального альбома.</param>
