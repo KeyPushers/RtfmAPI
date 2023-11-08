@@ -6,7 +6,7 @@ namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrack.Dtos;
 /// <summary>
 /// Объект переноса данных информации о музыкальном треке.
 /// </summary>
-public class TrackInfo
+public sealed class TrackInfo
 {
     /// <summary>
     /// Идентификатор музыкального трека.

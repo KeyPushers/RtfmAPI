@@ -5,7 +5,7 @@ namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 /// <summary>
 /// Объект переноса данных добавленного музыкального трека.
 /// </summary>
-public class AddedTrack
+public sealed class AddedTrack
 {
     /// <summary>
     /// Идентификатор музыкального трека.
