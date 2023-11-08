@@ -12,6 +12,7 @@ namespace RftmAPI.Domain.Models.Genres;
 /// </summary>
 public sealed class Genre : AggregateRoot<GenreId, Guid>
 {
+    // TODO: Сделать жанры независимыми: убрать список треков и музыкальных групп.
     private readonly List<TrackId> _trackIds = new();
     private readonly List<BandId> _bandIds = new();
 

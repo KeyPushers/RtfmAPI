@@ -41,20 +41,30 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
             typeof(TRequest).Name, DateTime.UtcNow);
         _logger.LogInformation("{Message}", startingRequestMessage);
 
-        var response = await next();
-        
-        var responseResult = response as BaseResult;
-        if (responseResult?.IsFailed is true)
+        try
         {
-            var failureRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestFailureError,
-                typeof(TRequest).Name, responseResult.Error.Message, DateTime.UtcNow);
-            _logger.LogError("{Message}", failureRequestMessage);
+            var response = await next();
+
+            var responseResult = response as BaseResult;
+            if (responseResult?.IsFailed is true)
+            {
+                var failureRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestFailureError,
+                    typeof(TRequest).Name, responseResult.Error.Message, DateTime.UtcNow);
+                _logger.LogError("{Message}", failureRequestMessage);
+            }
+
+            var completedRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestInformation,
+                typeof(TRequest).Name, DateTime.UtcNow);
+            _logger.LogInformation("{Message}", completedRequestMessage);
+
+            return response;
         }
-
-        var completedRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestInformation,
-            typeof(TRequest).Name, DateTime.UtcNow);
-        _logger.LogInformation("{Message}", completedRequestMessage);
-
-        return response;
+        catch (Exception ex)
+        {
+            var exceptionalMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestFailureError,
+                typeof(TRequest).Name, ex.Message, DateTime.UtcNow);
+            _logger.LogError(ex, "{Message}", exceptionalMessage);
+            throw;
+        }
     }
 }

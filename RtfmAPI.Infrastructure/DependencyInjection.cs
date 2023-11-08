@@ -31,7 +31,8 @@ public static class DependencyInjection
         services.AddScoped<ITrackFilesRepository, TrackFilesRepository>();
         services.AddScoped<IAlbumsRepository, AlbumsRepository>();
         services.AddScoped<IBandsRepository, BandsRepository>();
-
+        services.AddScoped<IGenresRepository, GenresRepository>();
+        
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IAudioHandlerFactory, AudioHandlerFactory>();
