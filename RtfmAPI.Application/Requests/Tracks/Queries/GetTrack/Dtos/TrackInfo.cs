@@ -22,12 +22,7 @@ public sealed class TrackInfo
     /// Дата выпуска музыкального трека.
     /// </summary>
     public DateTime ReleaseDate { get; init; }
-
-    /// <summary>
-    /// Идентификатор файла музыкального трека.
-    /// </summary>
-    public Guid FileId { get; init; }
-
+    
     /// <summary>
     /// Музыкальный альбом.
     /// </summary>

@@ -71,7 +71,6 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
             Id = trackId.Value,
             Name = track.Name.Value,
             ReleaseDate = track.ReleaseDate.Value,
-            FileId = track.TrackFileId.Value,
             Album = await albumTaskResult,
             Duration = track.Duration.Value,
             Genres = await genresTaskResult
