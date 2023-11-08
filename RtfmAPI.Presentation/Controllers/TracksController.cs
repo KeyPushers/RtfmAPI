@@ -11,8 +11,8 @@ using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackById;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
+using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks.Dtos;
 using RtfmAPI.Presentation.Dtos.Tracks;
-using File = TagLib.File;
 
 namespace RtfmAPI.Presentation.Controllers;
 
@@ -35,11 +35,16 @@ public class TracksController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальные треки.</returns>
     [HttpGet]
-    public Task<List<Track>> GetTracksAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<TrackItems>> GetTracksAsync(CancellationToken cancellationToken = default)
     {
         var query = new GetTracksQuery();
+        var queryResult = await Mediator.Send(query, cancellationToken);
+        if (queryResult.IsFailed)
+        {
+            return BadRequest(queryResult.Error.Message);
+        }
 
-        return Mediator.Send(query, cancellationToken);
+        return Ok(queryResult.Value);
     }
 
     /// <summary>
