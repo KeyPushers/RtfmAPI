@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RftmAPI.Domain.Models.Bands;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand;
-using RtfmAPI.Application.Requests.Bands.Queries.GetBandById;
+using RtfmAPI.Application.Requests.Bands.Commands.AddBand.Dtos;
+using RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo;
+using RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo.Dtos;
 using RtfmAPI.Application.Requests.Bands.Queries.GetBands;
+using RtfmAPI.Application.Requests.Bands.Queries.GetBands.Dtos;
 
 namespace RtfmAPI.Presentation.Controllers;
 
@@ -30,11 +32,14 @@ public class BandsController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальные группы.</returns>
     [HttpGet]
-    public Task<List<Band>> GetBandsAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<BandItems>> GetBandsAsync(CancellationToken cancellationToken = default)
     {
-        var query = new GetBandsQuery();
-
-        return Mediator.Send(query, cancellationToken);
+        var queryResult = await Mediator.Send(new GetBandsQuery(), cancellationToken);
+        if (queryResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+        }
+        return Ok(queryResult.Value);
     }
 
     /// <summary>
@@ -43,31 +48,37 @@ public class BandsController : ApiControllerBase
     /// <param name="id">Идентификатор.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальная группа.</returns>
-    [HttpGet("{id}")]
-    public Task<Band?> GetBandByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    [HttpGet("{id:guid}", Name = nameof(GetBandInfoAsync))]
+    public async Task<ActionResult<BandInfo>> GetBandInfoAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
-        var query = new GetBandByIdQuery
+        var queryResult = await Mediator.Send(new GetBandInfoQuery(id), cancellationToken);
+        if (queryResult.IsFailed)
         {
-            Id = id
-        };
-
-        return Mediator.Send(query, cancellationToken);
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+        }
+        return Ok(queryResult.Value);
     }
 
     /// <summary>
     /// Добавление музыкальной группы.
     /// </summary>
-    /// <param name="name">Название музыкальной группы.</param>
+    /// <param name="request">Объект переноса данных добавляемой музыкальной группы.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Добавленная музыкальная группа.</returns>
     [HttpPost]
-    public Task<Band> AddBandAsync([FromQuery] string name, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<AddedBand>> AddBandAsync([FromBody] AddingBand request, CancellationToken cancellationToken = default)
     {
-        var command = new AddBandCommand
+        if (string.IsNullOrWhiteSpace(request.Name))
         {
-            Name = name
-        };
-
-        return Mediator.Send(command, cancellationToken);
+            return BadRequest(nameof(request.Name));
+        }
+        
+        var commandResult = await Mediator.Send(new AddBandCommand(request.Name), cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+        
+        return CreatedAtRoute(nameof(GetBandInfoAsync), new {commandResult.Value.Name}, commandResult.Value);
     }
 }

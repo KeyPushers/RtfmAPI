@@ -1,16 +1,18 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RftmAPI.Domain.Models.Bands;
+using RftmAPI.Domain.Models.Bands.ValueObjects;
+using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
+using RtfmAPI.Application.Requests.Bands.Commands.AddBand.Dtos;
 
 namespace RtfmAPI.Application.Requests.Bands.Commands.AddBand;
 
 /// <summary>
 /// Обработчик команды добавления музыкальной группы.
 /// </summary>
-public class AddBandCommandHandler : IRequestHandler<AddBandCommand, Band>
+public class AddBandCommandHandler : IRequestHandler<AddBandCommand, Result<AddedBand>>
 {
     private readonly IBandsRepository _bandsRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -32,8 +34,29 @@ public class AddBandCommandHandler : IRequestHandler<AddBandCommand, Band>
     /// <param name="request">Команда добавления музыкальной группы.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальная группа.</returns>
-    public async Task<Band> Handle(AddBandCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<AddedBand>> Handle(AddBandCommand request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var bandNameResult = BandName.Create(request.Name);
+        if (bandNameResult.IsFailed)
+        {
+            return bandNameResult.Error;
+        }
+
+        var bandResult = Band.Create(bandNameResult.Value);
+        if (bandResult.IsFailed)
+        {
+            return bandResult.Error;
+        }
+
+        await _bandsRepository.AddAsync(bandResult.Value);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var band = bandResult.Value;
+        
+        return new AddedBand
+        {
+            Id = band.Id.Value,
+            Name = band.Name.Value
+        };
     }
 }

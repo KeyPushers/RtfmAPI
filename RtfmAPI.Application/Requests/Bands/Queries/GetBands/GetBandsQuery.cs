@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using MediatR;
-using RftmAPI.Domain.Models.Bands;
+﻿using MediatR;
+using RftmAPI.Domain.Primitives;
+using RtfmAPI.Application.Requests.Bands.Queries.GetBands.Dtos;
 
 namespace RtfmAPI.Application.Requests.Bands.Queries.GetBands;
 
 /// <summary>
 /// Запрос музыкальных групп.
 /// </summary>
-public class GetBandsQuery : IRequest<List<Band>>
+public class GetBandsQuery : IRequest<Result<BandItems>>
 {
     
 }
