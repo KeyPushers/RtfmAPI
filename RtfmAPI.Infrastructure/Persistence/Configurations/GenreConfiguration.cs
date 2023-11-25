@@ -17,8 +17,6 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
     public void Configure(EntityTypeBuilder<Genre> builder)
     {
         ConfigureGenresTable(builder);
-        ConfigureGenreTrackIdsTable(builder);
-        ConfigureGenreBandIdsTable(builder);
     }
 
     /// <summary>
@@ -41,63 +39,5 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
             .HasMaxLength(100)
             .HasConversion(entity => entity.Value,
                 name => GenreName.Create(name).Value);
-    }
-
-    /// <summary>
-    /// Создание таблицы для связи музыкальных жанров и музыкальных треков.
-    /// </summary>
-    /// <param name="builder">Конструктор.</param>
-    private void ConfigureGenreTrackIdsTable(EntityTypeBuilder<Genre> builder)
-    {
-        // Создание таблицы для связи музыкальных жанров и музыкальных треков.
-        builder.OwnsMany(h => h.TrackIds, dib =>
-        {
-            // Определение названия таблицы связи музыкальных жанров и музыкальных треков.
-            dib.ToTable("GenreTrackIds");
-
-            // Определение идентификатора музыкального жанра в музыкальном треке.
-            dib.WithOwner().HasForeignKey("GenreId");
-
-            // Определение идентификатора таблицы.
-            dib.HasKey("Id");
-
-            // Определение идентификатора музыкального трека в таблице "GenreTrackIds".
-            dib.Property(trackId => trackId.Value)
-                .ValueGeneratedNever()
-                .HasColumnName("GenreTrackId");
-        });
-
-        builder.Metadata
-            .FindNavigation(nameof(Genre.TrackIds))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
-    }
-
-    /// <summary>
-    /// Создание таблицы для связи музыкальных жанров и музыкальных групп.
-    /// </summary>
-    /// <param name="builder">Конструктор.</param>
-    private void ConfigureGenreBandIdsTable(EntityTypeBuilder<Genre> builder)
-    {
-        // Создание таблицы для связи музыкальных жанров и музыкальных групп.
-        builder.OwnsMany(h => h.BandIds, dib =>
-        {
-            // Определение названия таблицы связи музыкальных жанров и музыкальных групп.
-            dib.ToTable("GenreBandIds");
-
-            // Определение идентификатора музыкального жанра в музыкальной группе.
-            dib.WithOwner().HasForeignKey("GenreId");
-
-            // Определение идентификатора таблицы.
-            dib.HasKey("Id");
-
-            // Определение идентификатора музыкального трека в таблице "GenreBandIds".
-            dib.Property(trackId => trackId.Value)
-                .ValueGeneratedNever()
-                .HasColumnName("GenreBandId");
-        });
-
-        builder.Metadata
-            .FindNavigation(nameof(Genre.BandIds))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
