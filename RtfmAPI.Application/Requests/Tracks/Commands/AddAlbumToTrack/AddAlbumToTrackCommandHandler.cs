@@ -19,20 +19,22 @@ public class AddAlbumToTrackCommandHandler : IRequestHandler<AddAlbumToTrackComm
     private readonly IAlbumsRepository _albumsRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public AddAlbumToTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository, IUnitOfWork unitOfWork)
+    public AddAlbumToTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository,
+        IUnitOfWork unitOfWork)
     {
         _tracksRepository = tracksRepository;
         _albumsRepository = albumsRepository;
         _unitOfWork = unitOfWork;
     }
-    
+
     /// <summary>
     /// Обработка команды добавления музыкального альбома к музыкальному треку.
     /// </summary>
     /// <param name="request">Команда добавления музыкального альбома к музыкальному треку.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns><see cref="Unit"/>.</returns>
-    public async Task<Result<Unit>> Handle(AddAlbumToTrackCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<Unit>> Handle(AddAlbumToTrackCommand request,
+        CancellationToken cancellationToken = default)
     {
         var trackId = TrackId.Create(request.TrackId);
         var track = await _tracksRepository.GetTrackByIdAsync(trackId);
@@ -54,12 +56,12 @@ public class AddAlbumToTrackCommandHandler : IRequestHandler<AddAlbumToTrackComm
             return addAlbumToTrackResult.Error;
         }
 
-        var addTrackToAlbumResult = album.AddTrack(track);
+        var addTrackToAlbumResult = album.AddTracks(new[] {track});
         if (addTrackToAlbumResult.IsFailed)
         {
             return addTrackToAlbumResult.Error;
         }
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

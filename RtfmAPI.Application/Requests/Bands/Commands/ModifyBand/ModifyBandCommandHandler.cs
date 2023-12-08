@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Exceptions.BandExceptions;
+using RftmAPI.Domain.Exceptions.GenreExceptions;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Bands;
@@ -57,7 +60,10 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         var band = await _bandsRepository.GetBandByIdAsync(bandId);
         if (band is null)
         {
-            return BandExceptions.NotFound(bandId);
+            var error = BandExceptions.NotFound(bandId);
+            // TODO: Добавить в ресурсы.
+            _logger.LogError(error, "Не удалось изменить музыкальную группу {BandId}", bandId.Value);
+            return error;
         }
 
         if (request.Name is not null)
@@ -69,38 +75,38 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             }
         }
 
-        if (request.AddingAlbumsIds is not null)
+        if (request.AddingAlbumsIds is not null && request.AddingAlbumsIds.Any())
         {
-            var addAlbumsResult = await AddAlbumsAsync(band, request.AddingAlbumsIds, _albumsRepository, _logger);
+            var addAlbumsResult = await AddAlbumsAsync(band, request.AddingAlbumsIds);
             if (addAlbumsResult.IsFailed)
             {
                 return addAlbumsResult.Error;
             }
         }
 
-        if (request.RemovingAlbumsIds is not null)
+        if (request.RemovingAlbumsIds is not null && request.RemovingAlbumsIds.Any())
         {
             var removeAlbumsResult =
-                await RemoveAlbumsAsync(band, request.RemovingAlbumsIds, _albumsRepository, _logger);
+                await RemoveAlbumsAsync(band, request.RemovingAlbumsIds);
             if (removeAlbumsResult.IsFailed)
             {
                 return removeAlbumsResult.Error;
             }
         }
 
-        if (request.AddingGenresIds is not null)
+        if (request.AddingGenresIds is not null && request.AddingGenresIds.Any())
         {
-            var addGenresResult = await AddGenresAsync(band, request.AddingGenresIds, _genresRepository, _logger);
+            var addGenresResult = await AddGenresAsync(band, request.AddingGenresIds);
             if (addGenresResult.IsFailed)
             {
                 return addGenresResult.Error;
             }
         }
 
-        if (request.RemovingGenresIds is not null)
+        if (request.RemovingGenresIds is not null && request.RemovingGenresIds.Any())
         {
             var removeGenresResult =
-                await RemoveGenresAsync(band, request.RemovingGenresIds, _genresRepository, _logger);
+                await RemoveGenresAsync(band, request.RemovingGenresIds);
             if (removeGenresResult.IsFailed)
             {
                 return removeGenresResult.Error;
@@ -111,7 +117,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         return BaseResult.Success();
     }
 
-
     /// <summary>
     /// Установка названия музыкальной группы.
     /// </summary>
@@ -119,13 +124,13 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
     /// <param name="name">Название музыкальной группы.</param>
     private static BaseResult SetBandName(Band band, string name)
     {
-        var bandNameResult = BandName.Create(name);
-        if (bandNameResult.IsFailed)
+        var bandNameCreateResult = BandName.Create(name);
+        if (bandNameCreateResult.IsFailed)
         {
-            return bandNameResult.Error;
+            return bandNameCreateResult.Error;
         }
 
-        var setBandNameResult = band.SetName(bandNameResult.Value);
+        var setBandNameResult = band.SetName(bandNameCreateResult.Value);
         if (setBandNameResult.IsFailed)
         {
             return setBandNameResult.Error;
@@ -139,22 +144,21 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
     /// </summary>
     /// <param name="band">Музыкальная группа.</param>
     /// <param name="addingAlbumsIds">Идентификаторы добавляемых музыкальных альбомов.</param>
-    /// <param name="albumsRepository">Репозиторий музыкальных альбомов.</param>
-    /// <param name="logger">Логгер</param>
-    private static async Task<BaseResult> AddAlbumsAsync(Band band, IEnumerable<Guid> addingAlbumsIds,
-        IAlbumsRepository albumsRepository, ILogger logger)
+    private async Task<BaseResult> AddAlbumsAsync(Band band, IEnumerable<Guid> addingAlbumsIds)
     {
         List<Album> addingAlbums = new();
         foreach (var addingAlbumId in addingAlbumsIds)
         {
             var albumId = AlbumId.Create(addingAlbumId);
-            var album = await albumsRepository.GetAlbumByIdAsync(albumId);
+            var album = await _albumsRepository.GetAlbumByIdAsync(albumId);
             if (album is null)
             {
-                logger.LogWarning(
+                var error = AlbumExceptions.NotFound(albumId);
+                // TODO: Добавление в ресурсы.
+                _logger.LogError(error,
                     "Не удалось добавить музыкальный альбом {AddingAlbumId} в музыкальную группу {BandId}",
-                    addingAlbumId, band.Id.Value);
-                continue;
+                    albumId.Value, band.Id.Value);
+                return error;
             }
 
             addingAlbums.Add(album);
@@ -166,6 +170,16 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             return addAlbumsResult.Error;
         }
 
+        var addingBandToAlbums = new[] {band};
+        foreach (var addingAlbum in addingAlbums)
+        {
+            var albumAddBandsResult = addingAlbum.AddBands(addingBandToAlbums);
+            if (albumAddBandsResult.IsFailed)
+            {
+                return albumAddBandsResult.Error;
+            }
+        }
+
         return BaseResult.Success();
     }
 
@@ -174,22 +188,21 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
     /// </summary>
     /// <param name="band">Музыкальная группа.</param>
     /// <param name="removingAlbumsIds">Идентификаторы удаляемых музыкальных альбомов.</param>
-    /// <param name="albumsRepository">Репозиторий музыкальных альбомов.</param>
-    /// <param name="logger">Логгер.</param>
-    private static async Task<BaseResult> RemoveAlbumsAsync(Band band, IEnumerable<Guid> removingAlbumsIds,
-        IAlbumsRepository albumsRepository, ILogger logger)
+    private async Task<BaseResult> RemoveAlbumsAsync(Band band, IEnumerable<Guid> removingAlbumsIds)
     {
         List<Album> removingAlbums = new();
         foreach (var removingAlbumId in removingAlbumsIds)
         {
             var albumId = AlbumId.Create(removingAlbumId);
-            var album = await albumsRepository.GetAlbumByIdAsync(albumId);
+            var album = await _albumsRepository.GetAlbumByIdAsync(albumId);
             if (album is null)
             {
-                logger.LogWarning(
+                var error = AlbumExceptions.NotFound(albumId);
+                // TODO: Добавление в ресурсы.
+                _logger.LogError(error,
                     "Не удалось удалить музыкальный альбом {RemovingAlbumId} из музыкальной группы {BandId}",
-                    removingAlbumId, band.Id.Value);
-                continue;
+                    albumId.Value, band.Id.Value);
+                return error;
             }
 
             removingAlbums.Add(album);
@@ -201,6 +214,16 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             return removeAlbumsResult.Error;
         }
 
+        var removingBandFromAlbums = new[] {band};
+        foreach (var removingAlbum in removingAlbums)
+        {
+            var albumRemoveBandsResult = removingAlbum.RemoveBands(removingBandFromAlbums);
+            if (albumRemoveBandsResult.IsFailed)
+            {
+                return albumRemoveBandsResult.Error;
+            }
+        }
+
         return BaseResult.Success();
     }
 
@@ -209,21 +232,21 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
     /// </summary>
     /// <param name="band">Музыкальная группа.</param>
     /// <param name="addingGenresIds">Идентификаторы добавляемых музыкальных жанров.</param>
-    /// <param name="genresRepository">Репозиторий музыкальных жанров.</param>
-    /// <param name="logger">Логгер.</param>
-    private static async Task<BaseResult> AddGenresAsync(Band band, IEnumerable<Guid> addingGenresIds,
-        IGenresRepository genresRepository, ILogger logger)
+    private async Task<BaseResult> AddGenresAsync(Band band, IEnumerable<Guid> addingGenresIds)
     {
         List<Genre> addingGenres = new();
         foreach (var addingGenreId in addingGenresIds)
         {
             var genreId = GenreId.Create(addingGenreId);
-            var genre = await genresRepository.GetGenreByIdAsync(genreId);
+            var genre = await _genresRepository.GetGenreByIdAsync(genreId);
             if (genre is null)
             {
-                logger.LogWarning("Не удалось добавить музыкальный жанр {AddingGenreId} в музыкальную группу {BandId}",
+                var error = GenreExceptions.NotFound(genreId);
+                // TODO: Добавление в ресурсы.
+                _logger.LogError(error,
+                    "Не удалось добавить музыкальный жанр {AddingGenreId} в музыкальную группу {BandId}",
                     addingGenreId, band.Id.Value);
-                continue;
+                return error;
             }
 
             addingGenres.Add(genre);
@@ -243,22 +266,21 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
     /// </summary>
     /// <param name="band">Музыкальная группа.</param>
     /// <param name="removingGenresIds">Идентификаторы удаляемых музыкальных жанров.</param>
-    /// <param name="genresRepository">Репозиторий музыкальных жанров.</param>
-    /// <param name="logger">Логгер.</param>
-    private static async Task<BaseResult> RemoveGenresAsync(Band band, IEnumerable<Guid> removingGenresIds,
-        IGenresRepository genresRepository, ILogger logger)
+    private async Task<BaseResult> RemoveGenresAsync(Band band, IEnumerable<Guid> removingGenresIds)
     {
         List<Genre> removingGenres = new();
         foreach (var removingGenreId in removingGenresIds)
         {
             var genreId = GenreId.Create(removingGenreId);
-            var genre = await genresRepository.GetGenreByIdAsync(genreId);
+            var genre = await _genresRepository.GetGenreByIdAsync(genreId);
             if (genre is null)
             {
-                logger.LogWarning(
+                var error = GenreExceptions.NotFound(genreId);
+                // TODO: Добавление в ресурсы.
+                _logger.LogError(error,
                     "Не удалось удалить музыкальный жанр {RemovingGenreId} из музыкальной группы {BandId}",
                     removingGenreId, band.Id.Value);
-                continue;
+                return error;
             }
 
             removingGenres.Add(genre);

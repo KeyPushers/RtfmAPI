@@ -1,11 +1,9 @@
-﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
-
-namespace RftmAPI.Domain.Exceptions.AlbumExceptions;
+﻿namespace RftmAPI.Domain.Exceptions.AlbumExceptions;
 
 /// <summary>
 /// Исключение неудачного поиска музыкального альбома.
 /// </summary>
-public class AlbumNotFoundException : TrackException
+public class AlbumNotFoundException : AlbumException
 {
     /// <summary>
     /// Создание исключения неудачного поиска музыкального альбома.

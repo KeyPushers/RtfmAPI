@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RftmAPI.Domain.Models.Albums;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
+using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum;
+using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum.Dtos;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumById;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbums;
 
@@ -78,5 +81,35 @@ public class AlbumsController : ApiControllerBase
         }
 
         return Ok(commandResult.Value);
+    }
+    
+    /// <summary>
+    /// Изменение музыкального альбома.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкального альбома.</param>
+    /// <param name="request">Объект переноса данных команды изменения музыкального альбома.</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    [HttpPost("{id:guid}/modify")]
+    public async Task<ActionResult> ModifyAlbumAsync([FromRoute] Guid id, [FromBody] ModifyingAlbum request,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new ModifyAlbumCommand
+        {
+            AlbumId = id,
+            Name = request.Name,
+            ReleaseDate = request.ReleaseDate,
+            AddingTracksIds = request.AddingTracksIds,
+            AddingBandsIds = request.AddingBandsIds,
+            RemovingTracksIds = request.RemovingTracksIds,
+            RemovingBandsIds = request.RemovingBandsIds
+        };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+
+        return Ok();
     }
 }
