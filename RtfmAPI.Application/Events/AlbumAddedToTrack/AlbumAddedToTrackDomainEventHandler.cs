@@ -10,7 +10,7 @@ namespace RtfmAPI.Application.Events.AlbumAddedToTrack;
 /// <summary>
 /// Обработчик события добавления музыкального альбома к музыкальному треку.
 /// </summary>
-public class AlbumAddedToTrackDomainEventHandler : INotificationHandler<AlbumAddedToTrackDomainEvent>
+public class AlbumAddedToTrackDomainEventHandler : INotificationHandler<AlbumChangedInTrackDomainEvent>
 {
     private readonly ILogger<AlbumAddedToTrackDomainEventHandler> _logger;
 
@@ -26,9 +26,9 @@ public class AlbumAddedToTrackDomainEventHandler : INotificationHandler<AlbumAdd
     /// <summary>
     /// Обработка события добавления музыкального альбома к музыкальному треку.
     /// </summary>
-    /// <param name="notification">Событие <see cref="AlbumAddedToTrackDomainEvent"/>>.</param>
+    /// <param name="notification">Событие <see cref="AlbumChangedInTrackDomainEvent"/>>.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    public Task Handle(AlbumAddedToTrackDomainEvent notification, CancellationToken cancellationToken = default)
+    public Task Handle(AlbumChangedInTrackDomainEvent notification, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("{DomainEventMessage}", Resources.DomainEventHandledSuccesfully);
         return Task.CompletedTask;

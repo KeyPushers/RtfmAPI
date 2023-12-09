@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RtfmAPI.Application.Requests.Tracks.Commands.AddAlbumToTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
+using RtfmAPI.Application.Requests.Tracks.Commands.ModifyTrack;
+using RtfmAPI.Application.Requests.Tracks.Commands.ModifyTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrack;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
@@ -147,19 +148,23 @@ public class TracksController : ApiControllerBase
     }
 
     /// <summary>
-    /// Добавление музыкального альбома к музыкальному треку.
+    /// Изменение музыкального трека.
     /// </summary>
-    /// <param name="trackId">Идентификатор музыкального трека.</param>
-    /// <param name="albumId">Идентификатор музыкального альбома.</param>
-    /// <param name="cancellationToken">Токен отмены.</param>
-    [HttpPost("[action]")]
-    public async Task<IActionResult> AddAlbumToTrackAsync([FromQuery] Guid trackId, [FromQuery] Guid albumId,
+    /// <param name="id">Идентификатор музыкального трека.</param>
+    /// <param name="request">Объект переноса данных команды изменения музыкального трека.</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    [HttpPost("{id:guid}/modify")]
+    public async Task<ActionResult> ModifyBandAsync([FromRoute] Guid id, [FromBody] ModifyingTrack request,
         CancellationToken cancellationToken = default)
     {
-        var command = new AddAlbumToTrackCommand
+        var command = new ModifyTrackCommand
         {
-            TrackId = trackId,
-            AlbumId = albumId
+            TrackId = id,
+            Name = request.Name,
+            ReleaseDate = request.ReleaseDate,
+            AlbumId = request.AlbumId,
+            AddingGenresIds = request.AddingGenresIds,
+            RemovingGenresIds = request.RemovingGenresIds
         };
 
         var commandResult = await Mediator.Send(command, cancellationToken);
@@ -168,6 +173,6 @@ public class TracksController : ApiControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
         }
 
-        return Ok(commandResult.Value);
+        return Ok();
     }
 }

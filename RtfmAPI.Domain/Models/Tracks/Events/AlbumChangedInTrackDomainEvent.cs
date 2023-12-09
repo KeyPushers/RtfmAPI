@@ -8,4 +8,4 @@ namespace RftmAPI.Domain.Models.Tracks.Events;
 /// </summary>
 /// <param name="Track">Музыкальный трек.</param>
 /// <param name="Album">Музыкальный альбом.</param>
-public record AlbumAddedToTrackDomainEvent(Track Track, Album Album) : IDomainEvent;
+public record AlbumChangedInTrackDomainEvent(Track Track, Album Album) : IDomainEvent;

@@ -26,15 +26,15 @@ public class ModifyBandCommand : IRequest<BaseResult>
     public List<Guid>? AddingAlbumsIds { get; init; }
 
     /// <summary>
-    /// Идентификаторы добавляемых музыкальных жанров.
-    /// </summary>
-    public List<Guid>? AddingGenresIds { get; init; }
-
-    /// <summary>
     /// Идентификаторы удаляемых музыкальных альбомов.
     /// </summary>
     public List<Guid>? RemovingAlbumsIds { get; init; }
-
+    
+    /// <summary>
+    /// Идентификаторы добавляемых музыкальных жанров.
+    /// </summary>
+    public List<Guid>? AddingGenresIds { get; init; }
+    
     /// <summary>
     /// Идентификаторы удаляемых музыкальных жанров.
     /// </summary>

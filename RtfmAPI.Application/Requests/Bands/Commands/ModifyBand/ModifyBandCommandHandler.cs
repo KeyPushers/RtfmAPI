@@ -154,7 +154,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (album is null)
             {
                 var error = AlbumExceptions.NotFound(albumId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный альбом {AddingAlbumId} в музыкальную группу {BandId}",
                     albumId.Value, band.Id.Value);
@@ -198,7 +198,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (album is null)
             {
                 var error = AlbumExceptions.NotFound(albumId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный альбом {RemovingAlbumId} из музыкальной группы {BandId}",
                     albumId.Value, band.Id.Value);
@@ -242,7 +242,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (genre is null)
             {
                 var error = GenreExceptions.NotFound(genreId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный жанр {AddingGenreId} в музыкальную группу {BandId}",
                     addingGenreId, band.Id.Value);
@@ -276,7 +276,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (genre is null)
             {
                 var error = GenreExceptions.NotFound(genreId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный жанр {RemovingGenreId} из музыкальной группы {BandId}",
                     removingGenreId, band.Id.Value);

@@ -81,7 +81,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         AddDomainEvent(new TrackCreatedDomainEvent(this));
         if (album is not null)
         {
-            AddDomainEvent(new AlbumAddedToTrackDomainEvent(this, album));
+            AddDomainEvent(new AlbumChangedInTrackDomainEvent(this, album));
         }
     }
 
@@ -167,11 +167,59 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     #endregion
 
     /// <summary>
-    /// Добавление музыкального альбома.
+    /// Установление названия музыкального трека.
     /// </summary>
-    /// <param name="album">Музыкальный трек.</param>
-    /// <returns>Результат операции.</returns>
-    public BaseResult AddAlbum(Album album)
+    /// <param name="name">Название музыкального трека.</param>
+    public BaseResult SetName(TrackName name)
+    {
+        if (Name == name)
+        {
+            return BaseResult.Success();
+        }
+
+        Name = name;
+        AddDomainEvent(new TrackNameChangedDomainEvent(this, name));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Изменение даты выпуска музыкального трека.
+    /// </summary>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    public BaseResult SetReleaseDate(TrackReleaseDate releaseDate)
+    {
+        if (ReleaseDate == releaseDate)
+        {
+            return BaseResult.Success();
+        }
+
+        ReleaseDate = releaseDate;
+        AddDomainEvent(new TrackReleaseDateChangedDomainEvent(this, releaseDate));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Изменение файла музыкального трека.
+    /// </summary>
+    /// <param name="file">Файл музыкального трека.</param>
+    public BaseResult SetTrackFile(TrackFile file)
+    {
+        if (file.Id == TrackFileId)
+        {
+            return BaseResult.Success();
+        }
+
+        TrackFileId = TrackFileId.Create(file.Id.Value);
+
+        AddDomainEvent(new TrackFileChangedInTrackDomainEvent(this, file));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Изменение музыкального альбома.
+    /// </summary>
+    /// <param name="album">Музыкальный альбома.</param>
+    public BaseResult SetAlbum(Album album)
     {
         if (AlbumId?.Value == album.Id.Value)
         {
@@ -180,8 +228,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
 
         AlbumId = AlbumId.Create(album.Id.Value);
 
-        AddDomainEvent(new AlbumAddedToTrackDomainEvent(this, album));
-
+        AddDomainEvent(new AlbumChangedInTrackDomainEvent(this, album));
         return BaseResult.Success();
     }
 
@@ -199,6 +246,62 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         var albumId = AlbumId;
         AlbumId = null;
         AddDomainEvent(new AlbumRemovedFromTrackDomainEvent(this, albumId));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Добавление музыкальных жанров.
+    /// </summary>
+    /// <param name="genres">Добавляемые жанры.</param>
+    public BaseResult AddGenres(IReadOnlyCollection<Genre> genres)
+    {
+        if (!genres.Any())
+        {
+            return BaseResult.Success();
+        }
+
+        List<Genre> addedGenres = new();
+        foreach (var genre in genres)
+        {
+            var genreId = GenreId.Create(genre.Id.Value);
+            if (_genreIds.Contains(genreId))
+            {
+                continue;
+            }
+
+            addedGenres.Add(genre);
+            _genreIds.Add(genreId);
+        }
+
+        AddDomainEvent(new GenresAddedToTrackDomainEvent(this, addedGenres));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Удаление музыкальных жанров.
+    /// </summary>
+    /// <param name="genres">Удаляемые жанры.</param>
+    public BaseResult RemoveGenres(IReadOnlyCollection<Genre> genres)
+    {
+        if (!genres.Any())
+        {
+            return BaseResult.Success();
+        }
+
+        List<Genre> removedGenres = new();
+        foreach (var genre in genres)
+        {
+            var genreId = GenreId.Create(genre.Id.Value);
+            if (!_genreIds.Contains(genreId))
+            {
+                continue;
+            }
+
+            removedGenres.Add(genre);
+            _genreIds.Remove(genreId);
+        }
+
+        AddDomainEvent(new GenresRemovedFromTrackDomainEvent(this, removedGenres));
         return BaseResult.Success();
     }
 }

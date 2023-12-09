@@ -160,7 +160,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
         }
 
         var albumSetReleaseDateRelease = album.SetReleaseDate(albumReleaseDateCreateResult.Value);
-        if (albumReleaseDateCreateResult.IsFailed)
+        if (albumSetReleaseDateRelease.IsFailed)
         {
             return albumSetReleaseDateRelease.Error;
         }
@@ -183,7 +183,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             if (track is null)
             {
                 var error = TrackExceptions.NotFound(trackId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный трек {AddingTrackId} в музыкальный альбом {AlbumId}",
                     trackId.Value, album.Id.Value);
@@ -201,7 +201,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
 
         foreach (var addingTrack in addingTracks)
         {
-            var addAlbumResult = addingTrack.AddAlbum(album);
+            var addAlbumResult = addingTrack.SetAlbum(album);
             if (addAlbumResult.IsFailed)
             {
                 return addAlbumResult.Error;
@@ -226,7 +226,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             if (track is null)
             {
                 var error = TrackExceptions.NotFound(trackId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный трек {RemovingTrackId} из музыкального альбома {AlbumId}",
                     trackId.Value, album.Id.Value);
@@ -269,7 +269,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             if (band is null)
             {
                 var error = BandExceptions.NotFound(bandId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальную группу {AddingBandId} в музыкальный альбом {AlbumId}",
                     bandId.Value, album.Id.Value);
@@ -313,7 +313,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             if (band is null)
             {
                 var error = BandExceptions.NotFound(bandId);
-                // TODO: Добавление в ресурсы.
+                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальную группу {RemovingBandId} из музыкального альбома {AlbumId}",
                     bandId.Value, album.Id.Value);
