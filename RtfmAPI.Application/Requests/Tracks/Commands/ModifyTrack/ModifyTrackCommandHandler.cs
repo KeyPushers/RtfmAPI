@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RftmAPI.Domain.Exceptions.AlbumExceptions;
-using RftmAPI.Domain.Exceptions.BandExceptions;
 using RftmAPI.Domain.Exceptions.GenreExceptions;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.Albums.ValueObjects;

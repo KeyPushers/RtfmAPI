@@ -55,7 +55,7 @@ public class TracksController : ApiControllerBase
     /// </summary>
     /// <param name="id">Идентификатор музыкального трека..</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <returns>Поток музыкального трек.</returns>
+    /// <returns>Поток музыкального трека.</returns>
     [HttpGet("{id:guid}/stream", Name = nameof(GetTrackStreamByIdAsync))]
     public async Task<ActionResult<TrackStream>> GetTrackStreamByIdAsync([FromRoute] Guid id,
         CancellationToken cancellationToken = default)

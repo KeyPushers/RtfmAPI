@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RftmAPI.Domain.Models.Albums;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum;
 using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum.Dtos;
-using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumById;
-using RtfmAPI.Application.Requests.Albums.Queries.GetAlbums;
+using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo;
+using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo.Dtos;
+using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumsItems;
+using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumsItems.Dtos;
 
 namespace RtfmAPI.Presentation.Controllers;
 
@@ -33,28 +33,41 @@ public class AlbumsController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальные альбомы.</returns>
     [HttpGet]
-    public Task<List<Album>> GetAlbumsAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<AlbumsItems>> GetAlbumsItemsAsync(CancellationToken cancellationToken = default)
     {
-        var query = new GetAlbumsQuery();
+        var query = new GetAlbumsItemsQuery();
 
-        return Mediator.Send(query, cancellationToken);
+        var queryResult = await Mediator.Send(query, cancellationToken);
+        if (queryResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+        }
+
+        return queryResult.Value;
     }
 
     /// <summary>
-    /// Получение музыкального альбома по идентификатору
+    /// Получение информации о музыкальном альбома по идентификатору.
     /// </summary>
-    /// <param name="id">Идентификатор</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Музыкальный альбом</returns>
-    [HttpGet("{id}")]
-    public Task<Album?> GetAlbumByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    /// <param name="id">Идентификатор музыкального альбома.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Информация о музыкальном альбома.</returns>
+    [HttpGet("{id:guid}", Name = nameof(GetAlbumInfoAsync))]
+    public async Task<ActionResult<AlbumInfo>> GetAlbumInfoAsync([FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
     {
-        var query = new GetAlbumByIdQuery
+        var query = new GetAlbumInfoQuery
         {
             Id = id
         };
 
-        return Mediator.Send(query, cancellationToken);
+        var queryResult = await Mediator.Send(query, cancellationToken);
+        if (queryResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+        }
+
+        return queryResult.Value;
     }
 
     /// <summary>
@@ -65,7 +78,7 @@ public class AlbumsController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Добавленный музыкальный альбом</returns>
     [HttpPost]
-    public async Task<IActionResult> AddAlbumAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
+    public async Task<ActionResult> AddAlbumAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
         CancellationToken cancellationToken = default)
     {
         var command = new AddAlbumCommand
@@ -77,12 +90,12 @@ public class AlbumsController : ApiControllerBase
         var commandResult = await Mediator.Send(command, cancellationToken);
         if (commandResult.IsFailed)
         {
-            return BadRequest(commandResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
         }
 
-        return Ok(commandResult.Value);
+        return CreatedAtRoute(nameof(GetAlbumInfoAsync), new {commandResult.Value.Id}, commandResult.Value);
     }
-    
+
     /// <summary>
     /// Изменение музыкального альбома.
     /// </summary>

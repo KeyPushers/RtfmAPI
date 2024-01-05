@@ -13,7 +13,7 @@ public static class AlbumExceptions
     /// </summary>
     /// <param name="albumId">Идентификатор музыкального альбома.</param>
     /// <param name="trackId">Идентификатор музыкального трека.</param>
-    public static AlbumDoesntContainTrackException AlbumDoesntContainTrackException(AlbumId albumId, TrackId trackId) =>
+    public static AlbumDoesntContainTrackException AlbumDoesntContainTrack(AlbumId albumId, TrackId trackId) =>
         new($"Музыкальный альбом [{albumId}] не содержит музыкальный трек [{trackId}].");
 
     /// <summary>
@@ -29,8 +29,14 @@ public static class AlbumExceptions
     /// <param name="albumId">Идентификатор музыкального альбома.</param>
     /// <param name="trackId">Идентификатор музыкального трека.</param>
     public static TrackRemovingFromAlbumFailedException
-        TrackRemovingFromAlbumFailedException(AlbumId albumId, TrackId trackId) =>
+        TrackRemovingFromAlbumFailed(AlbumId albumId, TrackId trackId) =>
         new($"Не удалось удалить из музыкального альбома [{trackId}] музыкальный трек [{albumId}].");
+
+    /// <summary>
+    /// Создание "<inheritdoc cref="AddAlbumException"/>".
+    /// </summary>
+    /// <param name="error">Описание ошибки.</param>
+    public static AddAlbumException AddAlbumError(string error) => new($"Не удалось добавить альбом: {error}.");
 
     /// <summary>
     /// Исключения названия доменной модели музыкального альбома.

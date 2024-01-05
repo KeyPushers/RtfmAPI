@@ -1,17 +1,20 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Primitives;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
+using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum.Dtos;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 
 /// <summary>
 /// Обработчик команды добавления музыкального альбома.
 /// </summary>
-public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<Album>>
+public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<AddedAlbum>>
 {
     private readonly IAlbumsRepository _albumsRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -33,29 +36,40 @@ public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<Al
     /// <param name="request">Команда добавления музыкального альбома.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальный трек.</returns>
-    public async Task<Result<Album>> Handle(AddAlbumCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<AddedAlbum>> Handle(AddAlbumCommand request, CancellationToken cancellationToken = default)
     {
-        var albumNameResult = AlbumName.Create(request.Name ?? string.Empty);
-        if (albumNameResult.IsFailed)
+        try
         {
-            return albumNameResult.Error;
-        }
+            var albumNameResult = AlbumName.Create(request.Name ?? string.Empty);
+            if (albumNameResult.IsFailed)
+            {
+                return albumNameResult.Error;
+            }
 
-        var albumReleaseDateResult = AlbumReleaseDate.Create(request.ReleaseDate);
-        if (albumReleaseDateResult.IsFailed)
+            var albumReleaseDateResult = AlbumReleaseDate.Create(request.ReleaseDate);
+            if (albumReleaseDateResult.IsFailed)
+            {
+                return albumReleaseDateResult.Error;
+            }
+
+            var albumResult = Album.Create(albumNameResult.Value, albumReleaseDateResult.Value);
+            if (albumResult.IsFailed)
+            {
+                return albumResult.Error;
+            }
+
+            await _albumsRepository.AddAsync(albumResult.Value);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return new AddedAlbum
+            {
+                Id = albumResult.Value.Id.Value,
+                Name = albumResult.Value.Name.Value
+            };
+        }
+        catch (Exception ex)
         {
-            return albumReleaseDateResult.Error;
+            return AlbumExceptions.AddAlbumError(ex.Message);
         }
-
-        var albumResult = Album.Create(albumNameResult.Value, albumReleaseDateResult.Value);
-        if (albumResult.IsFailed)
-        {
-            return albumResult.Error;
-        }
-
-        await _albumsRepository.AddAsync(albumResult.Value);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        return albumResult;
     }
 }

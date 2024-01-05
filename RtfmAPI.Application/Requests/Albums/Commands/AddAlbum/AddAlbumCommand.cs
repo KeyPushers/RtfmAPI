@@ -1,14 +1,14 @@
 ﻿using System;
 using MediatR;
-using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Primitives;
+using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum.Dtos;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 
 /// <summary>
 /// Команда добавления музыкального альбома.
 /// </summary>
-public class AddAlbumCommand : IRequest<Result<Album>>
+public class AddAlbumCommand : IRequest<Result<AddedAlbum>>
 {
     /// <summary>
     /// Название альбома.
