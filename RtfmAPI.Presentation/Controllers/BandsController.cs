@@ -85,7 +85,7 @@ public class BandsController : ApiControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
         }
 
-        return CreatedAtRoute(nameof(GetBandInfoAsync), new {commandResult.Value.Name}, commandResult.Value);
+        return CreatedAtRoute(nameof(GetBandInfoAsync), new {commandResult.Value.Id}, commandResult.Value);
     }
 
     /// <summary>
