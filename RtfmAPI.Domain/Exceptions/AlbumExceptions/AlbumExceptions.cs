@@ -39,6 +39,13 @@ public static class AlbumExceptions
     public static AddAlbumException AddAlbumError(string error) => new($"Не удалось добавить альбом: {error}.");
 
     /// <summary>
+    /// Создание "<inheritdoc cref="DeleteAlbumException"/>".
+    /// </summary>
+    /// <param name="albumId">Идентификатор музыкального альбома.</param>
+    public static DeleteAlbumException DeleteAlbumError(AlbumId albumId) =>
+        new($"Не удалось удалить альбом: {albumId.Value}");
+
+    /// <summary>
     /// Исключения названия доменной модели музыкального альбома.
     /// </summary>
     public static class AlbumNameExceptions

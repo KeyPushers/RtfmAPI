@@ -22,21 +22,35 @@ public class AlbumsRepository : IAlbumsRepository
         _context = context;
     }
     
+    /// <summary>
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumsAsync"/>
+    /// </summary>
     public Task<List<Album>> GetAlbumsAsync()
     {
         return _context.Set<Album>().ToListAsync();
     }
 
+    /// <summary>
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumByIdAsync"/>
+    /// </summary>
     public Task<Album?> GetAlbumByIdAsync(AlbumId albumId)
     {
         return _context.Set<Album>().FirstOrDefaultAsync(entity => entity.Id == albumId);
     }
 
+    /// <summary>
     /// <inheritdoc cref="IAlbumsRepository.AddAsync"/>
+    /// </summary>
     public async Task AddAsync(Album album)
     {
         await _context.AddAsync(album);
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IAlbumsRepository.DeleteAlbumAsync"/>
+    /// </summary>
+    public Task DeleteAlbumAsync(Album album)
+    {
+        return Task.FromResult(_context.Remove(album));
     }
 }

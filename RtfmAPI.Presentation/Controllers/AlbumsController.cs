@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
+using RtfmAPI.Application.Requests.Albums.Commands.DeleteAlbumById;
 using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum;
 using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum.Dtos;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo;
@@ -116,6 +117,26 @@ public class AlbumsController : ApiControllerBase
             RemovingTracksIds = request.RemovingTracksIds,
             RemovingBandsIds = request.RemovingBandsIds
         };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Удаление музыкального альбома.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкального альбома.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteAlbumByIdAsync([FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new DeleteAlbumByIdCommand(id);
 
         var commandResult = await Mediator.Send(command, cancellationToken);
         if (commandResult.IsFailed)

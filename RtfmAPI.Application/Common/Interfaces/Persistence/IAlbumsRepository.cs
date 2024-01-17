@@ -28,4 +28,10 @@ public interface IAlbumsRepository
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>
     Task AddAsync(Album album);
+
+    /// <summary>
+    /// Удаление музыкального альбома.
+    /// </summary>
+    /// <param name="album">Музыкальный альбом.</param>
+    Task DeleteAlbumAsync(Album album);
 }

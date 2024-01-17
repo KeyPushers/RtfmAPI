@@ -236,4 +236,14 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
         AddDomainEvent(new BandsRemovedFromAlbumDomainEvent(this, removedBands));
         return BaseResult.Success();
     }
+
+    /// <summary>
+    /// Удаление альбома.
+    /// </summary>
+    public BaseResult Delete()
+    {
+        var albumId = AlbumId.Create(Id.Value);
+        AddDomainEvent(new AlbumDeletedDomainEvent(albumId));
+        return BaseResult.Success();
+    }
 }
