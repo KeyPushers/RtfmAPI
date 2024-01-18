@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Models.Albums;
+﻿using RftmAPI.Domain.Exceptions.BandExceptions;
+using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Bands.Events;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
@@ -217,6 +218,22 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         }
 
         AddDomainEvent(new GenresRemovedFromBandDomainEvent(this, removedGenres));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Удаление музыкальной группы.
+    /// </summary>
+    /// <param name="deleteAction">Делегат, отвечающий за удаление музыкальной группы.</param>
+    public async Task<BaseResult> DeleteAsync(Func<Band, Task<bool>> deleteAction)
+    {
+        var bandId = BandId.Create(Id.Value);
+        var deleteActionResult = await deleteAction(this);
+        if (!deleteActionResult)
+        {
+            return BandExceptions.DeleteBandError(bandId);
+        }
+        AddDomainEvent(new BandDeletedDomainEvent(bandId));
         return BaseResult.Success();
     }
 }

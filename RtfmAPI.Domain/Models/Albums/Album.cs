@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Models.Albums.Events;
+﻿using RftmAPI.Domain.Exceptions.AlbumExceptions;
+using RftmAPI.Domain.Models.Albums.Events;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Bands;
 using RftmAPI.Domain.Models.Bands.ValueObjects;
@@ -238,11 +239,18 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     }
 
     /// <summary>
-    /// Удаление альбома.
+    /// Удаление музыкального альбома.
     /// </summary>
-    public BaseResult Delete()
+    /// <param name="deleteAction">Делегат, отвечающий за удаление музыкального альбома.</param>
+    public async Task<BaseResult> DeleteAsync(Func<Album, Task<bool>> deleteAction)
     {
         var albumId = AlbumId.Create(Id.Value);
+        var deleteActionResult = await deleteAction(this);
+        if (!deleteActionResult)
+        {
+            return AlbumExceptions.DeleteAlbumError(albumId);
+        }
+        
         AddDomainEvent(new AlbumDeletedDomainEvent(albumId));
         return BaseResult.Success();
     }

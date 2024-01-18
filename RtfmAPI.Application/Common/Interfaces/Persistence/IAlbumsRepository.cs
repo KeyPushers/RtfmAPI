@@ -33,5 +33,5 @@ public interface IAlbumsRepository
     /// Удаление музыкального альбома.
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>
-    Task DeleteAlbumAsync(Album album);
+    Task<bool> DeleteAlbumAsync(Album album);
 }

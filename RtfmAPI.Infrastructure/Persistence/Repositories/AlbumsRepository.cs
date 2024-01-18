@@ -21,7 +21,7 @@ public class AlbumsRepository : IAlbumsRepository
     {
         _context = context;
     }
-    
+
     /// <summary>
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumsAsync"/>
     /// </summary>
@@ -49,8 +49,9 @@ public class AlbumsRepository : IAlbumsRepository
     /// <summary>
     /// <inheritdoc cref="IAlbumsRepository.DeleteAlbumAsync"/>
     /// </summary>
-    public Task DeleteAlbumAsync(Album album)
+    public Task<bool> DeleteAlbumAsync(Album album)
     {
-        return Task.FromResult(_context.Remove(album));
+        var removeResult = _context.Remove(album);
+        return Task.FromResult(removeResult.State is EntityState.Deleted);
     }
 }

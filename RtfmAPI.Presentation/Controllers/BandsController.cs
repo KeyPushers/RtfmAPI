@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand.Dtos;
+using RtfmAPI.Application.Requests.Bands.Commands.DeleteBandById;
 using RtfmAPI.Application.Requests.Bands.Commands.ModifyBand;
 using RtfmAPI.Application.Requests.Bands.Commands.ModifyBand.Dtos;
 using RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo;
@@ -107,6 +108,26 @@ public class BandsController : ApiControllerBase
             RemovingAlbumsIds = request.RemovingAlbumsIds,
             RemovingGenresIds = request.RemovingGenresIds
         };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+
+        return Ok();
+    }
+    
+    /// <summary>
+    /// Удаление музыкальной группы.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкальной группы.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteBandByIdAsync([FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new DeleteBandByIdCommand(id);
 
         var commandResult = await Mediator.Send(command, cancellationToken);
         if (commandResult.IsFailed)

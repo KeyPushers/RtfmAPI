@@ -22,7 +22,7 @@ public class BandsRepository : IBandsRepository
     {
         _context = context;
     }
-    
+
     /// <summary>
     /// <inheritdoc cref="IBandsRepository.GetBandsAsync"/>
     /// </summary>
@@ -55,5 +55,14 @@ public class BandsRepository : IBandsRepository
     public async Task AddAsync(Band band)
     {
         await _context.AddAsync(band);
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="IBandsRepository.DeleteAsync"/>
+    /// </summary>
+    public Task<bool> DeleteAsync(Band band)
+    {
+        var deleteAction = _context.Remove(band);
+        return Task.FromResult(deleteAction.State is EntityState.Deleted);
     }
 }

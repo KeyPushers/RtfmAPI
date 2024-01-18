@@ -15,6 +15,13 @@ public static class BandExceptions
         new($"Не удалось найти музыкальную группу с идентификатором [{bandId.Value}].");
     
     /// <summary>
+    /// Создание "<inheritdoc cref="DeleteBandException"/>".
+    /// </summary>
+    /// <param name="bandId">Идентификатор музыкальной группы.</param>
+    public static DeleteBandException DeleteBandError(BandId bandId) =>
+        new($"Не удалось удалить музыкальную группу: {bandId.Value}");
+    
+    /// <summary>
     /// Исключения названия доменной модели музыкальной группы.
     /// </summary>
     public static class BandNameExceptions

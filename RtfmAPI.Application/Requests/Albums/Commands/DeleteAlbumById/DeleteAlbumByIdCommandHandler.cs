@@ -32,25 +32,23 @@ public class DeleteAlbumByIdCommandHandler : IRequestHandler<DeleteAlbumByIdComm
     /// </summary>
     /// <param name="request">Команда удаления альбома.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    public async Task<Result<Unit>> Handle(DeleteAlbumByIdCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<Unit>> Handle(DeleteAlbumByIdCommand request,
+        CancellationToken cancellationToken = default)
     {
         var albumId = AlbumId.Create(request.Id);
-        
         var album = await _albumsRepository.GetAlbumByIdAsync(albumId);
         if (album is null)
         {
             return AlbumExceptions.NotFound(albumId);
         }
 
-        var deleteAlbumResult = album.Delete();
+        var deleteAlbumResult = await album.DeleteAsync(_albumsRepository.DeleteAlbumAsync);
         if (deleteAlbumResult.IsFailed)
         {
             return deleteAlbumResult.Error;
         }
-        
-        await _albumsRepository.DeleteAlbumAsync(album);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }
