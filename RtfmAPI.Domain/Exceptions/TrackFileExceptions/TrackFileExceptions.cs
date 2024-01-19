@@ -15,6 +15,13 @@ public static class TrackFileExceptions
         new($"Не удалось найти музыкальный трек с идентификатором [{trackFileId.Value}].");
     
     /// <summary>
+    /// Создание "<inheritdoc cref="DeleteTrackFileException"/>".
+    /// </summary>
+    /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
+    public static DeleteTrackFileException DeleteTrackError(TrackFileId trackFileId) =>
+        new($"Не удалось удалить файл музыкального трека: {trackFileId.Value}");
+    
+    /// <summary>
     /// Исключения названия файла доменной модели музыкального трека.
     /// </summary>
     public static class TrackFileNameExceptions

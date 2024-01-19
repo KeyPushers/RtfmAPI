@@ -21,16 +21,23 @@ public class TrackFilesRepository : ITrackFilesRepository
     {
         _context = context;
     }
-    
+
     /// <see cref="ITrackFilesRepository.GetTrackFileByIdAsync"/>
     public Task<TrackFile?> GetTrackFileByIdAsync(TrackFileId trackFileId)
     {
         return _context.Set<TrackFile>().FirstOrDefaultAsync(trackFile => trackFile.Id == trackFileId);
     }
-    
+
     /// <see cref="ITrackFilesRepository.AddAsync"/>
     public async Task AddAsync(TrackFile trackFile)
     {
         await _context.AddAsync(trackFile);
+    }
+
+    /// <inheritdoc cref="ITrackFilesRepository.DeleteAsync"/>
+    public Task<bool> DeleteAsync(TrackFile trackFile)
+    {
+        var removeResult = _context.Remove(trackFile);
+        return Task.FromResult(removeResult.State is EntityState.Deleted);
     }
 }

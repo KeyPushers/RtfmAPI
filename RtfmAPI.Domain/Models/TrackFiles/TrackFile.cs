@@ -1,4 +1,8 @@
-﻿using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
+﻿using RftmAPI.Domain.Exceptions.TrackFileExceptions;
+using RftmAPI.Domain.Models.TrackFiles.Events;
+using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
+using RftmAPI.Domain.Models.Tracks;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.TrackFiles;
@@ -74,5 +78,22 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
         TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileDuration duration)
     {
         return new TrackFile(name, data, extension, mimeType, duration);
+    }
+
+    /// <summary>
+    /// Удаление файла музыкального трека.
+    /// </summary>
+    /// <param name="deleteAction">Делегат, отвечающий за удаление файла музыкального трека.</param>
+    public async Task<BaseResult> DeleteAsync(Func<TrackFile, Task<bool>> deleteAction)
+    {
+        var trackFileId = (TrackFileId) Id;
+        var deleteActionResult = await deleteAction(this);
+        if (!deleteActionResult)
+        {
+            return TrackFileExceptions.DeleteTrackError(trackFileId);
+        }
+
+        AddDomainEvent(new TrackFileDeletedDomainEvent(trackFileId));
+        return BaseResult.Success();
     }
 }

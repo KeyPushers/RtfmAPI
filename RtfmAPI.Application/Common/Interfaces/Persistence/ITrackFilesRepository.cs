@@ -15,10 +15,16 @@ public interface ITrackFilesRepository
     /// <param name="trackFileId">Идентифиактор файла музыкального трека.</param>
     /// <returns>Файл музыкальный трека.</returns>
     Task<TrackFile?> GetTrackFileByIdAsync(TrackFileId trackFileId);
-    
+
     /// <summary>
     /// Добавление файла музыкального трека.
     /// </summary>
     /// <param name="trackFile">Файл музыкального трека.</param>
     Task AddAsync(TrackFile trackFile);
+
+    /// <summary>
+    /// Удаление файла музыкального трека.
+    /// </summary>
+    /// <param name="trackFile">Файл музыкального трека.</param>
+    Task<bool> DeleteAsync(TrackFile trackFile);
 }

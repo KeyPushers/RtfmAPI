@@ -1,4 +1,5 @@
-﻿using RftmAPI.Domain.Models.Albums;
+﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
+using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
@@ -94,13 +95,8 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <returns>Музыкальный трек.</returns>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
     {
-        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
-        if (trackDurationResult.IsFailed)
-        {
-            return trackDurationResult.Error;
-        }
-
-        return new Track(name, releaseDate, trackFile, null, trackDurationResult.Value, Enumerable.Empty<Genre>());
+        var trackResult = CreateTrack(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
+        return trackResult.IsFailed ? trackResult.Error : trackResult;
     }
 
     /// <summary>
@@ -114,13 +110,8 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album)
     {
-        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
-        if (trackDurationResult.IsFailed)
-        {
-            return trackDurationResult.Error;
-        }
-
-        return new Track(name, releaseDate, trackFile, album, trackDurationResult.Value, Enumerable.Empty<Genre>());
+        var trackResult = CreateTrack(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
+        return trackResult.IsFailed ? trackResult.Error : trackResult;
     }
 
     /// <summary>
@@ -134,13 +125,8 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         IEnumerable<Genre> genres)
     {
-        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
-        if (trackDurationResult.IsFailed)
-        {
-            return trackDurationResult.Error;
-        }
-
-        return new Track(name, releaseDate, trackFile, null, trackDurationResult.Value, genres);
+        var trackResult = CreateTrack(name, releaseDate, trackFile, null, genres);
+        return trackResult.IsFailed ? trackResult.Error : trackResult;
     }
 
     /// <summary>
@@ -155,13 +141,26 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         Album album, IEnumerable<Genre> genres)
     {
-        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
-        if (trackDurationResult.IsFailed)
-        {
-            return trackDurationResult.Error;
-        }
+        var trackResult = CreateTrack(name, releaseDate, trackFile, album, genres);
+        return trackResult.IsFailed ? trackResult.Error : trackResult;
+    }
 
-        return new Track(name, releaseDate, trackFile, album, trackDurationResult.Value, genres);
+    /// <summary>
+    /// Создание музыкального трека.
+    /// </summary>
+    /// <param name="name">Название музыкального трека.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
+    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
+    /// <param name="album">Музыкальный альбом.</param>
+    /// <param name="genres">Музыкальные жанры.</param>
+    /// <returns>Музыкальный трек.</returns>
+    private static Result<Track> CreateTrack(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
+        Album? album, IEnumerable<Genre> genres)
+    {
+        var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
+        return trackDurationResult.IsFailed
+            ? trackDurationResult.Error
+            : new Track(name, releaseDate, trackFile, album, trackDurationResult.Value, genres);
     }
 
     #endregion
@@ -302,6 +301,23 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         }
 
         AddDomainEvent(new GenresRemovedFromTrackDomainEvent(this, removedGenres));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Удаление музыкального трека.
+    /// </summary>
+    /// <param name="deleteAction">Делегат, отвечающий за удаление музыкального трека.</param>
+    public async Task<BaseResult> DeleteAsync(Func<Track, Task<bool>> deleteAction)
+    {
+        var trackId = (TrackId) Id;
+        var deleteActionResult = await deleteAction(this);
+        if (!deleteActionResult)
+        {
+            return TrackExceptions.DeleteTrackError(trackId);
+        }
+
+        AddDomainEvent(new TrackDeletedDomainEvent(trackId));
         return BaseResult.Success();
     }
 }

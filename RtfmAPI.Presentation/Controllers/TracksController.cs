@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
+using RtfmAPI.Application.Requests.Tracks.Commands.DeleteTrackById;
 using RtfmAPI.Application.Requests.Tracks.Commands.ModifyTrack;
 using RtfmAPI.Application.Requests.Tracks.Commands.ModifyTrack.Dtos;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrack;
@@ -166,6 +167,26 @@ public class TracksController : ApiControllerBase
             AddingGenresIds = request.AddingGenresIds,
             RemovingGenresIds = request.RemovingGenresIds
         };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+
+        return Ok();
+    }
+    
+    /// <summary>
+    /// Удаление музыкального трека.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкальной трека.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteBandByIdAsync([FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new DeleteTrackByIdCommand(id);
 
         var commandResult = await Mediator.Send(command, cancellationToken);
         if (commandResult.IsFailed)

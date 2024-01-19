@@ -39,4 +39,11 @@ public class TracksRepository : ITracksRepository
     {
         await _context.AddAsync(track);
     }
+
+    /// <inheritdoc cref="ITracksRepository.DeleteAsync"/>
+    public Task<bool> DeleteAsync(Track track)
+    {
+        var removeResult = _context.Remove(track);
+        return Task.FromResult(removeResult.State is EntityState.Deleted);
+    }
 }

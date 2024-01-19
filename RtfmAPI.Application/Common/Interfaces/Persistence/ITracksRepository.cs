@@ -22,10 +22,16 @@ public interface ITracksRepository
     /// <param name="trackId">Идентифиактор музыкального трека.</param>
     /// <returns>Музыкальный трек.</returns>
     Task<Track?> GetTrackByIdAsync(TrackId trackId);
-    
+
     /// <summary>
     /// Добавление музыкального трека.
     /// </summary>
     /// <param name="track">Музыкальный трек.</param>
     Task AddAsync(Track track);
+
+    /// <summary>
+    /// Удаление музыкального трека.
+    /// </summary>
+    /// <param name="track">Музыкальный трек.</param>
+    Task<bool> DeleteAsync(Track track);
 }
