@@ -98,7 +98,7 @@ internal class TrackConfiguration : IEntityTypeConfiguration<Track>
         });
 
         builder.Metadata
-            .FindNavigation(nameof(Track.GenreIds))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
+            .FindNavigation(nameof(Track.GenreIds))
+            ?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

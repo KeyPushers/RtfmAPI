@@ -68,8 +68,8 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
         });
 
         builder.Metadata
-            .FindNavigation(nameof(Band.AlbumIds))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
+            .FindNavigation(nameof(Band.AlbumIds))
+            ?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
         });
 
         builder.Metadata
-            .FindNavigation(nameof(Band.GenreIds))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
+            .FindNavigation(nameof(Band.GenreIds))
+            ?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
