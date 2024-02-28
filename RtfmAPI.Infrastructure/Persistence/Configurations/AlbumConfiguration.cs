@@ -18,7 +18,7 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
     {
         ConfigureAlbumsTable(builder);
         ConfigureAlbumTrackIdsTable(builder);
-        ConfigureAlbumBandIdsTable(builder);
+        // ConfigureAlbumBandIdsTable(builder);
     }
 
     /// <summary>
@@ -82,28 +82,28 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
     /// Создание таблицы для связи музыкальных альбомов и музыкальных треков.
     /// </summary>
     /// <param name="builder">Конструктор.</param>
-    private static void ConfigureAlbumBandIdsTable(EntityTypeBuilder<Album> builder)
-    {
-        // Создание таблицы для связи музыкальных альбомов и музыкальных групп.
-        builder.OwnsMany(h => h.BandIds, albumBandIdsBuilder =>
-        {
-            // Определение названия таблицы связи музыкальных альбомов и музыкальных групп.
-            albumBandIdsBuilder.ToTable("AlbumBandIds");
-
-            // Определение идентификатора музыкального альбома в музыкальной группе.
-            albumBandIdsBuilder.WithOwner().HasForeignKey("AlbumId");
-
-            // Определение идентификатора таблицы.
-            albumBandIdsBuilder.HasKey("Id");
-
-            // Определение идентификатора музыкальной группы в таблице "AlbumTrackIds".
-            albumBandIdsBuilder.Property(trackId => trackId.Value)
-                .ValueGeneratedNever()
-                .HasColumnName("AlbumBandId");
-        });
-
-        builder.Metadata
-            .FindNavigation(nameof(Album.BandIds))
-            ?.SetPropertyAccessMode(PropertyAccessMode.Field);
-    }
+    // private static void ConfigureAlbumBandIdsTable(EntityTypeBuilder<Album> builder)
+    // {
+    //     // Создание таблицы для связи музыкальных альбомов и музыкальных групп.
+    //     builder.OwnsMany(h => h.BandIds, albumBandIdsBuilder =>
+    //     {
+    //         // Определение названия таблицы связи музыкальных альбомов и музыкальных групп.
+    //         albumBandIdsBuilder.ToTable("AlbumBandIds");
+    //
+    //         // Определение идентификатора музыкального альбома в музыкальной группе.
+    //         albumBandIdsBuilder.WithOwner().HasForeignKey("AlbumId");
+    //
+    //         // Определение идентификатора таблицы.
+    //         albumBandIdsBuilder.HasKey("Id");
+    //
+    //         // Определение идентификатора музыкальной группы в таблице "AlbumTrackIds".
+    //         albumBandIdsBuilder.Property(trackId => trackId.Value)
+    //             .ValueGeneratedNever()
+    //             .HasColumnName("AlbumBandId");
+    //     });
+    //
+    //     builder.Metadata
+    //         .FindNavigation(nameof(Album.BandIds))
+    //         ?.SetPropertyAccessMode(PropertyAccessMode.Field);
+    // }
 }

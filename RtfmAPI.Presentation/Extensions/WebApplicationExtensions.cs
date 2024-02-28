@@ -20,7 +20,7 @@ public static class WebApplicationExtensions
         if (webApplication.Environment.IsDevelopment())
         {
             webApplication.UseOpenApi();
-            webApplication.UseSwaggerUi();
+            webApplication.UseSwaggerUi3();
             webApplication.UseReDoc(ReDocSettings.Apply);
         }
 
