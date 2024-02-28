@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
+using RtfmAPI.Infrastructure.Dao.TrackFiles;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
@@ -11,33 +13,39 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class TrackFilesRepository : ITrackFilesRepository
 {
-    private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
+    private readonly DbSet<TrackFileDao> _context;
 
     /// <summary>
     /// Репозиторий доменной модели <see cref="TrackFile"/>.
     /// </summary>
     /// <param name="context">Контекст базы данных.</param>
-    public TrackFilesRepository(AppDbContext context)
+    /// <param name="mapper">Маппер.</param>
+    public TrackFilesRepository(AppDbContext context, IMapper mapper)
     {
-        _context = context;
+        _context = context.Set<TrackFileDao>();
+        _mapper = mapper;
     }
 
     /// <see cref="ITrackFilesRepository.GetTrackFileByIdAsync"/>
-    public Task<TrackFile?> GetTrackFileByIdAsync(TrackFileId trackFileId)
+    public async Task<TrackFile?> GetTrackFileByIdAsync(TrackFileId trackFileId)
     {
-        return _context.Set<TrackFile>().FirstOrDefaultAsync(trackFile => trackFile.Id == trackFileId);
+        var value = await _context.FirstOrDefaultAsync(trackFile => trackFile.Id == trackFileId.Value);
+        return value is null ? null : _mapper.Map<TrackFile>(value);
     }
 
     /// <see cref="ITrackFilesRepository.AddAsync"/>
     public async Task AddAsync(TrackFile trackFile)
     {
-        await _context.AddAsync(trackFile);
+        var trackFileDao = _mapper.Map<TrackFileDao>(trackFile);
+        await _context.AddAsync(trackFileDao);
     }
 
     /// <inheritdoc cref="ITrackFilesRepository.DeleteAsync"/>
     public Task<bool> DeleteAsync(TrackFile trackFile)
     {
-        var removeResult = _context.Remove(trackFile);
+        var trackFileDao = _mapper.Map<TrackFileDao>(trackFile);
+        var removeResult = _context.Remove(trackFileDao);
         return Task.FromResult(removeResult.State is EntityState.Deleted);
     }
 }

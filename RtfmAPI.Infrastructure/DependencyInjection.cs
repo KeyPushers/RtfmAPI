@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using RtfmAPI.Application.Common.Interfaces.AudioHandlers;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
+using RtfmAPI.Infrastructure.MappingProfiles;
 using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Infrastructure.Persistence.Interceptors;
 using RtfmAPI.Infrastructure.Persistence.Repositories;
@@ -22,8 +23,8 @@ public static class DependencyInjection
     /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddInMemoryDatabase();
-        // services.AddPostgresDatabase();
+        // services.AddInMemoryDatabase();
+        services.AddPostgresDatabase();
 
         services.AddScoped<PublishDomainEventsInterceptor>();
         
@@ -37,6 +38,8 @@ public static class DependencyInjection
 
         services.AddScoped<IAudioHandlerFactory, AudioHandlerFactory>();
         
+        services.AddAutoMapper(typeof(TracksMappingProfile));
+
         return services;
     }
 

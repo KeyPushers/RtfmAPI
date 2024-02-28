@@ -6,11 +6,6 @@
 public abstract class AggregateRoot<TId, TIdType> : Entity<TId> where TId : AggregateRootId<TIdType>
 {
     /// <summary>
-    /// Идентификатор агрегата.
-    /// </summary>
-    public new AggregateRootId<TIdType> Id { get; }
-
-    /// <summary>
     /// Примитив агрегата.
     /// </summary>
     /// <param name="id">Идентификатор агрената</param>

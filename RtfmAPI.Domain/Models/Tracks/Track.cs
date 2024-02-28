@@ -77,7 +77,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         TrackFileId = TrackFileId.Create(trackFile.Id.Value);
         AlbumId = album?.Id is not null ? AlbumId.Create(album.Id.Value) : null;
         Duration = duration;
-        _genreIds = genres.Select(genre => (GenreId) genre.Id).ToHashSet();
+        _genreIds = genres.Select(genre => genre.Id).ToHashSet();
 
         AddDomainEvent(new TrackCreatedDomainEvent(this));
         if (album is not null)
@@ -310,7 +310,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="deleteAction">Делегат, отвечающий за удаление музыкального трека.</param>
     public async Task<BaseResult> DeleteAsync(Func<Track, Task<bool>> deleteAction)
     {
-        var trackId = (TrackId) Id;
+        var trackId = Id;
         var deleteActionResult = await deleteAction(this);
         if (!deleteActionResult)
         {
