@@ -15,7 +15,8 @@ public static class DependencyInjection
     /// <returns>Коллекция сервисов</returns>
     public static IServiceCollection AddDao(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(TracksMappingProfile));
+        services.AddAutoMapper(typeof(TracksMappingProfile), typeof(TrackFileMappingProfile),
+            typeof(GenreMappingProfile), typeof(AlbumMappingProfile));
 
         return services;
     }

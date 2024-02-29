@@ -68,7 +68,10 @@ public static class DependencyInjection
         };
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(sqlConnectionBuilder.ConnectionString));
+        {
+            options.UseNpgsql(sqlConnectionBuilder.ConnectionString);
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        });
         
         return services;
     }

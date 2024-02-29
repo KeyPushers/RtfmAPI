@@ -2,7 +2,7 @@
 using AutoMapper;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
+using RtfmAPI.Infrastructure.Dao.Dao.Track;
 
 namespace RtfmAPI.Infrastructure.Dao.MappingProfiles;
 
@@ -10,15 +10,15 @@ public class TracksMappingProfile : Profile
 {
     public TracksMappingProfile()
     {
-        CreateMap<RftmAPI.Domain.Models.Tracks.Track, TrackDao>()
+        CreateMap<Track, TrackDao>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
             .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate))
             .ForMember(dest => dest.TrackFileId, opt => opt.MapFrom(src => src.TrackFileId))
             // .ForMember(dest => dest.AlbumId, opt => opt.MapFrom(src => src.AlbumId))
-            // .ForMember(dest => dest.GenreIds,
-            //     opt => opt.MapFrom(src => src.GenreIds.Select(entity => entity)))
+            .ForMember(dest => dest.GenreIds,
+                opt => opt.MapFrom(src => src.GenreIds))
             .ReverseMap();
 
         CreateMap<TrackId, Guid>()

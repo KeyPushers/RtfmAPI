@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackGenre;
 
-namespace RtfmAPI.Infrastructure.Dao.Dao.Tracks;
+namespace RtfmAPI.Infrastructure.Dao.Dao.Track;
 
 public class TrackDao
 {
@@ -9,6 +11,6 @@ public class TrackDao
     public double Duration { get; set; }
     public DateTime ReleaseDate { get; set; }
     public Guid? TrackFileId { get; set; }
-    // public string? AlbumId { get; set; }
-    // public List<string> GenreIds { get; set; } = new();
+    public Guid? AlbumId { get; set; }
+    public List<TrackGenreDao> GenreIds { get; set; } = new();
 }

@@ -30,6 +30,12 @@ public interface IAlbumsRepository
     Task AddAsync(Album album);
 
     /// <summary>
+    /// Обновление музыкального альбома.
+    /// </summary>
+    /// <param name="album">Музыкальный альбом.</param>
+    Task UpdateAsync(Album album);
+    
+    /// <summary>
     /// Удаление музыкального альбома.
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>

@@ -28,4 +28,10 @@ public interface IGenresRepository
     /// </summary>
     /// <param name="genre">Музыкальный жанр.</param>
     Task AddAsync(Genre genre);
+    
+    /// <summary>
+    /// Обновление музыкального жанра.
+    /// </summary>
+    /// <param name="genre">Музыкальный жанр.</param>
+    Task UpdateAsync(Genre genre);
 }

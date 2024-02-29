@@ -17,11 +17,12 @@ public sealed class AppDbContext : DbContext
     /// </summary>
     /// <param name="dbContextOptions">Настройки базы данных: <see cref="DbContextOptions{AppDbContext}"/>.</param>
     /// <param name="publishDomainEventsInterceptor">Перехватчик доменных событий: <see cref="PublishDomainEventsInterceptor"/>.</param>
-    public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions, PublishDomainEventsInterceptor publishDomainEventsInterceptor) : base(dbContextOptions)
+    public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions,
+        PublishDomainEventsInterceptor publishDomainEventsInterceptor) : base(dbContextOptions)
     {
         _publishDomainEventsInterceptor = publishDomainEventsInterceptor;
     }
-    
+
     /// <summary>
     /// Подключаем конфигурации к контексту
     /// </summary>
@@ -31,13 +32,18 @@ public sealed class AppDbContext : DbContext
         // IgnoreDomainEventsInDataBase(modelBuilder);
         modelBuilder.ApplyConfiguration(new TrackDaoConfiguration());
         modelBuilder.ApplyConfiguration(new TrackFileDaoConfiguration());
+        modelBuilder.ApplyConfiguration(new GenreDaoConfiguration());
+        modelBuilder.ApplyConfiguration(new AlbumDaoConfiguration());
+
+
+        modelBuilder.ApplyConfiguration(new TrackGenreDaoConfiguration());
 
         // modelBuilder.ApplyConfiguration(new TrackConfiguration());
         // modelBuilder.ApplyConfiguration(new TrackFileConfiguration());
         // modelBuilder.ApplyConfiguration(new AlbumConfiguration());
         // modelBuilder.ApplyConfiguration(new BandConfiguration());
         // modelBuilder.ApplyConfiguration(new GenreConfiguration());
-        
+
         base.OnModelCreating(modelBuilder);
     }
 

@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
-using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
+using RtfmAPI.Infrastructure.Dao.Dao.Album;
+using RtfmAPI.Infrastructure.Dao.Dao.Track;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackFile;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
@@ -10,27 +11,28 @@ public class TrackDaoConfiguration : IEntityTypeConfiguration<TrackDao>
 {
     public void Configure(EntityTypeBuilder<TrackDao> builder)
     {
-        // Определение названия таблицы музыкальных треков.
         builder.ToTable("Tracks");
 
-        // Определение идентификатора музыкального трека.
         builder.HasKey(track => track.Id);
         builder.Property(track => track.Id)
             .ValueGeneratedNever();
 
-        // Определение названия музыкального трека.
         builder
             .Property(track => track.Name)
             .HasMaxLength(TrackName.MaxLength);
 
-        // Определение даты выпуска музыкального трека.
         builder.Property(track => track.ReleaseDate);
         
-        // Определение идентификатора файла музыкального трека.
         builder
             .HasOne<TrackFileDao>()
             .WithOne()
-            .HasForeignKey<TrackDao>(entity => entity.TrackFileId)
+            .HasForeignKey<TrackDao>(track => track.TrackFileId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder
+            .HasOne<AlbumDao>()
+            .WithMany()
+            .HasForeignKey(track => track.AlbumId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

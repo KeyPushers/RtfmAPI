@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RtfmAPI.Infrastructure.Dao.Dao.Bands;
+namespace RtfmAPI.Infrastructure.Dao.Dao.Band;
 
 public class BandDao
 {

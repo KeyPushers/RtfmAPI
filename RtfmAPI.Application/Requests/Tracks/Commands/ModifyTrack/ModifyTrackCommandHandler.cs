@@ -111,6 +111,8 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             }
         }
 
+        await _tracksRepository.UpdateAsync(track);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return BaseResult.Success();
     }
@@ -171,7 +173,6 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
         if (album is null)
         {
             var error = AlbumExceptions.NotFound(aId);
-            // TODO: Добавить в ресурсы.
             _logger.LogError(error, "Не удалось изменить музыкальный альбом {AlbumId} в музыкальном треке {TrackId}",
                 aId.Value, track.Id.Value);
             return error;
@@ -189,6 +190,7 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             return albumAddTrackResult.Error;
         }
 
+        await _albumsRepository.UpdateAsync(album);
         return BaseResult.Success();
     }
 
@@ -207,7 +209,6 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             if (genre is null)
             {
                 var error = GenreExceptions.NotFound(genreId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный жанр {AddingGenreId} в музыкальный трек {TrackId}",
                     addingGenreId, track.Id.Value);
@@ -215,6 +216,7 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             }
 
             addingGenres.Add(genre);
+            await _genresRepository.UpdateAsync(genre);
         }
 
         var addGenresResult = track.AddGenres(addingGenres);
@@ -241,7 +243,6 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             if (genre is null)
             {
                 var error = GenreExceptions.NotFound(genreId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный жанр {RemovingGenreId} из музыкального трека {TrackId}",
                     removingGenreId, track.Id.Value);
@@ -249,6 +250,7 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             }
 
             removingGenres.Add(genre);
+            await _genresRepository.UpdateAsync(genre);
         }
 
         var removeGenresResult = track.RemoveGenres(removingGenres);

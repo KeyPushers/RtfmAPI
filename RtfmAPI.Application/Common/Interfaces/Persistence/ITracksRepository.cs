@@ -30,6 +30,12 @@ public interface ITracksRepository
     Task AddAsync(Track track);
 
     /// <summary>
+    /// Обновление музыкального трека.
+    /// </summary>
+    /// <param name="track">Музыкальный трек.</param>
+    Task UpdateAsync(Track track);
+    
+    /// <summary>
     /// Удаление музыкального трека.
     /// </summary>
     /// <param name="track">Музыкальный трек.</param>

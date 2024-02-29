@@ -1,8 +1,6 @@
 ﻿using RftmAPI.Domain.Exceptions.TrackFileExceptions;
 using RftmAPI.Domain.Models.TrackFiles.Events;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
-using RftmAPI.Domain.Models.Tracks;
-using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
 
 namespace RftmAPI.Domain.Models.TrackFiles;

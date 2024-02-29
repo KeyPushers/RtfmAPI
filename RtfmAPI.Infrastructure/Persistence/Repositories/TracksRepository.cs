@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
-using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
+using RtfmAPI.Infrastructure.Dao.Dao.Track;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
@@ -45,6 +45,14 @@ public class TracksRepository : ITracksRepository
     {
         var trackDao = _mapper.Map<TrackDao>(track);
         await _context.AddAsync(trackDao);
+    }
+
+    /// <inheritdoc cref="ITracksRepository.UpdateAsync"/>
+    public Task UpdateAsync(Track track)
+    {
+        var trackDao = _mapper.Map<TrackDao>(track);
+        _context.Update(trackDao);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc cref="ITracksRepository.DeleteAsync"/>
