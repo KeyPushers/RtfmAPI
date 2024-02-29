@@ -1,15 +1,16 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.Tracks;
+using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
 
-namespace RtfmAPI.Infrastructure.MappingProfiles;
+namespace RtfmAPI.Infrastructure.Dao.MappingProfiles;
 
 public class TracksMappingProfile : Profile
 {
     public TracksMappingProfile()
     {
-        CreateMap<Track, TrackDao>()
+        CreateMap<RftmAPI.Domain.Models.Tracks.Track, TrackDao>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))

@@ -1,4 +1,6 @@
-﻿namespace RtfmAPI.Infrastructure.Dao.Genres;
+﻿using System;
+
+namespace RtfmAPI.Infrastructure.Dao.Dao.Genres;
 
 public class GenreDao
 {

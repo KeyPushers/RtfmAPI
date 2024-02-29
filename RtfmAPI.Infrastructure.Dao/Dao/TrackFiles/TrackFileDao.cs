@@ -1,4 +1,6 @@
-﻿namespace RtfmAPI.Infrastructure.Dao.TrackFiles;
+﻿using System;
+
+namespace RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
 
 public class TrackFileDao
 {

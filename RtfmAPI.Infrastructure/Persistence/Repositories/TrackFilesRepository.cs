@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
-using RtfmAPI.Infrastructure.Dao.TrackFiles;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;

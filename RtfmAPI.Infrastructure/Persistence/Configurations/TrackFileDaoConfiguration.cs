@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.TrackFiles;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 

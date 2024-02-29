@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Infrastructure", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Application", "RtfmAPI.Application\RtfmAPI.Application.csproj", "{7DE32A02-13B4-4D4D-9562-DFD0BB064914}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Infrastructure.Dao", "RtfmAPI.Infrastructure.Dao\RtfmAPI.Infrastructure.Dao.csproj", "{D5C18729-7B23-4690-A76F-46641344E0B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DE32A02-13B4-4D4D-9562-DFD0BB064914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5C18729-7B23-4690-A76F-46641344E0B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5C18729-7B23-4690-A76F-46641344E0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5C18729-7B23-4690-A76F-46641344E0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5C18729-7B23-4690-A76F-46641344E0B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

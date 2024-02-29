@@ -1,4 +1,7 @@
-﻿namespace RtfmAPI.Infrastructure.Dao.Albums;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RtfmAPI.Infrastructure.Dao.Dao.Albums;
 
 public class AlbumDao
 {

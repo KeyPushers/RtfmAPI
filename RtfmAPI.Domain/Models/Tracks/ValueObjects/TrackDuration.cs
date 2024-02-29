@@ -11,7 +11,7 @@ public sealed class TrackDuration : ValueObject
     /// <summary>
     /// Значение в миллисекундах.
     /// </summary>
-    public double Value { get; private set; }
+    public double Value { get; }
 
     /// <summary>
     /// Создание продолжительности музыкального трека.
