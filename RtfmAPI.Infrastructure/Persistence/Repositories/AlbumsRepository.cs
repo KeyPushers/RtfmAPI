@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
-using RtfmAPI.Infrastructure.Dao.Dao.Album;
+using RtfmAPI.Infrastructure.Dao.Dao.Albums;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;

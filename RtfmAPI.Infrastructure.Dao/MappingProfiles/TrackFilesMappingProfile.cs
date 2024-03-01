@@ -2,13 +2,13 @@
 using AutoMapper;
 using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.Dao.TrackFile;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
 
 namespace RtfmAPI.Infrastructure.Dao.MappingProfiles;
 
-public class TrackFileMappingProfile : Profile
+public class TrackFilesMappingProfile : Profile
 {
-    public TrackFileMappingProfile()
+    public TrackFilesMappingProfile()
     {
         CreateMap<TrackFile, TrackFileDao>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

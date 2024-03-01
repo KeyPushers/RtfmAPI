@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RftmAPI.Domain.Models.Albums;
-using RftmAPI.Domain.Models.Albums.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.Dao.Album;
-using RtfmAPI.Infrastructure.Dao.Dao.Track;
+using RtfmAPI.Infrastructure.Dao.Dao.Albums;
+using RtfmAPI.Infrastructure.Dao.Dao.BandAlbum;
+using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
-public class AlbumDaoConfiguration : IEntityTypeConfiguration<AlbumDao>
+public class AlbumsConfiguration : IEntityTypeConfiguration<AlbumDao>
 {
     public void Configure(EntityTypeBuilder<AlbumDao> builder)
     {
@@ -24,6 +23,13 @@ public class AlbumDaoConfiguration : IEntityTypeConfiguration<AlbumDao>
             .HasMany<TrackDao>()
             .WithOne()
             .HasForeignKey(track => track.AlbumId)
+            .OnDelete(DeleteBehavior.SetNull);
+        
+        // Many-To-One for BandAlbumDao and AlbumDao
+        builder
+            .HasMany<BandAlbumDao>()
+            .WithOne()
+            .HasForeignKey(bandAlbum => bandAlbum.BandId)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

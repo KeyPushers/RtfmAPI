@@ -30,19 +30,15 @@ public sealed class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // IgnoreDomainEventsInDataBase(modelBuilder);
-        modelBuilder.ApplyConfiguration(new TrackDaoConfiguration());
-        modelBuilder.ApplyConfiguration(new TrackFileDaoConfiguration());
-        modelBuilder.ApplyConfiguration(new GenreDaoConfiguration());
-        modelBuilder.ApplyConfiguration(new AlbumDaoConfiguration());
-
-
-        modelBuilder.ApplyConfiguration(new TrackGenreDaoConfiguration());
-
-        // modelBuilder.ApplyConfiguration(new TrackConfiguration());
-        // modelBuilder.ApplyConfiguration(new TrackFileConfiguration());
-        // modelBuilder.ApplyConfiguration(new AlbumConfiguration());
-        // modelBuilder.ApplyConfiguration(new BandConfiguration());
-        // modelBuilder.ApplyConfiguration(new GenreConfiguration());
+        modelBuilder.ApplyConfiguration(new TracksConfiguration());
+        modelBuilder.ApplyConfiguration(new TrackFilesConfiguration());
+        modelBuilder.ApplyConfiguration(new GenresConfiguration());
+        modelBuilder.ApplyConfiguration(new AlbumsConfiguration());
+        modelBuilder.ApplyConfiguration(new BandsConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new TrackGenreConfiguration());
+        modelBuilder.ApplyConfiguration(new BandAlbumConfiguration());
+        modelBuilder.ApplyConfiguration(new BandGenreConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

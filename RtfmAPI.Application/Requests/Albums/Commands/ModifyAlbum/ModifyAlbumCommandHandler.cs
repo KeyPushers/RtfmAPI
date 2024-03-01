@@ -120,6 +120,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             }
         }
 
+        await _albumsRepository.UpdateAsync(album);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return BaseResult.Success();
     }
@@ -206,6 +207,8 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             {
                 return addAlbumResult.Error;
             }
+            
+            await _tracksRepository.UpdateAsync(addingTrack);
         }
 
         return BaseResult.Success();
@@ -249,6 +252,8 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             {
                 return removingTrackRemoveAlbumResult.Error;
             }
+
+            await _tracksRepository.UpdateAsync(removingTrack);
         }
 
         return BaseResult.Success();
@@ -293,6 +298,8 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             {
                 return addAlbumResult.Error;
             }
+
+            await _bandsRepository.UpdateAsync(addingBand);
         }
 
         return BaseResult.Success();
@@ -337,6 +344,8 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             {
                 return removeAlbumResult.Error;
             }
+            
+            await _bandsRepository.UpdateAsync(removingBand);
         }
         
         return BaseResult.Success();

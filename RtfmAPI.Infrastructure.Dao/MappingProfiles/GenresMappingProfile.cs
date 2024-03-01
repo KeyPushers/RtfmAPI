@@ -6,13 +6,14 @@ using RtfmAPI.Infrastructure.Dao.Dao.Genre;
 
 namespace RtfmAPI.Infrastructure.Dao.MappingProfiles;
 
-public class GenreMappingProfile : Profile
+public class GenresMappingProfile : Profile
 {
-    public GenreMappingProfile()
+    public GenresMappingProfile()
     {
         CreateMap<Genre, GenreDao>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            // TODO: Добавить треки и бенды 
             .ReverseMap();
 
         CreateMap<GenreId, Guid>()

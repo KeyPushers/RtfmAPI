@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using RtfmAPI.Infrastructure.Dao.Dao.TrackGenre;
 
-namespace RtfmAPI.Infrastructure.Dao.Dao.Track;
+namespace RtfmAPI.Infrastructure.Dao.Dao.Tracks;
 
 public class TrackDao
 {

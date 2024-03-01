@@ -38,6 +38,12 @@ public interface IBandsRepository
     Task AddAsync(Band band);
 
     /// <summary>
+    /// Обновление музыкальной группы.
+    /// </summary>
+    /// <param name="band">Музыкальная группа.</param>
+    Task UpdateAsync(Band band);
+    
+    /// <summary>
     /// Удаление музыкальной группы.
     /// </summary>
     /// <param name="band">Музыкальная группа.</param>

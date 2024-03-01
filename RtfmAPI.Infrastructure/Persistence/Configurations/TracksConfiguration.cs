@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Infrastructure.Dao.Dao.Album;
-using RtfmAPI.Infrastructure.Dao.Dao.Track;
-using RtfmAPI.Infrastructure.Dao.Dao.TrackFile;
+using RtfmAPI.Infrastructure.Dao.Dao.Albums;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
+using RtfmAPI.Infrastructure.Dao.Dao.TrackGenre;
+using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
-public class TrackDaoConfiguration : IEntityTypeConfiguration<TrackDao>
+public class TracksConfiguration : IEntityTypeConfiguration<TrackDao>
 {
     public void Configure(EntityTypeBuilder<TrackDao> builder)
     {
@@ -34,5 +35,11 @@ public class TrackDaoConfiguration : IEntityTypeConfiguration<TrackDao>
             .WithMany()
             .HasForeignKey(track => track.AlbumId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany<TrackGenreDao>()
+            .WithOne()
+            .HasForeignKey(trackGenre => trackGenre.TrackId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -2,10 +2,11 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RtfmAPI.Infrastructure.Dao.Dao.Genre;
 using RtfmAPI.Infrastructure.Dao.Dao.TrackGenre;
+using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
-public class TrackGenreDaoConfiguration : IEntityTypeConfiguration<TrackGenreDao>
+public class TrackGenreConfiguration : IEntityTypeConfiguration<TrackGenreDao>
 {
     public void Configure(EntityTypeBuilder<TrackGenreDao> builder)
     {
@@ -22,14 +23,16 @@ public class TrackGenreDaoConfiguration : IEntityTypeConfiguration<TrackGenreDao
             .ValueGeneratedNever();
 
         builder
-            .HasOne(trackGenre => trackGenre.Track)
-            .WithMany(track => track.GenreIds)
-            .HasForeignKey(trackGenre => trackGenre.TrackId);
+            .HasOne<TrackDao>()
+            .WithMany()
+            .HasForeignKey(trackGenre => trackGenre.TrackId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder
-            .HasOne(trackGenre => trackGenre.Genre)
-            .WithMany(track => track.TrackIds)
-            .HasForeignKey(trackGenre => trackGenre.GenreId);
+            .HasOne<GenreDao>()
+            .WithMany()
+            .HasForeignKey(trackGenre => trackGenre.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     
 }
