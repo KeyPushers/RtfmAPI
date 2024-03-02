@@ -1,19 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RtfmAPI.Infrastructure.Dao.Dao.Genre;
+using RftmAPI.Domain.Models.Genres;
+using RftmAPI.Domain.Models.Genres.ValueObjects;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
 
-public class GenresConfiguration : IEntityTypeConfiguration<GenreDao>
+public class GenresConfiguration : IEntityTypeConfiguration<Genre>
 {
-    public void Configure(EntityTypeBuilder<GenreDao> builder)
+    public void Configure(EntityTypeBuilder<Genre> builder)
     {
+        // Определение названия таблицы музыкальных жанров.
         builder.ToTable("Genres");
 
+        // Определение идентификатора музыкального жанра.
         builder.HasKey(genre => genre.Id);
         builder.Property(genre => genre.Id)
-            .ValueGeneratedNever();
+            .ValueGeneratedNever()
+            .HasConversion(id => id.Value, id => GenreId.Create(id));
 
-        builder.Property(genre => genre.Name);
+        // Определение названия музыкального жанра.
+        builder.Property(genre => genre.Name)
+            .HasMaxLength(100)
+            .HasConversion(entity => entity.Value,
+                name => GenreName.Create(name).Value);
     }
 }

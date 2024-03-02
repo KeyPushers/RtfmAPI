@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
-using RtfmAPI.Infrastructure.Dao.Dao.Albums;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
@@ -14,60 +12,52 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class AlbumsRepository : IAlbumsRepository
 {
-    private readonly IMapper _mapper;
-    private readonly DbSet<AlbumDao> _context;
+    private readonly DbSet<Album> _context;
 
     /// <summary>
     /// Репозиторий доменной модели <see cref="Album"/>.
     /// </summary>
     /// <param name="context">Контекст базы данных</param>
-    /// <param name="mapper">Маппер.</param>
-    public AlbumsRepository(AppDbContext context, IMapper mapper)
+    public AlbumsRepository(AppDbContext context)
     {
-        _mapper = mapper;
-        _context = context.Set<AlbumDao>();
+        _context = context.Set<Album>();
     }
 
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumsAsync"/>
     public Task<List<Album>> GetAlbumsAsync()
     {
-        return _context.Select(entity => _mapper.Map<Album>(entity)).ToListAsync();
+        return _context.ToListAsync();
     }
 
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumByIdAsync"/>
-    public async Task<Album?> GetAlbumByIdAsync(AlbumId albumId)
+    public Task<Album?> GetAlbumByIdAsync(AlbumId albumId)
     {
-        var albumDao = await _context.FirstOrDefaultAsync(entity => entity.Id == albumId.Value);
-        return albumDao is null ? null : _mapper.Map<Album>(albumDao);
+        return _context.FirstOrDefaultAsync(entity => ReferenceEquals(entity.Id, albumId));
     }
 
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumsByTrackIdAsync"/>
-    public async Task<List<Album>> GetAlbumsByTrackIdAsync(TrackId trackId)
+    public Task<List<Album>> GetAlbumsByTrackIdAsync(TrackId trackId)
     {
-        var albumDaos = await _context.Where(entity => entity.TrackIds.Contains(trackId.Value)).ToListAsync();
-        return albumDaos.Select(entity => _mapper.Map<Album>(entity)).ToList();
+        return _context.Where(entity => entity.TrackIds.Any(id => ReferenceEquals(id, trackId))).ToListAsync();
     }
 
     /// <inheritdoc cref="IAlbumsRepository.AddAsync"/>
     public async Task AddAsync(Album album)
     {
-        var albumDao = _mapper.Map<AlbumDao>(album);
-        await _context.AddAsync(albumDao);
+        await _context.AddAsync(album);
     }
 
     /// <inheritdoc cref="IAlbumsRepository.UpdateAsync"/>
     public Task UpdateAsync(Album album)
     {
-        var albumDao = _mapper.Map<AlbumDao>(album);
-        _context.Update(albumDao);
+        _context.Update(album);
         return Task.CompletedTask;
     }
 
     /// <inheritdoc cref="IAlbumsRepository.DeleteAlbumAsync"/>
     public Task<bool> DeleteAlbumAsync(Album album)
     {
-        var albumDao = _mapper.Map<AlbumDao>(album);
-        var removeResult = _context.Remove(albumDao);
+        var removeResult = _context.Remove(album);
         return Task.FromResult(removeResult.State is EntityState.Deleted);
     }
 }

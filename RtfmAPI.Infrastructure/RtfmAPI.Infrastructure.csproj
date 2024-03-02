@@ -21,7 +21,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\RtfmAPI.Application\RtfmAPI.Application.csproj" />
-        <ProjectReference Include="..\RtfmAPI.Infrastructure.Dao\RtfmAPI.Infrastructure.Dao.csproj" />
     </ItemGroup>
 
 

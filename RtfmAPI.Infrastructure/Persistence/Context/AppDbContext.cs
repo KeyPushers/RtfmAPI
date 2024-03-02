@@ -29,7 +29,7 @@ public sealed class AppDbContext : DbContext
     /// <param name="modelBuilder"></param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // IgnoreDomainEventsInDataBase(modelBuilder);
+        IgnoreDomainEventsInDataBase(modelBuilder);
         modelBuilder.ApplyConfiguration(new TracksConfiguration());
         modelBuilder.ApplyConfiguration(new TrackFilesConfiguration());
         modelBuilder.ApplyConfiguration(new GenresConfiguration());

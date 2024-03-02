@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
-using RtfmAPI.Infrastructure.Dao.Dao.Genre;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories;
@@ -13,45 +11,39 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class GenresRepository : IGenresRepository
 {
-    private readonly IMapper _mapper;
-    private readonly DbSet<GenreDao> _context;
+    private readonly DbSet<Genre> _context;
 
     /// <summary>
     /// Создание репозитория музыкальных жанров.
     /// </summary>
     /// <param name="context">Контекст базы данных.</param>
-    /// <param name="mapper">Маппер.</param>
-    public GenresRepository(AppDbContext context, IMapper mapper)
+    public GenresRepository(AppDbContext context)
     {
-        _mapper = mapper;
-        _context = context.Set<GenreDao>();
+        _context = context.Set<Genre>();
     }
 
     /// <inheritdoc cref="IGenresRepository.GetGenresAsync"/>
     public Task<List<Genre>> GetGenresAsync()
     {
-        return _context.Select(entity => _mapper.Map<Genre>(entity)).ToListAsync();
+        return _context.ToListAsync();
     }
 
     /// <inheritdoc cref="IGenresRepository.GetGenresAsync"/>
-    public async Task<Genre?> GetGenreByIdAsync(GenreId genreId)
+    public Task<Genre?> GetGenreByIdAsync(GenreId genreId)
     {
-        var genreDao = await _context.FirstOrDefaultAsync(entity => entity.Id == genreId.Value);
-        return genreDao is null ? null : _mapper.Map<Genre>(genreDao);
+        return _context.FirstOrDefaultAsync(entity => ReferenceEquals(entity.Id, genreId));
     }
 
     /// <inheritdoc cref="IGenresRepository.GetGenresAsync"/>
     public async Task AddAsync(Genre genre)
     {
-        var genreDao = _mapper.Map<GenreDao>(genre);
-        await _context.AddAsync(genreDao);
+        await _context.AddAsync(genre);
     }
 
     /// <inheritdoc cref="IGenresRepository.UpdateAsync"/>
     public Task UpdateAsync(Genre genre)
     {
-        var genreDao = _mapper.Map<GenreDao>(genre);
-        _context.Update(genreDao);
+        _context.Update(genre);
         return Task.CompletedTask;
     }
 }
