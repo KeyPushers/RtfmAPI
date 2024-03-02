@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RftmAPI.Domain.Models.TrackFiles;
 using RftmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
@@ -42,11 +43,11 @@ public class TracksConfiguration : IEntityTypeConfiguration<Track>
 
         // Определение идентификатора файла музыкального трека.
         builder
-            .Property(track => track.TrackFileId)
-            .ValueGeneratedNever()
-            .HasConversion(entity => entity.Value,
-                value => TrackFileId.Create(value));
-        
+            .HasOne<TrackFile>()
+            .WithOne()
+            .HasForeignKey<Track>(entity => entity.TrackFileId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Создание таблицы для связи музыкальных треков и музыкальных жанров.
         builder.OwnsMany(track => track.GenreIds, b =>
         {
