@@ -25,7 +25,7 @@ public class TrackFilesRepository : ITrackFilesRepository
     /// <see cref="ITrackFilesRepository.GetTrackFileByIdAsync"/>
     public Task<TrackFile?> GetTrackFileByIdAsync(TrackFileId trackFileId)
     {
-        return _context.FirstOrDefaultAsync(trackFile => ReferenceEquals(trackFile.Id, trackFileId));
+        return _context.FirstOrDefaultAsync(trackFile => trackFile.Id == trackFileId);
     }
 
     /// <see cref="ITrackFilesRepository.AddAsync"/>

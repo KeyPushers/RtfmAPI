@@ -31,7 +31,7 @@ public class GenresRepository : IGenresRepository
     /// <inheritdoc cref="IGenresRepository.GetGenresAsync"/>
     public Task<Genre?> GetGenreByIdAsync(GenreId genreId)
     {
-        return _context.FirstOrDefaultAsync(entity => ReferenceEquals(entity.Id, genreId));
+        return _context.FirstOrDefaultAsync(entity => entity.Id == genreId);
     }
 
     /// <inheritdoc cref="IGenresRepository.GetGenresAsync"/>

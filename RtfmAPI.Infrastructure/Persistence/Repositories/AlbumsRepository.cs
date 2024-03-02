@@ -32,13 +32,13 @@ public class AlbumsRepository : IAlbumsRepository
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumByIdAsync"/>
     public Task<Album?> GetAlbumByIdAsync(AlbumId albumId)
     {
-        return _context.FirstOrDefaultAsync(entity => ReferenceEquals(entity.Id, albumId));
+        return _context.FirstOrDefaultAsync(entity => entity.Id == albumId);
     }
 
     /// <inheritdoc cref="IAlbumsRepository.GetAlbumsByTrackIdAsync"/>
     public Task<List<Album>> GetAlbumsByTrackIdAsync(TrackId trackId)
     {
-        return _context.Where(entity => entity.TrackIds.Any(id => ReferenceEquals(id, trackId))).ToListAsync();
+        return _context.Where(entity => entity.TrackIds.Any(id => id == trackId)).ToListAsync();
     }
 
     /// <inheritdoc cref="IAlbumsRepository.AddAsync"/>

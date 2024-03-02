@@ -31,7 +31,7 @@ public class TracksRepository : ITracksRepository
     /// <inheritdoc cref="ITracksRepository.GetTrackByIdAsync"/>
     public Task<Track?> GetTrackByIdAsync(TrackId trackId)
     {
-        return _context.FirstOrDefaultAsync(entity => ReferenceEquals(entity.Id, trackId));
+        return _context.FirstOrDefaultAsync(entity => entity.Id == trackId);
     }
 
     /// <inheritdoc cref="ITracksRepository.AddAsync"/>

@@ -33,14 +33,14 @@ public class BandsRepository : IBandsRepository
     public Task<List<Band>> GetBandsByAlbumIdAsync(AlbumId albumId)
     {
         return _context
-            .Where(entity => entity.AlbumIds.Any(id => ReferenceEquals(id, albumId)))
+            .Where(entity => entity.AlbumIds.Any(id => id == albumId))
             .ToListAsync();
     }
 
     /// <inheritdoc cref="IBandsRepository.GetBandByIdAsync"/>
     public Task<Band?> GetBandByIdAsync(BandId bandId)
     {
-        return _context.FirstOrDefaultAsync(entity => ReferenceEquals(entity.Id, bandId));
+        return _context.FirstOrDefaultAsync(entity => entity.Id == bandId);
     }
 
     /// <inheritdoc cref="IBandsRepository.AddAsync"/>
