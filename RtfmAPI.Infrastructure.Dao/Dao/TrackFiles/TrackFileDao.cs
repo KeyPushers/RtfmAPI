@@ -10,5 +10,4 @@ public class TrackFileDao
     public string? Extension { get; set; }
     public string? MimeType { get; set; }
     public double Duration { get; set; }
-    public Guid? TrackId { get; set; }
 }

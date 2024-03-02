@@ -71,7 +71,7 @@ public class TracksController : ApiControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
         }
-        
+
         return new FileStreamResult(queryResult.Value.Stream, queryResult.Value.MediaType)
         {
             EnableRangeProcessing = true
@@ -98,10 +98,10 @@ public class TracksController : ApiControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
         }
-        
+
         return Ok(queryResult.Value);
     }
-    
+
     /// <summary>
     /// Добавление музыкального трека.
     /// </summary>
@@ -163,7 +163,6 @@ public class TracksController : ApiControllerBase
             TrackId = id,
             Name = request.Name,
             ReleaseDate = request.ReleaseDate,
-            AlbumId = request.AlbumId,
             AddingGenresIds = request.AddingGenresIds,
             RemovingGenresIds = request.RemovingGenresIds
         };
@@ -176,7 +175,7 @@ public class TracksController : ApiControllerBase
 
         return Ok();
     }
-    
+
     /// <summary>
     /// Удаление музыкального трека.
     /// </summary>

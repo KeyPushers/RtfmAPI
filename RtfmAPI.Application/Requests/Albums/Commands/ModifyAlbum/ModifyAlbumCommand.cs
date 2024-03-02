@@ -34,14 +34,4 @@ public class ModifyAlbumCommand : IRequest<BaseResult>
     /// Идентификаторы удаляемых музыкальных треков.
     /// </summary>
     public IReadOnlyCollection<Guid>? RemovingTracksIds { get; init; }
-    
-    /// <summary>
-    /// Идентификаторы добавляемых музыкальных групп.
-    /// </summary>
-    public IReadOnlyCollection<Guid>? AddingBandsIds { get; init; }
-    
-    /// <summary>
-    /// Идентификаторы удаляемых музыкальных групп.
-    /// </summary>
-    public IReadOnlyCollection<Guid>? RemovingBandsIds { get; init; }
 }

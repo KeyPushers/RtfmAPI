@@ -31,10 +31,10 @@ public class TrackFilesConfiguration : IEntityTypeConfiguration<TrackFileDao>
             .Property(trackFile => trackFile.Duration)
             .ValueGeneratedNever();
         
-        builder
-            .HasOne<TrackDao>()
-            .WithOne()
-            .HasForeignKey<TrackFileDao>(track => track.TrackId)
-            .OnDelete(DeleteBehavior.SetNull);
+        // builder
+        //     .HasOne<TrackDao>()
+        //     .WithOne()
+        //     .HasForeignKey<TrackFileDao>("TrackId")
+        //     .OnDelete(DeleteBehavior.SetNull);
     }
 }

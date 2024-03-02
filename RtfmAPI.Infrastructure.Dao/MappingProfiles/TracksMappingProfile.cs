@@ -16,7 +16,6 @@ public class TracksMappingProfile : Profile
             .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
             .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate))
             .ForMember(dest => dest.TrackFileId, opt => opt.MapFrom(src => src.TrackFileId))
-            .ForMember(dest => dest.AlbumId, opt => opt.MapFrom(src => src.AlbumId))
             .ForMember(dest => dest.GenreIds,
                 opt => opt.MapFrom(src => src.GenreIds))
             .ReverseMap();

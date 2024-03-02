@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RftmAPI.Domain.Exceptions.AlbumExceptions;
-using RftmAPI.Domain.Exceptions.BandExceptions;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
-using RftmAPI.Domain.Models.Bands;
-using RftmAPI.Domain.Models.Bands.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
@@ -26,7 +23,6 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
 {
     private readonly IAlbumsRepository _albumsRepository;
     private readonly ITracksRepository _tracksRepository;
-    private readonly IBandsRepository _bandsRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ModifyAlbumCommandHandler> _logger;
 
@@ -35,15 +31,13 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
     /// </summary>
     /// <param name="albumsRepository">Репозиторий музыкального альбома.</param>
     /// <param name="tracksRepository">Репозиторий музыкального трека.</param>
-    /// <param name="bandsRepository">Репозиторий музыкальной группы.</param>
     /// <param name="unitOfWork">Единица работы.</param>
     /// <param name="logger">Логгер.</param>
     public ModifyAlbumCommandHandler(IAlbumsRepository albumsRepository, ITracksRepository tracksRepository,
-        IBandsRepository bandsRepository, IUnitOfWork unitOfWork, ILogger<ModifyAlbumCommandHandler> logger)
+        IUnitOfWork unitOfWork, ILogger<ModifyAlbumCommandHandler> logger)
     {
         _albumsRepository = albumsRepository;
         _tracksRepository = tracksRepository;
-        _bandsRepository = bandsRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
@@ -102,24 +96,6 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             }
         }
 
-        if (request.AddingBandsIds is not null && request.AddingBandsIds.Any())
-        {
-            var addBandsResult = await AddBandsAsync(album, request.AddingBandsIds);
-            if (addBandsResult.IsFailed)
-            {
-                return addBandsResult.Error;
-            }
-        }
-
-        if (request.RemovingBandsIds is not null && request.RemovingBandsIds.Any())
-        {
-            var removeBandsResult = await RemoveBandsAsync(album, request.RemovingBandsIds);
-            if (removeBandsResult.IsFailed)
-            {
-                return removeBandsResult.Error;
-            }
-        }
-
         await _albumsRepository.UpdateAsync(album);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return BaseResult.Success();
@@ -139,12 +115,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
         }
 
         var setAlbumNameResult = album.SetName(albumNameCreateResult.Value);
-        if (setAlbumNameResult.IsFailed)
-        {
-            return setAlbumNameResult.Error;
-        }
-
-        return BaseResult.Success();
+        return setAlbumNameResult.IsFailed ? setAlbumNameResult.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -184,7 +155,6 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             if (track is null)
             {
                 var error = TrackExceptions.NotFound(trackId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный трек {AddingTrackId} в музыкальный альбом {AlbumId}",
                     trackId.Value, album.Id.Value);
@@ -195,23 +165,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
         }
 
         var addTracksResult = album.AddTracks(addingTracks);
-        if (addTracksResult.IsFailed)
-        {
-            return addTracksResult.Error;
-        }
-
-        foreach (var addingTrack in addingTracks)
-        {
-            var addAlbumResult = addingTrack.SetAlbum(album);
-            if (addAlbumResult.IsFailed)
-            {
-                return addAlbumResult.Error;
-            }
-            
-            await _tracksRepository.UpdateAsync(addingTrack);
-        }
-
-        return BaseResult.Success();
+        return addTracksResult.IsFailed ? addTracksResult.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -229,7 +183,6 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             if (track is null)
             {
                 var error = TrackExceptions.NotFound(trackId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный трек {RemovingTrackId} из музыкального альбома {AlbumId}",
                     trackId.Value, album.Id.Value);
@@ -240,114 +193,6 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
         }
 
         var removeTracksResult = album.RemoveTracks(removingTracks);
-        if (removeTracksResult.IsFailed)
-        {
-            return removeTracksResult.Error;
-        }
-
-        foreach (var removingTrack in removingTracks)
-        {
-            var removingTrackRemoveAlbumResult = removingTrack.RemoveAlbum();
-            if (removingTrackRemoveAlbumResult.IsFailed)
-            {
-                return removingTrackRemoveAlbumResult.Error;
-            }
-
-            await _tracksRepository.UpdateAsync(removingTrack);
-        }
-
-        return BaseResult.Success();
-    }
-
-    /// <summary>
-    /// Добавление музыкальных группы в музыкальный альбом.
-    /// </summary>
-    /// <param name="album">Музыкальный альбом.</param>
-    /// <param name="addingBandsIds">Идентификаторы, добавляемых музыкальных групп.</param>
-    private async Task<BaseResult> AddBandsAsync(Album album, IEnumerable<Guid> addingBandsIds)
-    {
-        List<Band> addingBands = new();
-        foreach (var addingBandId in addingBandsIds)
-        {
-            var bandId = BandId.Create(addingBandId);
-            var band = await _bandsRepository.GetBandByIdAsync(bandId);
-            if (band is null)
-            {
-                var error = BandExceptions.NotFound(bandId);
-                // TODO: Добавить в ресурсы.
-                _logger.LogError(error,
-                    "Не удалось добавить музыкальную группу {AddingBandId} в музыкальный альбом {AlbumId}",
-                    bandId.Value, album.Id.Value);
-                return error;
-            }
-
-            addingBands.Add(band);
-        }
-
-        var addBandsResult = album.AddBands(addingBands);
-        if (addBandsResult.IsFailed)
-        {
-            return addBandsResult.Error;
-        }
-
-        var addingAlbumToBands = new[] {album};
-        foreach (var addingBand in addingBands)
-        {
-            var addAlbumResult = addingBand.AddAlbums(addingAlbumToBands);
-            if (addAlbumResult.IsFailed)
-            {
-                return addAlbumResult.Error;
-            }
-
-            await _bandsRepository.UpdateAsync(addingBand);
-        }
-
-        return BaseResult.Success();
-    }
-
-    /// <summary>
-    /// Удаление музыкальных групп из музыкального альбома.
-    /// </summary>
-    /// <param name="album">Музыкальный альбом.</param>
-    /// <param name="removingBandsIds">Идентификаторы, удаляемых музыкальных групп.</param>
-    private async Task<BaseResult> RemoveBandsAsync(Album album, IEnumerable<Guid> removingBandsIds)
-    {
-        List<Band> removingBands = new();
-        foreach (var removingBandId in removingBandsIds)
-        {
-            var bandId = BandId.Create(removingBandId);
-            var band = await _bandsRepository.GetBandByIdAsync(bandId);
-            if (band is null)
-            {
-                var error = BandExceptions.NotFound(bandId);
-                // TODO: Добавить в ресурсы.
-                _logger.LogError(error,
-                    "Не удалось удалить музыкальную группу {RemovingBandId} из музыкального альбома {AlbumId}",
-                    bandId.Value, album.Id.Value);
-                return error;
-            }
-            
-            removingBands.Add(band);
-        }
-
-        var removeBandsResult = album.RemoveBands(removingBands);
-        if (removeBandsResult.IsFailed)
-        {
-            return removeBandsResult.Error;
-        }
-
-        var removingAlbumFromBands = new[] {album};
-        foreach (var removingBand in removingBands)
-        {
-            var removeAlbumResult = removingBand.RemoveAlbums(removingAlbumFromBands);
-            if (removeAlbumResult.IsFailed)
-            {
-                return removeAlbumResult.Error;
-            }
-            
-            await _bandsRepository.UpdateAsync(removingBand);
-        }
-        
-        return BaseResult.Success();
+        return removeTracksResult.IsFailed ? removeTracksResult.Error : BaseResult.Success();
     }
 }

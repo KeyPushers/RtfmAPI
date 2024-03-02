@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Infrastructure.Dao.Dao.Albums;
 using RtfmAPI.Infrastructure.Dao.Dao.TrackFiles;
-using RtfmAPI.Infrastructure.Dao.Dao.TrackGenre;
 using RtfmAPI.Infrastructure.Dao.Dao.Tracks;
 
 namespace RtfmAPI.Infrastructure.Persistence.Configurations;
@@ -28,18 +27,6 @@ public class TracksConfiguration : IEntityTypeConfiguration<TrackDao>
             .HasOne<TrackFileDao>()
             .WithOne()
             .HasForeignKey<TrackDao>(track => track.TrackFileId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        builder
-            .HasOne<AlbumDao>()
-            .WithMany()
-            .HasForeignKey(track => track.AlbumId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder
-            .HasMany<TrackGenreDao>()
-            .WithOne()
-            .HasForeignKey(trackGenre => trackGenre.TrackId)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

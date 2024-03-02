@@ -61,7 +61,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         if (band is null)
         {
             var error = BandExceptions.NotFound(bandId);
-            // TODO: Добавить в ресурсы.
             _logger.LogError(error, "Не удалось изменить музыкальную группу {BandId}", bandId.Value);
             return error;
         }
@@ -113,6 +112,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             }
         }
 
+        await _bandsRepository.UpdateAsync(band);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return BaseResult.Success();
     }
@@ -154,7 +154,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (album is null)
             {
                 var error = AlbumExceptions.NotFound(albumId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный альбом {AddingAlbumId} в музыкальную группу {BandId}",
                     albumId.Value, band.Id.Value);
@@ -165,22 +164,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         }
 
         var addAlbumsResult = band.AddAlbums(addingAlbums);
-        if (addAlbumsResult.IsFailed)
-        {
-            return addAlbumsResult.Error;
-        }
-
-        var addingBandToAlbums = new[] {band};
-        foreach (var addingAlbum in addingAlbums)
-        {
-            var albumAddBandsResult = addingAlbum.AddBands(addingBandToAlbums);
-            if (albumAddBandsResult.IsFailed)
-            {
-                return albumAddBandsResult.Error;
-            }
-        }
-
-        return BaseResult.Success();
+        return addAlbumsResult.IsFailed ? addAlbumsResult.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -198,7 +182,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (album is null)
             {
                 var error = AlbumExceptions.NotFound(albumId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный альбом {RemovingAlbumId} из музыкальной группы {BandId}",
                     albumId.Value, band.Id.Value);
@@ -209,22 +192,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         }
 
         var removeAlbumsResult = band.RemoveAlbums(removingAlbums);
-        if (removeAlbumsResult.IsFailed)
-        {
-            return removeAlbumsResult.Error;
-        }
-
-        var removingBandFromAlbums = new[] {band};
-        foreach (var removingAlbum in removingAlbums)
-        {
-            var albumRemoveBandsResult = removingAlbum.RemoveBands(removingBandFromAlbums);
-            if (albumRemoveBandsResult.IsFailed)
-            {
-                return albumRemoveBandsResult.Error;
-            }
-        }
-
-        return BaseResult.Success();
+        return removeAlbumsResult.IsFailed ? removeAlbumsResult.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -242,7 +210,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (genre is null)
             {
                 var error = GenreExceptions.NotFound(genreId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось добавить музыкальный жанр {AddingGenreId} в музыкальную группу {BandId}",
                     addingGenreId, band.Id.Value);
@@ -253,12 +220,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         }
 
         var addGenresResult = band.AddGenres(addingGenres);
-        if (addGenresResult.IsFailed)
-        {
-            return addGenresResult.Error;
-        }
-
-        return BaseResult.Success();
+        return addGenresResult.IsFailed ? addGenresResult.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -276,7 +238,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             if (genre is null)
             {
                 var error = GenreExceptions.NotFound(genreId);
-                // TODO: Добавить в ресурсы.
                 _logger.LogError(error,
                     "Не удалось удалить музыкальный жанр {RemovingGenreId} из музыкальной группы {BandId}",
                     removingGenreId, band.Id.Value);
@@ -287,11 +248,6 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
         }
 
         var removeGenresResult = band.RemoveGenres(removingGenres);
-        if (removeGenresResult.IsFailed)
-        {
-            return removeGenresResult.Error;
-        }
-
-        return BaseResult.Success();
+        return removeGenresResult.IsFailed ? removeGenresResult.Error : BaseResult.Success();
     }
 }

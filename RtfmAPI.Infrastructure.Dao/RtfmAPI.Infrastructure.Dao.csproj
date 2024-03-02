@@ -15,4 +15,8 @@
       <ProjectReference Include="..\RtfmAPI.Domain\RtfmAPI.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Dao\TrackGenre\" />
+    </ItemGroup>
+
 </Project>

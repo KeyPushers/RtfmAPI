@@ -22,19 +22,9 @@ public sealed class ModifyingAlbum
     /// Идентификаторы добавляемых музыкальных треков.
     /// </summary>
     public List<Guid>? AddingTracksIds { get; init; }
-
-    /// <summary>
-    /// Идентификаторы добавляемых музыкальных групп.
-    /// </summary>
-    public List<Guid>? AddingBandsIds { get; init; }
-
+    
     /// <summary>
     /// Идентификаторы удаляемых музыкальных треков.
     /// </summary>
     public List<Guid>? RemovingTracksIds { get; init; }
-
-    /// <summary>
-    /// Идентификаторы удаляемых музыкальных групп.
-    /// </summary>
-    public List<Guid>? RemovingBandsIds { get; init; }
 }

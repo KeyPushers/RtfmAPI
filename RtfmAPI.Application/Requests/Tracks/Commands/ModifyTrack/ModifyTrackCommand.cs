@@ -26,11 +26,6 @@ public class ModifyTrackCommand : IRequest<BaseResult>
     public DateTime? ReleaseDate { get; init; }
     
     /// <summary>
-    /// Идентификатор музыкального альбома.
-    /// </summary>
-    public Guid? AlbumId { get; init; }
-    
-    /// <summary>
     /// Идентификаторы добавляемых музыкальных жанров.
     /// </summary>
     public IReadOnlyCollection<Guid>? AddingGenresIds { get; init; }

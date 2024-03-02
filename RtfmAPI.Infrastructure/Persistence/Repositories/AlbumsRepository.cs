@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Application.Common.Interfaces.Persistence;
 using RtfmAPI.Infrastructure.Dao.Dao.Albums;
 using RtfmAPI.Infrastructure.Persistence.Context;
@@ -38,6 +39,13 @@ public class AlbumsRepository : IAlbumsRepository
     {
         var albumDao = await _context.FirstOrDefaultAsync(entity => entity.Id == albumId.Value);
         return albumDao is null ? null : _mapper.Map<Album>(albumDao);
+    }
+
+    /// <inheritdoc cref="IAlbumsRepository.GetAlbumsByTrackIdAsync"/>
+    public async Task<List<Album>> GetAlbumsByTrackIdAsync(TrackId trackId)
+    {
+        var albumDaos = await _context.Where(entity => entity.TrackIds.Contains(trackId.Value)).ToListAsync();
+        return albumDaos.Select(entity => _mapper.Map<Album>(entity)).ToList();
     }
 
     /// <inheritdoc cref="IAlbumsRepository.AddAsync"/>

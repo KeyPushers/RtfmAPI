@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
-using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Models.Tracks.ValueObjects;
 using RftmAPI.Domain.Primitives;
@@ -82,12 +81,8 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
     /// <returns>Объект переноса данных информации об альбоме в музыкальном треке.</returns>
     private async Task<AlbumOfTrackInfo?> GetAlbumOfTrackAsync(Track track)
     {
-        if (track.AlbumId is null)
-        {
-            return null;
-        }
-
-        var album = await _albumsRepository.GetAlbumByIdAsync(AlbumId.Create(track.AlbumId.Value));
+        var albums = await _albumsRepository.GetAlbumsByTrackIdAsync(track.Id);
+        var album = albums.FirstOrDefault();
         if (album is null)
         {
             return null;

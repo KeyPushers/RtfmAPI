@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using RftmAPI.Domain.Models.Albums;
 using RftmAPI.Domain.Models.Albums.ValueObjects;
+using RftmAPI.Domain.Models.Tracks.ValueObjects;
 
 namespace RtfmAPI.Application.Common.Interfaces.Persistence;
 
@@ -22,6 +23,13 @@ public interface IAlbumsRepository
     /// <param name="albumId">Идентифиактор музыкального альбома.</param>
     /// <returns>Музыкальный альбом.</returns>
     Task<Album?> GetAlbumByIdAsync(AlbumId albumId);
+
+    /// <summary>
+    /// Получение музыкальных альбомов с музыкальным треком.
+    /// </summary>
+    /// <param name="trackId">Идентификатор музыкального трека.</param>
+    /// <returns>Музыкальные альбомы.</returns>
+    Task<List<Album>> GetAlbumsByTrackIdAsync(TrackId trackId);
     
     /// <summary>
     /// Добавление музыкального альбома.

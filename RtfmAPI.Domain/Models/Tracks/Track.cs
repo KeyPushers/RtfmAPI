@@ -1,6 +1,4 @@
 ﻿using RftmAPI.Domain.Exceptions.TrackExceptions;
-using RftmAPI.Domain.Models.Albums;
-using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
 using RftmAPI.Domain.Models.TrackFiles;
@@ -34,11 +32,6 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public TrackFileId TrackFileId { get; private set; }
 
     /// <summary>
-    /// Музыкальный альбом.
-    /// </summary>
-    public AlbumId? AlbumId { get; private set; }
-
-    /// <summary>
     /// Продолжительность.
     /// </summary>
     public TrackDuration Duration { get; private set; }
@@ -65,25 +58,18 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="name">Название музыкального трека.</param>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFile">Содержимое файла музыкального трека.</param>
-    /// <param name="album">Музыкальный альбом.</param>
     /// <param name="duration">Продолжительность музыкального трека.</param>
     /// <param name="genres">Музыкальные жанры.</param>
-    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, Album? album,
-        TrackDuration duration,
+    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile, TrackDuration duration,
         IEnumerable<Genre> genres) : base(TrackId.Create())
     {
         Name = name;
         ReleaseDate = releaseDate;
         TrackFileId = TrackFileId.Create(trackFile.Id.Value);
-        AlbumId = album?.Id is not null ? AlbumId.Create(album.Id.Value) : null;
         Duration = duration;
         _genreIds = genres.Select(genre => genre.Id).ToHashSet();
 
         AddDomainEvent(new TrackCreatedDomainEvent(this));
-        if (album is not null)
-        {
-            AddDomainEvent(new AlbumChangedInTrackDomainEvent(this, album));
-        }
     }
 
     /// <summary>
@@ -95,24 +81,10 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <returns>Музыкальный трек.</returns>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile)
     {
-        var trackResult = CreateTrack(name, releaseDate, trackFile, null, Enumerable.Empty<Genre>());
+        var trackResult = CreateTrack(name, releaseDate, trackFile, Enumerable.Empty<Genre>());
         return trackResult.IsFailed ? trackResult.Error : trackResult;
     }
 
-    /// <summary>
-    /// Создание музыкального трека.
-    /// </summary>
-    /// <param name="name">Название музыкального трека.</param>
-    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
-    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
-    /// <param name="album">Музыкальный альбом.</param>
-    /// <returns>Музыкальный трек.</returns>
-    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
-        Album album)
-    {
-        var trackResult = CreateTrack(name, releaseDate, trackFile, album, Enumerable.Empty<Genre>());
-        return trackResult.IsFailed ? trackResult.Error : trackResult;
-    }
 
     /// <summary>
     /// Создание музыкального трека.
@@ -125,7 +97,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
         IEnumerable<Genre> genres)
     {
-        var trackResult = CreateTrack(name, releaseDate, trackFile, null, genres);
+        var trackResult = CreateTrack(name, releaseDate, trackFile, genres);
         return trackResult.IsFailed ? trackResult.Error : trackResult;
     }
 
@@ -135,32 +107,15 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="name">Название музыкального трека.</param>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFile">Содержимое файла музыкального трека.</param>
-    /// <param name="album">Музыкальный альбом.</param>
-    /// <param name="genres">Музыкальные жанры.</param>
-    /// <returns>Музыкальный трек.</returns>
-    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
-        Album album, IEnumerable<Genre> genres)
-    {
-        var trackResult = CreateTrack(name, releaseDate, trackFile, album, genres);
-        return trackResult.IsFailed ? trackResult.Error : trackResult;
-    }
-
-    /// <summary>
-    /// Создание музыкального трека.
-    /// </summary>
-    /// <param name="name">Название музыкального трека.</param>
-    /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
-    /// <param name="trackFile">Содержимое файла музыкального трека.</param>
-    /// <param name="album">Музыкальный альбом.</param>
     /// <param name="genres">Музыкальные жанры.</param>
     /// <returns>Музыкальный трек.</returns>
     private static Result<Track> CreateTrack(TrackName name, TrackReleaseDate releaseDate, TrackFile trackFile,
-        Album? album, IEnumerable<Genre> genres)
+        IEnumerable<Genre> genres)
     {
         var trackDurationResult = TrackDuration.Create(trackFile.Duration.Value);
         return trackDurationResult.IsFailed
             ? trackDurationResult.Error
-            : new Track(name, releaseDate, trackFile, album, trackDurationResult.Value, genres);
+            : new Track(name, releaseDate, trackFile, trackDurationResult.Value, genres);
     }
 
     #endregion
@@ -211,40 +166,6 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         TrackFileId = TrackFileId.Create(file.Id.Value);
 
         AddDomainEvent(new TrackFileChangedInTrackDomainEvent(this, file));
-        return BaseResult.Success();
-    }
-
-    /// <summary>
-    /// Изменение музыкального альбома.
-    /// </summary>
-    /// <param name="album">Музыкальный альбома.</param>
-    public BaseResult SetAlbum(Album album)
-    {
-        if (AlbumId?.Value == album.Id.Value)
-        {
-            return BaseResult.Success();
-        }
-
-        AlbumId = AlbumId.Create(album.Id.Value);
-
-        AddDomainEvent(new AlbumChangedInTrackDomainEvent(this, album));
-        return BaseResult.Success();
-    }
-
-    /// <summary>
-    /// Удаление музыкального альбома.
-    /// </summary>
-    /// <returns>Результат операции.</returns>
-    public BaseResult RemoveAlbum()
-    {
-        if (AlbumId is null)
-        {
-            return BaseResult.Success();
-        }
-
-        var albumId = AlbumId;
-        AlbumId = null;
-        AddDomainEvent(new AlbumRemovedFromTrackDomainEvent(this, albumId));
         return BaseResult.Success();
     }
 

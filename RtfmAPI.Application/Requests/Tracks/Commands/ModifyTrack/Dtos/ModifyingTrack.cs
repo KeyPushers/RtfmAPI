@@ -19,11 +19,6 @@ public sealed class ModifyingTrack
     public DateTime? ReleaseDate { get; init; }
     
     /// <summary>
-    /// Идентификатор музыкального альбома.
-    /// </summary>
-    public Guid? AlbumId { get; init; }
-    
-    /// <summary>
     /// Идентификаторы добавляемых музыкальных жанров.
     /// </summary>
     public List<Guid>? AddingGenresIds { get; init; }

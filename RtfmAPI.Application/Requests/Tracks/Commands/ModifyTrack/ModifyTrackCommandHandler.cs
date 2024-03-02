@@ -5,10 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using RftmAPI.Domain.Exceptions.AlbumExceptions;
 using RftmAPI.Domain.Exceptions.GenreExceptions;
 using RftmAPI.Domain.Exceptions.TrackExceptions;
-using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Genres;
 using RftmAPI.Domain.Models.Genres.ValueObjects;
 using RftmAPI.Domain.Models.Tracks;
@@ -24,7 +22,6 @@ namespace RtfmAPI.Application.Requests.Tracks.Commands.ModifyTrack;
 public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, BaseResult>
 {
     private readonly ITracksRepository _tracksRepository;
-    private readonly IAlbumsRepository _albumsRepository;
     private readonly IGenresRepository _genresRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ModifyTrackCommandHandler> _logger;
@@ -33,15 +30,13 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
     /// Создание обработчика команды изменения музыкального трека.
     /// </summary>
     /// <param name="tracksRepository">Репозиторий музыкальных треков.</param>
-    /// <param name="albumsRepository">Репозиторий музыкальных альбомов.</param>
     /// <param name="genresRepository">Репозиторий музыкальных жанров.</param>
     /// <param name="unitOfWork">Единица работы.</param>
     /// <param name="logger">Логгер.</param>
-    public ModifyTrackCommandHandler(ITracksRepository tracksRepository, IAlbumsRepository albumsRepository,
+    public ModifyTrackCommandHandler(ITracksRepository tracksRepository,
         IGenresRepository genresRepository, IUnitOfWork unitOfWork, ILogger<ModifyTrackCommandHandler> logger)
     {
         _tracksRepository = tracksRepository;
-        _albumsRepository = albumsRepository;
         _genresRepository = genresRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
@@ -60,7 +55,6 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
         if (track is null)
         {
             var error = TrackExceptions.NotFound(trackId);
-            // TODO: Добавить в ресурсы.
             _logger.LogError(error, "Не удалось изменить музыкальный трек {TrackId}", trackId.Value);
             return error;
         }
@@ -80,15 +74,6 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
             if (setTrackReleaseDateResult.IsFailed)
             {
                 return setTrackReleaseDateResult.Error;
-            }
-        }
-
-        if (request.AlbumId is not null)
-        {
-            var setAlbumResult = await SetAlbumAsync(track, request.AlbumId.Value);
-            if (setAlbumResult.IsFailed)
-            {
-                return setAlbumResult.Error;
             }
         }
 
@@ -153,45 +138,7 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
         }
 
         var trackSetReleaseDateRelease = track.SetReleaseDate(trackReleaseDateCreateResult.Value);
-        if (trackSetReleaseDateRelease.IsFailed)
-        {
-            return trackSetReleaseDateRelease.Error;
-        }
-
-        return BaseResult.Success();
-    }
-
-    /// <summary>
-    /// Изменение музыкального альбома к музыкальному треку.
-    /// </summary>
-    /// <param name="track">Музыкальный трек.</param>
-    /// <param name="albumId">Идентификатор музыкального альбома.</param>
-    private async Task<BaseResult> SetAlbumAsync(Track track, Guid albumId)
-    {
-        var aId = AlbumId.Create(albumId);
-        var album = await _albumsRepository.GetAlbumByIdAsync(aId);
-        if (album is null)
-        {
-            var error = AlbumExceptions.NotFound(aId);
-            _logger.LogError(error, "Не удалось изменить музыкальный альбом {AlbumId} в музыкальном треке {TrackId}",
-                aId.Value, track.Id.Value);
-            return error;
-        }
-
-        var setAlbumResult = track.SetAlbum(album);
-        if (setAlbumResult.IsFailed)
-        {
-            return setAlbumResult.Error;
-        }
-
-        var albumAddTrackResult = album.AddTracks(new[] {track});
-        if (albumAddTrackResult.IsFailed)
-        {
-            return albumAddTrackResult.Error;
-        }
-
-        await _albumsRepository.UpdateAsync(album);
-        return BaseResult.Success();
+        return trackSetReleaseDateRelease.IsFailed ? trackSetReleaseDateRelease.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -220,12 +167,7 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
         }
 
         var addGenresResult = track.AddGenres(addingGenres);
-        if (addGenresResult.IsFailed)
-        {
-            return addGenresResult.Error;
-        }
-
-        return BaseResult.Success();
+        return addGenresResult.IsFailed ? addGenresResult.Error : BaseResult.Success();
     }
 
     /// <summary>
@@ -254,11 +196,6 @@ public class ModifyTrackCommandHandler : IRequestHandler<ModifyTrackCommand, Bas
         }
 
         var removeGenresResult = track.RemoveGenres(removingGenres);
-        if (removeGenresResult.IsFailed)
-        {
-            return removeGenresResult.Error;
-        }
-
-        return BaseResult.Success();
+        return removeGenresResult.IsFailed ? removeGenresResult.Error : BaseResult.Success();
     }
 }

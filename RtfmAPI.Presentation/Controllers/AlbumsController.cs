@@ -113,9 +113,7 @@ public class AlbumsController : ApiControllerBase
             Name = request.Name,
             ReleaseDate = request.ReleaseDate,
             AddingTracksIds = request.AddingTracksIds,
-            AddingBandsIds = request.AddingBandsIds,
             RemovingTracksIds = request.RemovingTracksIds,
-            RemovingBandsIds = request.RemovingBandsIds
         };
 
         var commandResult = await Mediator.Send(command, cancellationToken);

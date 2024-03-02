@@ -13,7 +13,6 @@ public class GenresMappingProfile : Profile
         CreateMap<Genre, GenreDao>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-            // TODO: Добавить треки и бенды 
             .ReverseMap();
 
         CreateMap<GenreId, Guid>()

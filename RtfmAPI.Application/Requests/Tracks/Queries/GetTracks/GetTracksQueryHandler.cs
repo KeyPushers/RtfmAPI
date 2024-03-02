@@ -4,8 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using RftmAPI.Domain.Models.Albums;
-using RftmAPI.Domain.Models.Albums.ValueObjects;
 using RftmAPI.Domain.Models.Bands;
 using RftmAPI.Domain.Models.Tracks;
 using RftmAPI.Domain.Primitives;
@@ -98,44 +96,23 @@ public class GetTracksQueryHandler : IRequestHandler<GetTracksQuery, Result<Trac
     }
 
     /// <summary>
-    /// Получение альбома по треку.
-    /// </summary>
-    /// <param name="track">Музыкальный трек.</param>
-    /// <returns>Музыкальный альбом.</returns>
-    private Task<Album?> GetAlbumByTrackAsync(Track track)
-    {
-        if (track.AlbumId is null)
-        {
-            return Task.FromResult<Album?>(null);
-        }
-
-        return _albumsRepository.GetAlbumByIdAsync(track.AlbumId);
-    }
-
-    /// <summary>
     /// Получение названий музыкальных групп, котоыре исполнили музыкальный трек.
     /// </summary>
     /// <param name="track">Музыкальный трек.</param>
     /// <returns>Список названий музыкальных групп.</returns>
     private async Task<List<string>> GetBandNamesAsync(Track track)
     {
-        var album = await GetAlbumByTrackAsync(track);
-        if (album is null)
+        var albums = await _albumsRepository.GetAlbumsByTrackIdAsync(track.Id);
+
+        List<Band> bands = new();
+        foreach (var album in albums)
         {
-            return new();
+            var albumBands = await _bandsRepository.GetBandsByAlbumIdAsync(album.Id);
+            bands.AddRange(albumBands);
         }
 
-        var bands =  await GetBandsByAlbumAsync(album);
-        return bands.Select(entity => entity.Name.Value).ToList();
-    }
-    
-    /// <summary>
-    /// Получение группы по альбому.
-    /// </summary>
-    /// <param name="album">Музыкальный альбом.</param>
-    /// <returns>Музыкальная группа.</returns>
-    private Task<List<Band>> GetBandsByAlbumAsync(Album album)
-    {
-        return _bandsRepository.GetBandsByAlbumIdAsync(AlbumId.Create(album.Id.Value));
+        return bands
+            .DistinctBy(entity => entity.Id.Value)
+            .Select(entity => entity.Name.Value).ToList();
     }
 }
