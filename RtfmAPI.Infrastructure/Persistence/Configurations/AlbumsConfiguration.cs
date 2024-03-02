@@ -26,7 +26,7 @@ public class AlbumsConfiguration : IEntityTypeConfiguration<Album>
 
         // Определение даты выпуска музыкального альбома.
         builder
-            .Property(track => track.ReleaseDate)
+            .Property(album => album.ReleaseDate)
             .HasConversion(entity => entity.Value,
                 name => AlbumReleaseDate.Create(name).Value);
         

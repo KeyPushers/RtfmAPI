@@ -13,15 +13,15 @@ public class TrackFilesConfiguration : IEntityTypeConfiguration<TrackFile>
         builder.ToTable("TrackFiles");
 
         // Определение идентификатора музыкального трека.
-        builder.HasKey(track => track.Id);
-        builder.Property(track => track.Id)
+        builder.HasKey(trackFile => trackFile.Id);
+        builder.Property(trackFile => trackFile.Id)
             .ValueGeneratedNever()
             .HasConversion(entity => entity.Value,
                 value => TrackFileId.Create(value));
 
         // Определение названия музыкального трека.
         builder
-            .Property(track => track.Name)
+            .Property(trackFile => trackFile.Name)
             .HasMaxLength(TrackFileName.MaxLength)
             .HasConversion(entity => entity.Value,
                 name => TrackFileName.Create(name).Value);

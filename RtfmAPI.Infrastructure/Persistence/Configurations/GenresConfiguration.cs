@@ -20,7 +20,6 @@ public class GenresConfiguration : IEntityTypeConfiguration<Genre>
 
         // Определение названия музыкального жанра.
         builder.Property(genre => genre.Name)
-            .HasMaxLength(100)
             .HasConversion(entity => entity.Value,
                 name => GenreName.Create(name).Value);
     }

@@ -19,9 +19,8 @@ public class BandsConfiguration : IEntityTypeConfiguration<Band>
             .HasConversion(id => id.Value, id => BandId.Create(id));
 
         // Определение названия музыкальной группы.
-        builder.Property(album => album.Name)
-            .HasMaxLength(100)
-            .HasConversion(entity => entity.Value,
+        builder.Property(band => band.Name)
+            .HasConversion(bandName => bandName.Value,
                 name => BandName.Create(name).Value);
         
         // Создание таблицы для связи музыкальных группы и музыкальных альбомов.
