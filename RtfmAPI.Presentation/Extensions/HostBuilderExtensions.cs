@@ -18,7 +18,7 @@ public static class HostBuilderExtensions
         builder.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services));
-
+        
         return builder;
     }    
 }

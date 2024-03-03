@@ -11,7 +11,8 @@ builder.Host.UseHostExtensions();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 builder.Services.AddPresentation();
-
+builder.Services.ConfigureOptions(builder);
+    
 var app = builder.Build();
 
 app.UseWebApplicationExtension();

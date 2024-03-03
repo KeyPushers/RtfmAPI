@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Presentation.Settings;
 using Serilog;
 
@@ -27,6 +32,25 @@ public static class WebApplicationExtensions
         webApplication.UseSerilogRequestLogging();
         webApplication.MapControllers();
 
+        webApplication.Lifetime.ApplicationStarted.Register(OnApplicationStarted, webApplication.Services);
+        
         return webApplication;
+    }
+
+    private static async void OnApplicationStarted(object? provider)
+    {
+        if (provider is not ServiceProvider serviceProvider)
+        {
+            return;
+        }
+
+        await InitDataBaseAsync(serviceProvider);
+    }
+
+
+    private static Task InitDataBaseAsync(IServiceProvider serviceProvider)
+    {
+        var context = serviceProvider.GetRequiredService<DataContext>();
+        return context.InitAsync();
     }
 }
