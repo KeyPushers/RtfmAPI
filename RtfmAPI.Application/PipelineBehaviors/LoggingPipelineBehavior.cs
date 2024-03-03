@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using RtfmAPI.Application.Properties;
 using RtfmAPI.Domain.Primitives;
 
-namespace RtfmAPI.Application.Common.PipelineBehaviors;
+namespace RtfmAPI.Application.PipelineBehaviors;
 
 /// <summary>
 /// Конвейер логирования.

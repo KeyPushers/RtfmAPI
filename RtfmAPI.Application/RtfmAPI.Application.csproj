@@ -13,11 +13,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Common\" />
+      <ProjectReference Include="..\RtfmAPI.Domain\RtfmAPI.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\RtfmAPI.Domain\RtfmAPI.Domain.csproj" />
+      <Folder Include="Requests\" />
     </ItemGroup>
 
 </Project>

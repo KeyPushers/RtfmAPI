@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using RtfmAPI.Application.Common.PipelineBehaviors;
+using RtfmAPI.Application.Fabrics;
+using RtfmAPI.Application.PipelineBehaviors;
 
 namespace RtfmAPI.Application;
 
@@ -19,6 +20,10 @@ public static class DependencyInjection
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
+        
+        services.AddScoped<BandsFabric>();
+        services.AddScoped<AlbumsFabric>();
+
         return services;
     }
 }

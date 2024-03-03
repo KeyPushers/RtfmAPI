@@ -1,13 +1,13 @@
 ﻿namespace RtfmAPI.Domain.Primitives;
 
 /// <summary>
-/// Примитив идентификатора агрегата
+/// Примитив идентификатора агрегата.
 /// </summary>
-/// <typeparam name="TId">Тип идентификатора</typeparam>
-public abstract class AggregateRootId<TId> : ValueObject
+/// <typeparam name="TValue">Тип идентификатора.</typeparam>
+public abstract class AggregateRootId<TValue> : ValueObject
 {
     /// <summary>
     /// Значение идентификатора.
     /// </summary>
-    public abstract TId Value { get; }
+    public abstract TValue Value { get; }
 }

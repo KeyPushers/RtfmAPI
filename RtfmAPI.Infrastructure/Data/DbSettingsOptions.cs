@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.JavaScript;
-
-namespace RtfmAPI.Infrastructure.Data;
+﻿namespace RtfmAPI.Infrastructure.Data;
 
 /// <summary>
 /// Настройки подключения к базе данных.
