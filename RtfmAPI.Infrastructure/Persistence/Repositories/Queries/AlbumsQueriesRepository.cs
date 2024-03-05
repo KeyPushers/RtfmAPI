@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Dapper;
-using RtfmAPI.Application.Fabrics;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.Albums;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
@@ -35,17 +34,23 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var sql = @"SELECT Id, Name, ReleaseDate FROM Albums WHERE Id = @AlbumId";
-        var response = await connection.QueryFirstOrDefaultAsync<AlbumDao>(sql, new {AlbumId = albumId.Value});
+        var response = await connection.QuerySingleOrDefaultAsync<AlbumDao>(sql, new {AlbumId = albumId.Value});
         if (response is null)
         {
             return new InvalidOperationException();
         }
-
-        if (string.IsNullOrWhiteSpace(response.Name))
-        {
-            return new InvalidOperationException();
-        }
         
-        return _albumsFabric.CreateAlbum(response.Name, response.ReleaseDate);
+        return _albumsFabric.Restore(albumId.Value, response.Name, response.ReleaseDate);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> IsAlbumExistsAsync(AlbumId albumId)
+    {
+        using var connection = _dataContext.CreateOpenedConnection();
+        var trx = connection.BeginTransaction();
+        var sql = @"SELECT EXISTS(SELECT 1 FROM Albums WHERE Id=@AlbumId)";
+
+        var result = await connection.ExecuteScalarAsync<bool>(sql, new {AlbumId = albumId.Value}, trx);
+        return result;
     }
 }

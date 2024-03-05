@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using RtfmAPI.Application.Fabrics;
 using RtfmAPI.Application.PipelineBehaviors;
+using RtfmAPI.Domain.Models.Albums;
+using RtfmAPI.Domain.Models.Bands;
 
 namespace RtfmAPI.Application;
 

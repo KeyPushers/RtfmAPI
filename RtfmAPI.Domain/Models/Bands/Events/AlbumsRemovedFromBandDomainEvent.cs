@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using RtfmAPI.Domain.Models.Albums;
+using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Bands.Events;
@@ -8,5 +8,5 @@ namespace RtfmAPI.Domain.Models.Bands.Events;
 /// Событие удаления музыкальных альбомов из музыкальной группы.
 /// </summary>
 /// <param name="Band">Музыкальная группа.</param>
-/// <param name="RemovedAlbums">Удаленные музыкальные альбомы.</param>
-public record AlbumsRemovedFromBandDomainEvent(Band Band, IReadOnlyCollection<Album> RemovedAlbums) : IDomainEvent;
+/// <param name="RemovedAlbumIds">Идентификаторы удаленных музыкальных альбомов.</param>
+public record AlbumsRemovedFromBandDomainEvent(Band Band, IReadOnlyCollection<AlbumId> RemovedAlbumIds) : IDomainEvent;

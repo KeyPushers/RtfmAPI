@@ -16,4 +16,10 @@ public interface IAlbumsQueriesRepository
     /// <param name="albumId">Идентифиактор музыкального альбома.</param>
     /// <returns>Музыкальный альбом.</returns>
     Task<Result<Album>> GetAlbumByIdAsync(AlbumId albumId);
+
+    /// <summary>
+    /// Получение признака существования музыкального альбома.
+    /// </summary>
+    /// <param name="albumId">Идентификатор музыкального альбома.</param>
+    Task<bool> IsAlbumExistsAsync(AlbumId albumId);
 }

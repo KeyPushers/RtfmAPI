@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using RtfmAPI.Application.Fabrics;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.Bands;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
@@ -34,13 +34,21 @@ public class BandsQueriesRepository : IBandsQueriesRepository
     public async Task<Result<Band>> GetBandByIdAsync(BandId bandId)
     {
         using var connection = _dataContext.CreateOpenedConnection();
-        var sql = @"SELECT Id, Name FROM Bands WHERE Id = @BandId";
-        var response = await connection.QueryFirstOrDefaultAsync<BandDao>(sql, new {BandId = bandId.Value});
-        if (response is null)
+        
+        const string sql = @"SELECT Id, Name FROM Bands WHERE Id = @BandId";
+        var band = await connection.QuerySingleOrDefaultAsync<BandDao>(sql, new {BandId = bandId.Value});
+        if (band is null)
         {
             return new InvalidOperationException();
         }
-
-        return _bandsFabric.CreateBand(response.Name ?? string.Empty);
+        
+        const string sqlAlbumIds = @"
+                    SELECT ba.AlbumId FROM Bands b
+                    INNER JOIN BandAlbums ba ON b.Id = ba.BandId
+                    WHERE b.id = @BandId
+                   ";
+        var albumIds = await connection.QueryAsync<Guid>(sqlAlbumIds, new {BandId = bandId.Value});
+        
+        return _bandsFabric.Restore(bandId.Value, band.Name ?? string.Empty, albumIds.ToList());
     }
 }

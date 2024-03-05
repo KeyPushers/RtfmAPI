@@ -20,22 +20,26 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// Дата выпуска музыкального альбома.
     /// </summary>
     public AlbumReleaseDate ReleaseDate { get; private set; }
-    
+
     /// <summary>
     /// Музыкальный альбом.
     /// </summary>
     /// <param name="name">Название музыкального альбома.</param>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
-    private Album(AlbumName name, AlbumReleaseDate releaseDate) : base(
-        AlbumId.Create())
+    private Album(AlbumName name, AlbumReleaseDate releaseDate) : this(AlbumId.Create(), name, releaseDate)
     {
-        AddDomainEvent(new AlbumCreatedDomainEvent(this));
-        
-        Name = name;
-        AddDomainEvent(new AlbumNameChangedDomainEvent(this, name));
+    }
 
+    /// <summary>
+    /// Музыкальный альбом.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкального альбома.</param>
+    /// <param name="name">Название музыкального альбома.</param>
+    /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
+    private Album(AlbumId id, AlbumName name, AlbumReleaseDate releaseDate) : base(id)
+    {
+        Name = name;
         ReleaseDate = releaseDate;
-        AddDomainEvent(new AlbumReleaseDateChangedDomainEvent(this, releaseDate));
     }
 
     /// <summary>
@@ -46,9 +50,22 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// <returns>Музыкальный альбом.</returns>
     public static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate)
     {
-        return new Album(name, releaseDate);
+        var album = new Album(name, releaseDate);
+        album.AddDomainEvent(new AlbumCreatedDomainEvent(album));
+        album.AddDomainEvent(new AlbumNameChangedDomainEvent(album, name));
+        album.AddDomainEvent(new AlbumReleaseDateChangedDomainEvent(album, releaseDate));
+
+        return album;
     }
-    
+
+    /// <summary>
+    /// Восстановление музыкального альбома.
+    /// </summary>
+    internal static Result<Album> Restore(AlbumId id, AlbumName name, AlbumReleaseDate releaseDate)
+    {
+        return new Album(id, name, releaseDate);
+    }
+
     /// <summary>
     /// Изменение названия музыкального альбома.
     /// </summary>
@@ -80,7 +97,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
         AddDomainEvent(new AlbumReleaseDateChangedDomainEvent(this, releaseDate));
         return BaseResult.Success();
     }
-    
+
     /// <summary>
     /// Удаление музыкального альбома.
     /// </summary>

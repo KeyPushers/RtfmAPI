@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using RtfmAPI.Application.Fabrics;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand.Dtos;
+using RtfmAPI.Domain.Models.Bands;
+using RtfmAPI.Domain.Models.Bands.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Bands.Commands.AddBand;
@@ -14,17 +15,14 @@ namespace RtfmAPI.Application.Requests.Bands.Commands.AddBand;
 public class AddBandCommandHandler : IRequestHandler<AddBandCommand, Result<AddedBand>>
 {
     private readonly IBandsCommandsRepository _repository;
-    private readonly BandsFabric _bandsFabric;
 
     /// <summary>
     /// Обработчик команды добавления музыкальной группы.
     /// </summary>
     /// <param name="repository">Репозиторий.</param>
-    /// <param name="bandsFabric">Фабрика музыкальных групп.</param>
-    public AddBandCommandHandler(IBandsCommandsRepository repository, BandsFabric bandsFabric)
+    public AddBandCommandHandler(IBandsCommandsRepository repository)
     {
         _repository = repository;
-        _bandsFabric = bandsFabric;
     }
 
     /// <summary>
@@ -35,7 +33,13 @@ public class AddBandCommandHandler : IRequestHandler<AddBandCommand, Result<Adde
     /// <returns>Музыкальная группа.</returns>
     public async Task<Result<AddedBand>> Handle(AddBandCommand request, CancellationToken cancellationToken = default)
     {
-        var getBandResult = _bandsFabric.CreateBand(request.Name);
+        var getBandNameResult = BandName.Create(request.Name);
+        if (getBandNameResult.IsFailed)
+        {
+            return getBandNameResult.Error;
+        }
+        
+        var getBandResult = Band.Create(getBandNameResult.Value);
         if (getBandResult.IsFailed)
         {
             return getBandResult.Error;

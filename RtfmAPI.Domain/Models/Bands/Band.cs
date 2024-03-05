@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RtfmAPI.Domain.Models.Albums;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Bands.Events;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
@@ -15,7 +14,7 @@ namespace RtfmAPI.Domain.Models.Bands;
 /// </summary>
 public sealed class Band : AggregateRoot<BandId, Guid>
 {
-    private readonly HashSet<AlbumId> _albumIds = new();
+    private readonly HashSet<AlbumId> _albumIds;
 
     /// <summary>
     /// Название музыкальной группы.
@@ -26,24 +25,28 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// Музыкальные альбомы.
     /// </summary>
     public IReadOnlyCollection<AlbumId> AlbumIds => _albumIds;
-    
+
     /// <summary>
     /// Создание музыкальной группы.
     /// </summary>
     /// <param name="name">Название музыкальной группы.</param>
     /// <param name="albumIds">Идентификаторы музыкальных альбомов.</param>
-    private Band(BandName name, IReadOnlyCollection<AlbumId> albumIds) : base(
-        BandId.Create())
+    private Band(BandName name, IEnumerable<AlbumId> albumIds) : this(BandId.Create(), name, albumIds)
     {
-        AddDomainEvent(new BandCreatedDomainEvent(this));
-
-        Name = name;
-        AddDomainEvent(new BandNameChangedDomainEvent(this, name));
-
-        _albumIds = albumIds.ToHashSet();
-        AddDomainEvent(new AlbumsAddedToBandDomainEvent(this, albumIds));
     }
-    
+
+    /// <summary>
+    /// Создание музыкальной группы.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкальной группы.</param>
+    /// <param name="name">Название музыкальной группы.</param>
+    /// <param name="albumIds">Идентификаторы музыкальных альбомов.</param>
+    private Band(BandId id, BandName name, IEnumerable<AlbumId> albumIds) : base(id)
+    {
+        Name = name;
+        _albumIds = albumIds.ToHashSet();
+    }
+
     /// <summary>
     /// Создание музыкальной группы.
     /// </summary>
@@ -51,18 +54,23 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// <returns>Музыкальная группа.</returns>
     public static Result<Band> Create(BandName name)
     {
-        return new Band(name, new List<AlbumId>());
+        var band = new Band(name, new List<AlbumId>());
+        band.AddDomainEvent(new BandCreatedDomainEvent(band));
+        band.AddDomainEvent(new BandNameChangedDomainEvent(band, band.Name));
+        band.AddDomainEvent(new AlbumsAddedToBandDomainEvent(band, band.AlbumIds));
+
+        return band;
     }
 
     /// <summary>
-    /// Создание музыкальной группы.
+    /// Восстановление музыкальной группы.
     /// </summary>
+    /// <param name="id">Идентификатор музыкальной группы.</param>
     /// <param name="name">Название музыкальной группы.</param>
-    /// <param name="albumIds">Идентификаторы музыкальных альбомов.</param>
-    /// <returns>Музыкальная группа.</returns>
-    public static Result<Band> Create(BandName name, IReadOnlyCollection<AlbumId> albumIds)
+    /// <param name="albumIds">Идентификаторы альбомов музыкальной группы.</param>
+    internal static Result<Band> Restore(BandId id, BandName name, IEnumerable<AlbumId> albumIds)
     {
-        return new Band(name, albumIds);
+        return new Band(id, name, albumIds.ToList());
     }
 
     /// <summary>
@@ -111,31 +119,30 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// <summary>
     /// Удаление музыкальных альбомов.
     /// </summary>
-    /// <param name="albums">Удаляемые альбомы.</param>
-    public BaseResult RemoveAlbums(IReadOnlyCollection<Album> albums)
+    /// <param name="albumIds">Идентификаторы удаляемых альбомов.</param>
+    public BaseResult RemoveAlbums(IReadOnlyCollection<AlbumId> albumIds)
     {
-        if (!albums.Any())
+        if (!albumIds.Any())
         {
             return BaseResult.Success();
         }
 
-        List<Album> removedAlbums = new();
-        foreach (var album in albums)
+        List<AlbumId> removedAlbumIds = new();
+        foreach (var albumId in albumIds)
         {
-            var albumId = AlbumId.Create(album.Id.Value);
             if (!_albumIds.Contains(albumId))
             {
                 continue;
             }
 
-            removedAlbums.Add(album);
+            removedAlbumIds.Add(albumId);
             _albumIds.Remove(albumId);
         }
 
-        AddDomainEvent(new AlbumsRemovedFromBandDomainEvent(this, removedAlbums));
+        AddDomainEvent(new AlbumsRemovedFromBandDomainEvent(this, removedAlbumIds));
         return BaseResult.Success();
     }
-    
+
     /// <summary>
     /// Удаление музыкальной группы.
     /// </summary>
@@ -147,6 +154,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         {
             return new ArgumentOutOfRangeException();
         }
+
         AddDomainEvent(new BandDeletedDomainEvent(this));
         return BaseResult.Success();
     }

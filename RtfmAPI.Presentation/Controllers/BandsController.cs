@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand.Dtos;
+using RtfmAPI.Application.Requests.Bands.Commands.ModifyBand;
+using RtfmAPI.Application.Requests.Bands.Commands.ModifyBand.Dtos;
 using RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo;
 using RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo.Dtos;
 
@@ -66,4 +68,31 @@ public class BandsController : ApiControllerBase
 
         return Ok(queryResult.Value);
     }
+    /// <summary>
+    /// Изменение музыкальной группы.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкальной группы.</param>
+    /// <param name="request">Объект переноса данных команды изменения музыкальной группы.</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    [HttpPost("{id:guid}/modify")]
+    public async Task<ActionResult> ModifyBandAsync([FromRoute] Guid id, [FromBody] ModifyingBand request,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new ModifyBandCommand
+        {
+            BandId = id,
+            Name = request.Name,
+            AddingAlbumsIds = request.AddingAlbumsIds,
+            RemovingAlbumsIds = request.RemovingAlbumsIds,
+        };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+
+        return Ok();
+    }
+    
 }
