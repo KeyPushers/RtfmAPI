@@ -39,6 +39,12 @@ public class GenreCommandsRepository : IGenresCommandsRepository
                     await CreateGenreAsync(genreCreatedDomainEvent, connection, trx);
                     break;
                 }
+                
+                case GenreNameChangedDomainEvent genreNameChangedDomainEvent:
+                {
+                    await ChangeGenreNameAsync(genreNameChangedDomainEvent, connection, trx);
+                    break;
+                }
             }
             
         }
@@ -60,5 +66,21 @@ public class GenreCommandsRepository : IGenresCommandsRepository
                     INSERT INTO Genres (Id) VALUES(@Id)
                   """;
         return connection.ExecuteAsync(sql, new {Id = genre.Id.Value, Name = string.Empty}, trx);
+    }
+    
+    /// <summary>
+    /// Изменение названия музыкального жанра.
+    /// </summary>
+    /// <param name="domainEvent">Событие.</param>
+    /// <param name="connection">Соединения.</param>
+    /// <param name="trx">Транзакция.</param>
+    private static Task ChangeGenreNameAsync(GenreNameChangedDomainEvent domainEvent, IDbConnection connection, IDbTransaction trx)
+    {
+        var genre = domainEvent.Genre;
+
+        var sql = """
+                    UPDATE Genres SET Name = @Name WHERE Id = @Id
+                  """;
+        return connection.ExecuteAsync(sql, new {Id = genre.Id.Value, Name = genre.Name.Value}, trx);
     }
 }

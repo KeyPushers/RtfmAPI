@@ -62,6 +62,7 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     public static Result<Genre> Create(GenreName name)
     {
         var genre = new Genre(name);
+        genre.AddDomainEvent(new GenreCreatedDomainEvent(genre));
         genre.AddDomainEvent(new GenreNameChangedDomainEvent(genre, name));
         return genre;
     }
