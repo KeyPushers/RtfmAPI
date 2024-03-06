@@ -27,6 +27,9 @@ public static class DependencyInjection
         services.AddScoped<IAlbumsCommandsRepository, AlbumsCommandsRepository>();
         services.AddScoped<IAlbumsQueriesRepository, AlbumsQueriesRepository>();
         
+        services.AddScoped<IGenresQueriesRepository, GenresQueriesRepository>();
+        services.AddScoped<IGenresCommandsRepository, GenreCommandsRepository>();
+        
         return services;
     }
 }
