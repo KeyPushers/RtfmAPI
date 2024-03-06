@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand;
+using RtfmAPI.Application.Requests.Genres.Commands.AddGenre;
 using RtfmAPI.Application.Requests.Genres.Commands.AddGenre.Dtos;
 
 namespace RtfmAPI.Presentation.Controllers;
@@ -36,7 +37,8 @@ public class GenreController : ApiControllerBase
             return BadRequest(nameof(request.Name));
         }
 
-        var commandResult = await Mediator.Send(new AddBandCommand(request.Name), cancellationToken);
+        var genreCommand = new AddGenreCommand(request.Name);
+        var commandResult = await Mediator.Send(genreCommand, cancellationToken);
         if (commandResult.IsFailed)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
