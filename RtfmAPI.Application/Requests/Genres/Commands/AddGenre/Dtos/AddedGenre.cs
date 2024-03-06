@@ -3,7 +3,7 @@
 namespace RtfmAPI.Application.Requests.Genres.Commands.AddGenre.Dtos;
 
 /// <summary>
-/// Объект переноса данных добавленного жанра.
+/// Объект переноса данных добавленного музыкального жанра.
 /// </summary>
 public sealed class AddedGenre
 {
