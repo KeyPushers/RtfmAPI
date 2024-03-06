@@ -16,8 +16,4 @@
       <ProjectReference Include="..\RtfmAPI.Domain\RtfmAPI.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Requests\" />
-    </ItemGroup>
-
 </Project>
