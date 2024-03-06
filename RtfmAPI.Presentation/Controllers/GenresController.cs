@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RtfmAPI.Application.Requests.Bands.Commands.AddBand;
 using RtfmAPI.Application.Requests.Genres.Commands.AddGenre;
 using RtfmAPI.Application.Requests.Genres.Commands.AddGenre.Dtos;
 
@@ -12,13 +11,13 @@ namespace RtfmAPI.Presentation.Controllers;
 /// <summary>
 /// Контроллер музыкальных жанров.
 /// </summary>
-public class GenreController : ApiControllerBase
+public class GenresController : ApiControllerBase
 {
     /// <summary>
     /// Создание контроллера музыкальных жанров.
     /// </summary>
     /// <param name="mediator">Медиатор.</param>
-    public GenreController(IMediator mediator) : base(mediator)
+    public GenresController(IMediator mediator) : base(mediator)
     {
     }
 
