@@ -28,7 +28,7 @@ public class GenreController : ApiControllerBase
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Объект переноса данных добавленного музыкального жанра.</returns>
     [HttpPost]
-    public async Task<ActionResult<AddedGenre>> AddGenreAsync([FromBody] AddedGenre request,
+    public async Task<ActionResult<AddedGenre>> AddGenreAsync([FromBody] AddingGenre request,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
