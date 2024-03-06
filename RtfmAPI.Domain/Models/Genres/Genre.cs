@@ -1,4 +1,5 @@
 ﻿using System;
+using RtfmAPI.Domain.Models.Genres.Events;
 using RtfmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
@@ -26,10 +27,31 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// <summary>
     /// Создание музыкального жанра.
     /// </summary>
+    /// <param name="id">Идентификатор.</param>
+    /// <param name="name">Название музыкального жанра.</param>
+    private Genre(GenreId id, GenreName name) : base(id)
+    {
+        Name = name;
+    }
+    
+    /// <summary>
+    /// Создание музыкального жанра.
+    /// </summary>
     /// <param name="name">Название музыкального жанра.</param>
     private Genre(GenreName name) : base(GenreId.Create())
     {
         Name = name;
+    }
+
+    /// <summary>
+    /// Восстановление музыкального жанра.
+    /// </summary>
+    /// <param name="id">Идентификатор.</param>
+    /// <param name="name">Название музыкального жанра.</param>
+    /// <returns>Музыкальный жанр.</returns>
+    internal static Genre Restore(GenreId id, GenreName name)
+    {
+        return new Genre(id, name);
     }
     
     /// <summary>
@@ -39,6 +61,8 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// <returns>Музыкальный жанр.</returns>
     public static Result<Genre> Create(GenreName name)
     {
-        return new Genre(name);
+        var genre = new Genre(name);
+        genre.AddDomainEvent(new GenreNameChangedDomainEvent(genre, name));
+        return genre;
     }
 }

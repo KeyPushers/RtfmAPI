@@ -8,7 +8,7 @@ using RtfmAPI.Domain.Primitives;
 namespace RtfmAPI.Domain.Models.Bands;
 
 /// <summary>
-/// Фабрик музыкальных групп.
+/// Фабрика музыкальных групп.
 /// </summary>
 public class BandsFabric
 {
