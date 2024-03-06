@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace RtfmAPI.Infrastructure.Daos;
 
-public class BandDao
+public class GenreDao
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public List<Guid> AlbumIds { get; set; } = new();
 }

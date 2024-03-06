@@ -13,7 +13,7 @@ namespace RtfmAPI.Infrastructure.Persistence.Context;
 public class DataContext
 {
     private readonly DbSettingsOptions _dbSettingsOptions;
-    
+
     /// <summary>
     /// Создание контекста базы данных.
     /// </summary>
@@ -32,7 +32,7 @@ public class DataContext
         connection.Open();
         return connection;
     }
-    
+
     /// <summary>
     /// Создание соединения с базой данных.
     /// </summary>
@@ -42,7 +42,7 @@ public class DataContext
             $"Host={_dbSettingsOptions.Server}; Database={_dbSettingsOptions.Database}; Username={_dbSettingsOptions.UserId}; Password={_dbSettingsOptions.Password};";
         return new NpgsqlConnection(connectionString);
     }
-    
+
     /// <summary>
     /// Инициализация соединения.
     /// </summary>
@@ -51,10 +51,10 @@ public class DataContext
         using var connection = CreateConnection();
         connection.Open();
         var trx = connection.BeginTransaction();
-        
+
         await InitDatabaseAsync(connection, trx);
         await InitTablesAsync(connection, trx);
-        
+
         trx.Commit();
     }
 
@@ -81,42 +81,49 @@ public class DataContext
         await InitBandsTableAsync(connection, trx);
         await InitAlbumsTableAsync(connection, trx);
         await InitBandAlbumsTableAsync(connection, trx);
+        await InitGenresTableAsync(connection, trx);
     }
 
     private static Task InitBandsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        var sql = """
-                    CREATE TABLE IF NOT EXISTS Bands (
+        var sql = @"
+                        CREATE TABLE IF NOT EXISTS Bands (
                         Id UUID PRIMARY KEY,
                         Name VARCHAR
                     );
-                  """;
+                    ";
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitAlbumsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        var sql = """
-                    CREATE TABLE IF NOT EXISTS Albums  (
+        var sql = @"CREATE TABLE IF NOT EXISTS Albums (
                         Id UUID PRIMARY KEY,
                         Name VARCHAR,
-                        ReleaseDate Date
-                    );
-                  """;
+                        ReleaseDate Date)";
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitBandAlbumsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        var sql = """
+        var sql = @"
                     CREATE TABLE IF NOT EXISTS BandAlbums (
                         CONSTRAINT Id PRIMARY KEY (BandId, AlbumId),
                         BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
                         AlbumId UUID REFERENCES Albums(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
-                  """;
+                  ";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitGenresTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        var sql = @"CREATE TABLE IF NOT EXISTS Genres (
+                        Id UUID PRIMARY KEY,
+                        Name VARCHAR)";
 
         return connection.ExecuteAsync(sql, trx);
     }
