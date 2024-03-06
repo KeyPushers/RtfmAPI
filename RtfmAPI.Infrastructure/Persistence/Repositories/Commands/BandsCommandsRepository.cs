@@ -35,7 +35,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
         {
             if (domainEvent is BandCreatedDomainEvent bandCreatedDomainEvent)
             {
-                await AddBandAsync(bandCreatedDomainEvent, connection, trx);
+                await CreateBandAsync(bandCreatedDomainEvent, connection, trx);
                 continue;
             }
 
@@ -73,7 +73,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
     /// <param name="trx">Транзакция.</param>
-    private static Task AddBandAsync(BandCreatedDomainEvent domainEvent, IDbConnection connection, IDbTransaction trx)
+    private static Task CreateBandAsync(BandCreatedDomainEvent domainEvent, IDbConnection connection, IDbTransaction trx)
     {
         var band = domainEvent.Band;
 
