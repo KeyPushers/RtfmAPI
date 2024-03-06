@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using RtfmAPI.Domain.Primitives;
 
-namespace RtfmAPI.Domain.Models.Bands.ValueObjects;
+namespace RtfmAPI.Domain.Models.Genres.ValueObjects;
 
 /// <summary>
-/// Название музыкальной группы.
+/// Название музыкального жанра.
 /// </summary>
-public sealed class BandName : ValueObject
+public sealed class GenreName : ValueObject
 {
     /// <summary>
     /// Минимальная длина названия.
@@ -20,10 +20,10 @@ public sealed class BandName : ValueObject
     public const int MaxLength = 50;
 
     /// <summary>
-    /// Название музыкальной группы.
+    /// Название музыкального жанра.
     /// </summary>
     /// <param name="value">Значение.</param>
-    private BandName(string value)
+    private GenreName(string value)
     {
         Value = value;
     }
@@ -34,11 +34,11 @@ public sealed class BandName : ValueObject
     public string Value { get; }
 
     /// <summary>
-    /// Создание названия музыкальной группы.
+    /// Создание названия музыкального жанра.
     /// </summary>
     /// <param name="value">Значение.</param>
-    /// <returns>Название музыкальной группы.</returns>
-    public static Result<BandName> Create(string value)
+    /// <returns>Название музыкального жанра.</returns>
+    public static Result<GenreName> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -55,10 +55,12 @@ public sealed class BandName : ValueObject
             return new InvalidOperationException();
         }
 
-        return new BandName(value);
+        return new GenreName(value);
     }
 
+    /// <summary>
     /// <inheritdoc cref="ValueObject.GetEqualityComponents"/>
+    /// </summary>
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;

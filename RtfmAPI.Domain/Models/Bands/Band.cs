@@ -152,7 +152,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         var deleteActionResult = await deleteAction(this);
         if (!deleteActionResult)
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         AddDomainEvent(new BandDeletedDomainEvent(this));

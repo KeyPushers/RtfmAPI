@@ -32,7 +32,7 @@ public sealed class AlbumReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         var date = value.Kind is DateTimeKind.Unspecified

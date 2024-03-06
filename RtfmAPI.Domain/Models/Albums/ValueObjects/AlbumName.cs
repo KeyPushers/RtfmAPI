@@ -42,17 +42,17 @@ public sealed class AlbumName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         if (value.Length < MinLength)
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         if (value.Length > MaxLength)
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         return new AlbumName(value);

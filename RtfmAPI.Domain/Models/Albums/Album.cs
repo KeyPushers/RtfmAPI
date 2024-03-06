@@ -107,7 +107,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
         var deleteActionResult = await deleteAction(this);
         if (!deleteActionResult)
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         AddDomainEvent(new AlbumDeletedDomainEvent(this));
