@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
@@ -26,7 +27,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     }
 
     /// <inheritdoc/>
-    public async Task CommitChangesAsync(Album value)
+    public async Task CommitChangesAsync(Album value, CancellationToken cancellationToken)
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();

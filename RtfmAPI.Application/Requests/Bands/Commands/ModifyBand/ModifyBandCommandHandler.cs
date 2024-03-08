@@ -9,6 +9,7 @@ using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Bands;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
+using RtfmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Bands.Commands.ModifyBand;
@@ -18,22 +19,26 @@ namespace RtfmAPI.Application.Requests.Bands.Commands.ModifyBand;
 /// </summary>
 public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseResult>
 {
-    private readonly IBandsQueriesRepository _bandsQueriesRepository;
     private readonly IBandsCommandsRepository _bandsCommandsRepository;
+    private readonly IBandsQueriesRepository _bandsQueriesRepository;
     private readonly IAlbumsQueriesRepository _albumsQueriesRepository;
+    private readonly IGenresQueriesRepository _genresQueriesRepository;
 
     /// <summary>
     /// Создание обработчика команды изменения музыкальной группы.
     /// </summary>
-    /// <param name="bandsQueriesRepository">Репозиторий запросов музыкальных групп.</param>
     /// <param name="bandsCommandsRepository">Репозиторий команд музыкальных групп.</param>
+    /// <param name="bandsQueriesRepository">Репозиторий запросов музыкальных групп.</param>
     /// <param name="albumsQueriesRepository">Репозиторий запросов музыкальных альбомов.</param>
-    public ModifyBandCommandHandler(IBandsQueriesRepository bandsQueriesRepository,
-        IBandsCommandsRepository bandsCommandsRepository, IAlbumsQueriesRepository albumsQueriesRepository)
+    /// <param name="genresQueriesRepository">репозиторий запросов музыкальных жанров.</param>
+    public ModifyBandCommandHandler(IBandsCommandsRepository bandsCommandsRepository,
+        IBandsQueriesRepository bandsQueriesRepository, IAlbumsQueriesRepository albumsQueriesRepository,
+        IGenresQueriesRepository genresQueriesRepository)
     {
         _bandsQueriesRepository = bandsQueriesRepository;
         _bandsCommandsRepository = bandsCommandsRepository;
         _albumsQueriesRepository = albumsQueriesRepository;
+        _genresQueriesRepository = genresQueriesRepository;
     }
 
     /// <summary>
@@ -81,8 +86,26 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             }
         }
 
+        if (request.AddingGenresIds.Any())
+        {
+            var addGenresResult = await AddGenresAsync(band, request.AddingGenresIds);
+            if (addGenresResult.IsFailed)
+            {
+                return addGenresResult.Error;
+            }
+        }
 
-        await _bandsCommandsRepository.CommitChangesAsync(band);
+        if (request.RemovingGenresIds.Any())
+        {
+            var removeGenresResult =
+                await RemoveGenresAsync(band, request.RemovingGenresIds);
+            if (removeGenresResult.IsFailed)
+            {
+                return removeGenresResult.Error;
+            }
+        }
+        
+        await _bandsCommandsRepository.CommitChangesAsync(band, cancellationToken);
         return BaseResult.Success();
     }
 
@@ -122,7 +145,7 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
             var isAlbumExists = await _albumsQueriesRepository.IsAlbumExistsAsync(albumId);
             if (!isAlbumExists)
             {
-                return new NotImplementedException();
+                return new InvalidOperationException();
             }
 
             addingAlbumIds.Add(albumId);
@@ -139,10 +162,48 @@ public class ModifyBandCommandHandler : IRequestHandler<ModifyBandCommand, BaseR
     /// <param name="removingAlbumsIds">Идентификаторы удаляемых музыкальных альбомов.</param>
     private Task<BaseResult> RemoveAlbumsAsync(Band band, IEnumerable<Guid> removingAlbumsIds)
     {
-        var removingAlbumIds = removingAlbumsIds.Select(AlbumId.Create)
+        var removingAlbums = removingAlbumsIds.Select(AlbumId.Create)
             .Select(albumId => albumId).ToList();
 
-        var removeAlbumsResult = band.RemoveAlbums(removingAlbumIds);
+        var removeAlbumsResult = band.RemoveAlbums(removingAlbums);
         return Task.FromResult(removeAlbumsResult.IsFailed ? removeAlbumsResult.Error : BaseResult.Success());
+    }
+
+    /// <summary>
+    /// Добавление музыкальных жанров в музыкальную группу.
+    /// </summary>
+    /// <param name="band">Музыкальная группа.</param>
+    /// <param name="addingGenresIds">Идентификаторы добавляемых музыкальных жанров.</param>
+    private async Task<BaseResult> AddGenresAsync(Band band, IEnumerable<Guid> addingGenresIds)
+    {
+        List<GenreId> addingGenreIds = new();
+        foreach (var addingGenreId in addingGenresIds)
+        {
+            var genreId = GenreId.Create(addingGenreId);
+            var isGenreExists = await _genresQueriesRepository.IsGenreExistsAsync(genreId);
+            if (!isGenreExists)
+            {
+                return new InvalidOperationException();
+            }
+
+            addingGenreIds.Add(genreId);
+        }
+
+        var addGenresResult = band.AddGenres(addingGenreIds);
+        return addGenresResult.IsFailed ? addGenresResult.Error : BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Удаление музыкальных жанров из музыкальной группы.
+    /// </summary>
+    /// <param name="band">Музыкальная группа.</param>
+    /// <param name="removingGenresIds">Идентификаторы удаляемых музыкальных жанров.</param>
+    private Task<BaseResult> RemoveGenresAsync(Band band, IEnumerable<Guid> removingGenresIds)
+    {
+        var removingGenres = removingGenresIds.Select(GenreId.Create)
+            .Select(albumId => albumId).ToList();
+
+        var removeGenresResult = band.RemoveGenres(removingGenres);
+        return Task.FromResult(removeGenresResult.IsFailed ? removeGenresResult.Error : BaseResult.Success());
     }
 }

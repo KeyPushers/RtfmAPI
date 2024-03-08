@@ -16,4 +16,10 @@ public interface IGenresQueriesRepository
     /// <param name="genreId">Идентифиактор музыкального жанра.</param>
     /// <returns>Музыкальный жанр.</returns>
     Task<Result<Genre>> GetGenreByIdAsync(GenreId genreId);
+    
+    /// <summary>
+    /// Получение признака существования музыкального жанра.
+    /// </summary>
+    /// <param name="genreId">Идентификатор музыкального жанра.</param>
+    Task<bool> IsGenreExistsAsync(GenreId genreId);
 }

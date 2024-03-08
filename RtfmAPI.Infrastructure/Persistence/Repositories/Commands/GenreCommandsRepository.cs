@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
@@ -25,7 +26,7 @@ public class GenreCommandsRepository : IGenresCommandsRepository
     }
 
     /// <inheritdoc/>
-    public async Task CommitChangesAsync(Genre value)
+    public async Task CommitChangesAsync(Genre value,CancellationToken cancellationToken)
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();

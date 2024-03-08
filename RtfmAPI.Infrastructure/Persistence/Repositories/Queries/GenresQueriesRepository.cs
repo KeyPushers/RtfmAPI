@@ -43,4 +43,15 @@ public class GenresQueriesRepository : IGenresQueriesRepository
         
         return _genreFabric.Restore(genreId.Value, band.Name);
     }
+
+    /// <inheritdoc />
+    public async Task<bool> IsGenreExistsAsync(GenreId genreId)
+    {
+        using var connection = _dataContext.CreateOpenedConnection();
+        var trx = connection.BeginTransaction();
+        var sql = @"SELECT EXISTS(SELECT 1 FROM Genres WHERE Id=@GenreId)";
+
+        var result = await connection.ExecuteScalarAsync<bool>(sql, new {GenreId = genreId.Value}, trx);
+        return result;
+    }
 }

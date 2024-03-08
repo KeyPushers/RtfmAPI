@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
@@ -26,41 +27,51 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     }
 
     /// <inheritdoc/>
-    public async Task CommitChangesAsync(Band value)
+    public async Task CommitChangesAsync(Band value, CancellationToken cancellationToken)
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();
 
         foreach (var domainEvent in value.DomainEvents)
         {
-            if (domainEvent is BandCreatedDomainEvent bandCreatedDomainEvent)
+            switch (domainEvent)
             {
-                await CreateBandAsync(bandCreatedDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is BandNameChangedDomainEvent bandNameChangedDomainEvent)
-            {
-                await ChangeBandNameAsync(bandNameChangedDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is AlbumsAddedToBandDomainEvent albumsAddedToBandDomainEvent)
-            {
-                await AddAlbumsToBandAsync(albumsAddedToBandDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is AlbumsRemovedFromBandDomainEvent albumsRemovedFromBandDomainEvent)
-            {
-                await RemoveAlbumsFromBandAsync(albumsRemovedFromBandDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is BandDeletedDomainEvent bandDeletedDomainEvent)
-            {
-                throw new NotImplementedException();
-                continue;
+                case BandCreatedDomainEvent bandCreatedDomainEvent:
+                {
+                    await CreateBandAsync(bandCreatedDomainEvent, connection, trx);
+                    break;
+                }
+                case BandNameChangedDomainEvent bandNameChangedDomainEvent:
+                {
+                    await ChangeBandNameAsync(bandNameChangedDomainEvent, connection, trx);
+                    break;
+                }
+                case AlbumsAddedToBandDomainEvent albumsAddedToBandDomainEvent:
+                {
+                    await AddAlbumsToBandAsync(albumsAddedToBandDomainEvent, connection, trx);
+                    break;
+                }
+                case AlbumsRemovedFromBandDomainEvent albumsRemovedFromBandDomainEvent:
+                {
+                    await RemoveAlbumsFromBandAsync(albumsRemovedFromBandDomainEvent, connection, trx);
+                    break;
+                }
+                case GenresAddedToBandDomainEvent genresAddedToBandDomainEvent:
+                {
+                    await AddGenresToBandAsync(genresAddedToBandDomainEvent, connection, trx);
+                    break;
+                }
+                case GenresRemovedFromBandDomainEvent genresRemovedFromBandDomainEvent:
+                {
+                    await RemoveGenresFromBandAsync(genresRemovedFromBandDomainEvent, connection, trx);
+                    break;
+                }
+                case BandDeletedDomainEvent bandDeletedDomainEvent:
+                {
+                    throw new NotImplementedException();
+                }
+                default:
+                    throw new InvalidOperationException();
             }
         }
 
@@ -73,7 +84,8 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
     /// <param name="trx">Транзакция.</param>
-    private static Task CreateBandAsync(BandCreatedDomainEvent domainEvent, IDbConnection connection, IDbTransaction trx)
+    private static Task CreateBandAsync(BandCreatedDomainEvent domainEvent, IDbConnection connection,
+        IDbTransaction trx)
     {
         var band = domainEvent.Band;
 
@@ -135,6 +147,44 @@ public class BandsCommandsRepository : IBandsCommandsRepository
         {
             var sql = @"DELETE FROM BandAlbums WHERE BandId = @BandId AND AlbumId = @AlbumId";
             await connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumId = albumId.Value}, trx);
+        }
+    }
+
+    /// <summary>
+    /// Добавление музыкальных жанров в музыкальную группу.
+    /// </summary>
+    /// <param name="domainEvent">Событие.</param>
+    /// <param name="connection">Соединения.</param>
+    /// <param name="trx">Транзакция.</param>
+    private async Task AddGenresToBandAsync(GenresAddedToBandDomainEvent domainEvent, IDbConnection connection,
+        IDbTransaction trx)
+    {
+        var bandId = domainEvent.Band.Id;
+        var genreIds = domainEvent.AddedGenreIds;
+
+        foreach (var genreId in genreIds)
+        {
+            var sql = @"INSERT INTO BandGenres (BandId, GenreId) VALUES(@BandId, @GenreId)";
+            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreId = genreId.Value}, trx);
+        }
+    }
+
+    /// <summary>
+    /// Удаление музыкальных жанров из музыкальной группы.
+    /// </summary>
+    /// <param name="domainEvent">Событие.</param>
+    /// <param name="connection">Соединения.</param>
+    /// <param name="trx">Транзакция.</param>
+    private async Task RemoveGenresFromBandAsync(GenresRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
+        IDbTransaction trx)
+    {
+        var bandId = domainEvent.Band.Id;
+        var genreIds = domainEvent.RemovedGenreIds;
+
+        foreach (var genreId in genreIds)
+        {
+            var sql = @"DELETE FROM BandGenres WHERE BandId = @BandId AND GenreId = @GenreId";
+            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreId = genreId.Value}, trx);
         }
     }
 }

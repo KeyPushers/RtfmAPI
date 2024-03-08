@@ -82,6 +82,7 @@ public class DataContext
         await InitAlbumsTableAsync(connection, trx);
         await InitBandAlbumsTableAsync(connection, trx);
         await InitGenresTableAsync(connection, trx);
+        await InitBandGenresTableAsync(connection, trx);
     }
 
     private static Task InitBandsTableAsync(IDbConnection connection, IDbTransaction trx)
@@ -110,7 +111,7 @@ public class DataContext
     {
         var sql = @"
                     CREATE TABLE IF NOT EXISTS BandAlbums (
-                        CONSTRAINT Id PRIMARY KEY (BandId, AlbumId),
+                        CONSTRAINT BandAlbumId PRIMARY KEY (BandId, AlbumId),
                         BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
                         AlbumId UUID REFERENCES Albums(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
@@ -124,6 +125,19 @@ public class DataContext
         var sql = @"CREATE TABLE IF NOT EXISTS Genres (
                         Id UUID PRIMARY KEY,
                         Name VARCHAR)";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitBandGenresTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        var sql = @"
+                    CREATE TABLE IF NOT EXISTS BandGenres (
+                        CONSTRAINT BandGenreId PRIMARY KEY (BandId, GenreId),
+                        BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        GenreId UUID REFERENCES Genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    );
+                  ";
 
         return connection.ExecuteAsync(sql, trx);
     }
