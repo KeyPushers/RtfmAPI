@@ -14,16 +14,7 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// Название музыкального жанра.
     /// </summary>
     public GenreName Name { get; private set; }
-
-    /// <summary>
-    /// Создание музыкального жанра.
-    /// </summary>
-#pragma warning disable CS8618
-    private Genre()
-    {
-    }
-#pragma warning restore CS8618
-
+    
     /// <summary>
     /// Создание музыкального жанра.
     /// </summary>

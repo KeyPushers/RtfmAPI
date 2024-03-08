@@ -6,7 +6,7 @@ namespace RtfmAPI.Domain.Primitives;
 /// <summary>
 /// Примитив сущности.
 /// </summary>
-public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvents
+public abstract class Entity<TId> : IEquatable<Entity<TId>>
     where TId : ValueObject
 {
     private readonly List<IDomainEvent> _domainEvents = new();
