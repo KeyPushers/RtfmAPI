@@ -48,7 +48,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// <param name="name">Название музыкального альбома.</param>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
     /// <returns>Музыкальный альбом.</returns>
-    public static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate)
+    internal static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate)
     {
         var album = new Album(name, releaseDate);
         album.AddDomainEvent(new AlbumCreatedDomainEvent(album));

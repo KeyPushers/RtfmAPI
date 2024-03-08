@@ -76,6 +76,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
         }
 
         trx.Commit();
+        value.ClearDomainEvents();
     }
 
     /// <summary>

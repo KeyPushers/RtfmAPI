@@ -4,7 +4,6 @@ using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Requests.Genres.Commands.AddGenre.Dtos;
 using RtfmAPI.Domain.Models.Genres;
-using RtfmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Genres.Commands.AddGenre;
@@ -34,24 +33,19 @@ public class AddGenreCommandHandler : IRequestHandler<AddGenreCommand, Result<Ad
     public async Task<Result<AddedGenre>> Handle(AddGenreCommand request, CancellationToken cancellationToken = default)
     {
         // TODO: Добавить проверку существования музыкального жанра с тем же именем.
+        
+        var genresFabric = new GenresFabric(request.Name);
 
-        var createGenreNameResult = GenreName.Create(request.Name);
-        if (createGenreNameResult.IsFailed)
-        {
-            return createGenreNameResult.Error;
-        }
-
-        var genreName = createGenreNameResult.Value;
-
-        var createGenreResult = Genre.Create(genreName);
-        if (createGenreNameResult.IsFailed)
+        var createGenreResult = genresFabric.Create();
+        if (createGenreResult.IsFailed)
         {
             return createGenreResult.Error;
         }
 
         var genre = createGenreResult.Value;
-        await _repository.CommitChangesAsync(genre);
         
+        await _repository.CommitChangesAsync(genre, cancellationToken);
+
         return new AddedGenre
         {
             Id = genre.Id.Value,

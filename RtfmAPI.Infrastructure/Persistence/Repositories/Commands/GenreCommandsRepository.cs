@@ -26,7 +26,7 @@ public class GenreCommandsRepository : IGenresCommandsRepository
     }
 
     /// <inheritdoc/>
-    public async Task CommitChangesAsync(Genre value,CancellationToken cancellationToken)
+    public async Task CommitChangesAsync(Genre value, CancellationToken cancellationToken)
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();
@@ -40,26 +40,27 @@ public class GenreCommandsRepository : IGenresCommandsRepository
                     await CreateGenreAsync(genreCreatedDomainEvent, connection, trx);
                     break;
                 }
-                
+
                 case GenreNameChangedDomainEvent genreNameChangedDomainEvent:
                 {
                     await ChangeGenreNameAsync(genreNameChangedDomainEvent, connection, trx);
                     break;
                 }
             }
-            
         }
-        
+
         trx.Commit();
+        value.ClearDomainEvents();
     }
-    
+
     /// <summary>
     /// Добавление музыкального жанра.
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
     /// <param name="trx">Транзакция.</param>
-    private static Task CreateGenreAsync(GenreCreatedDomainEvent domainEvent, IDbConnection connection, IDbTransaction trx)
+    private static Task CreateGenreAsync(GenreCreatedDomainEvent domainEvent, IDbConnection connection,
+        IDbTransaction trx)
     {
         var genre = domainEvent.Genre;
 
@@ -68,14 +69,15 @@ public class GenreCommandsRepository : IGenresCommandsRepository
                   """;
         return connection.ExecuteAsync(sql, new {Id = genre.Id.Value, Name = string.Empty}, trx);
     }
-    
+
     /// <summary>
     /// Изменение названия музыкального жанра.
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
     /// <param name="trx">Транзакция.</param>
-    private static Task ChangeGenreNameAsync(GenreNameChangedDomainEvent domainEvent, IDbConnection connection, IDbTransaction trx)
+    private static Task ChangeGenreNameAsync(GenreNameChangedDomainEvent domainEvent, IDbConnection connection,
+        IDbTransaction trx)
     {
         var genre = domainEvent.Genre;
 

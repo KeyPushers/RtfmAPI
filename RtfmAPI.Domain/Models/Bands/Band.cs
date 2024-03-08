@@ -63,7 +63,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// </summary>
     /// <param name="name">Название музыкальной группы.</param>
     /// <returns>Музыкальная группа.</returns>
-    public static Result<Band> Create(BandName name)
+    internal static Result<Band> Create(BandName name)
     {
         var band = new Band(name, Enumerable.Empty<AlbumId>(), Enumerable.Empty<GenreId>());
         band.AddDomainEvent(new BandCreatedDomainEvent(band));

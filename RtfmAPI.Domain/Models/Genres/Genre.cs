@@ -50,7 +50,7 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// </summary>
     /// <param name="name">Название музыкального жанра.</param>
     /// <returns>Музыкальный жанр.</returns>
-    public static Result<Genre> Create(GenreName name)
+    internal static Result<Genre> Create(GenreName name)
     {
         var genre = new Genre(name);
         genre.AddDomainEvent(new GenreCreatedDomainEvent(genre));

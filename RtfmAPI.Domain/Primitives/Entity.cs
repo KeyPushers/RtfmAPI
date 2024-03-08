@@ -23,7 +23,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
     /// Добавление доменного события.
     /// </summary>
     /// <param name="domainEvent">Доменное событие.</param>
-    public void AddDomainEvent(IDomainEvent domainEvent)
+    protected void AddDomainEvent(IDomainEvent domainEvent)
     {
         _domainEvents.Add(domainEvent);
     }

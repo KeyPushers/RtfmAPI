@@ -2,9 +2,6 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using RtfmAPI.Application.PipelineBehaviors;
-using RtfmAPI.Domain.Models.Albums;
-using RtfmAPI.Domain.Models.Bands;
-using RtfmAPI.Domain.Models.Genres;
 
 namespace RtfmAPI.Application;
 
@@ -22,11 +19,6 @@ public static class DependencyInjection
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
-        
-        // TODO Перенести на доменный слой!
-        services.AddScoped<BandsFabric>();
-        services.AddScoped<AlbumsFabric>();
-        services.AddScoped<GenresFabric>();
 
         return services;
     }

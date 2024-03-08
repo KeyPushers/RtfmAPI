@@ -16,17 +16,14 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
 public class BandsQueriesRepository : IBandsQueriesRepository
 {
     private readonly DataContext _dataContext;
-    private readonly BandsFabric _bandsFabric;
 
     /// <summary>
     /// Создание репозитория запросов доменной модели <see cref="Band"/>.
     /// </summary>
     /// <param name="dataContext">Контекст базы данных.</param>
-    /// <param name="bandsFabric">Фабрика музыкальных групп.</param>
-    public BandsQueriesRepository(DataContext dataContext, BandsFabric bandsFabric)
+    public BandsQueriesRepository(DataContext dataContext)
     {
         _dataContext = dataContext;
-        _bandsFabric = bandsFabric;
     }
 
     /// <inheritdoc />
@@ -46,6 +43,8 @@ public class BandsQueriesRepository : IBandsQueriesRepository
 
         const string sqlGenreIds = @"SELECT bg.GenreId FROM BandGenres bg WHERE bg.BandId = @BandId";
         var genreIds = await connection.QueryAsync<Guid>(sqlGenreIds, new {BandId = bandId.Value});
-        return _bandsFabric.Restore(bandId.Value, band.Name, albumIds, genreIds);
+
+        var bandsFabric = new BandsFabric(band.Name, albumIds, genreIds);
+        return bandsFabric.Restore(band.Id);
     }
 }

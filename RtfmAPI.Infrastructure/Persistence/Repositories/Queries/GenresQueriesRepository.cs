@@ -16,17 +16,14 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
 public class GenresQueriesRepository : IGenresQueriesRepository
 {
     private readonly DataContext _dataContext;
-    private readonly GenresFabric _genreFabric;
 
     /// <summary>
     /// Создание репозитория запросов доменной модели <see cref="Genre"/>.
     /// </summary>
     /// <param name="dataContext">Контекст базы данных.</param>
-    /// <param name="genreFabric">Фабрика музыкальных жанров.</param>
-    public GenresQueriesRepository(DataContext dataContext, GenresFabric genreFabric)
+    public GenresQueriesRepository(DataContext dataContext)
     {
         _dataContext = dataContext;
-        _genreFabric = genreFabric;
     }
     
     /// <inheritdoc />
@@ -35,13 +32,14 @@ public class GenresQueriesRepository : IGenresQueriesRepository
         using var connection = _dataContext.CreateOpenedConnection();
         
         const string sql = @"SELECT * FROM Genres WHERE Id = @GenreId";
-        var band = await connection.QuerySingleOrDefaultAsync<GenreDao>(sql, new {GenreId = genreId.Value});
-        if (band is null)
+        var genre = await connection.QuerySingleOrDefaultAsync<GenreDao>(sql, new {GenreId = genreId.Value});
+        if (genre is null)
         {
             return new InvalidOperationException();
         }
-        
-        return _genreFabric.Restore(genreId.Value, band.Name);
+
+        var genresFabric = new GenresFabric(genre.Name);
+        return genresFabric.Restore(genre.Id);
     }
 
     /// <inheritdoc />

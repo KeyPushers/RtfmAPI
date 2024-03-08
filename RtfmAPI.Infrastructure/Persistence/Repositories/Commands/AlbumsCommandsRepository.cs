@@ -60,6 +60,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
         }
 
         trx.Commit();
+        value.ClearDomainEvents();
     }
 
     /// <summary>

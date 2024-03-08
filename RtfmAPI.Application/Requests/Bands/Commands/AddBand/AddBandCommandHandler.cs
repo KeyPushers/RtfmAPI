@@ -1,10 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Requests.Bands.Commands.AddBand.Dtos;
 using RtfmAPI.Domain.Models.Bands;
-using RtfmAPI.Domain.Models.Bands.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Bands.Commands.AddBand;
@@ -33,21 +34,16 @@ public class AddBandCommandHandler : IRequestHandler<AddBandCommand, Result<Adde
     /// <returns>Музыкальная группа.</returns>
     public async Task<Result<AddedBand>> Handle(AddBandCommand request, CancellationToken cancellationToken = default)
     {
-        var getBandNameResult = BandName.Create(request.Name);
-        if (getBandNameResult.IsFailed)
+        var bandsFabric = new BandsFabric(request.Name, Enumerable.Empty<Guid>(), Enumerable.Empty<Guid>());
+        var createBandResult = bandsFabric.Create();
+        if (createBandResult.IsFailed)
         {
-            return getBandNameResult.Error;
+            return createBandResult.Error;
         }
-        
-        var getBandResult = Band.Create(getBandNameResult.Value);
-        if (getBandResult.IsFailed)
-        {
-            return getBandResult.Error;
-        }
-        
-        var band = getBandResult.Value;
-        await _repository.CommitChangesAsync(band);
-        
+
+        var band = createBandResult.Value;
+        await _repository.CommitChangesAsync(band, cancellationToken);
+
         return new AddedBand
         {
             Id = band.Id.Value,

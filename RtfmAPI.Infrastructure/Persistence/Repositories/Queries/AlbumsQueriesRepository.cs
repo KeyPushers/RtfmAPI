@@ -16,19 +16,16 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
 public class AlbumsQueriesRepository : IAlbumsQueriesRepository
 {
     private readonly DataContext _dataContext;
-    private readonly AlbumsFabric _albumsFabric;
 
     /// <summary>
     /// Создание репозитория запросов доменной модели <see cref="Album"/>.
     /// </summary>
     /// <param name="dataContext">Контекст базы данных.</param>
-    /// <param name="albumsFabric">Фабрика музыкальных альбомов.</param>
-    public AlbumsQueriesRepository(DataContext dataContext, AlbumsFabric albumsFabric)
+    public AlbumsQueriesRepository(DataContext dataContext)
     {
         _dataContext = dataContext;
-        _albumsFabric = albumsFabric;
     }
-    
+
     /// <inheritdoc />
     public async Task<Result<Album>> GetAlbumByIdAsync(AlbumId albumId)
     {
@@ -39,8 +36,9 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
         {
             return new InvalidOperationException();
         }
-        
-        return _albumsFabric.Restore(albumId.Value, response.Name, response.ReleaseDate);
+
+        var albumsFabric = new AlbumsFabric(response.Name, response.ReleaseDate);
+        return albumsFabric.Restore(response.Id);
     }
 
     /// <inheritdoc />
