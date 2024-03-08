@@ -8,6 +8,11 @@ namespace RtfmAPI.Infrastructure.Daos;
 public class TrackFileDao
 {
     /// <summary>
+    /// Идентификатор файла музыкального трека.
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
     /// название файла музыкального трека.
     /// </summary>
     public string? Name { get; set; }

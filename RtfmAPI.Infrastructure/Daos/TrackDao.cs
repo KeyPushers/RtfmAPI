@@ -19,6 +19,11 @@ public class TrackDao
     public string? Name { get; set; }
 
     /// <summary>
+    /// Дата выпуска музыкального трека.
+    /// </summary>
+    public DateTime ReleaseDate { get; set; }
+    
+    /// <summary>
     /// Идентификатор файла музыкального трека.
     /// </summary>
     public Guid? TrackFileId { get; set; }
