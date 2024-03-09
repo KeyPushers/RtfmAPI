@@ -32,7 +32,7 @@ public class BandsQueriesRepository : IBandsQueriesRepository
     {
         using var connection = _dataContext.CreateOpenedConnection();
 
-        const string sql = @"SELECT Id, Name FROM Bands WHERE Id = @BandId";
+        const string sql = @"SELECT * FROM Bands WHERE Id = @BandId";
         var band = await connection.QuerySingleOrDefaultAsync<BandDao>(sql, new {BandId = bandId.Value});
         if (band is null)
         {

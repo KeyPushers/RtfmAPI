@@ -12,7 +12,7 @@ namespace RtfmAPI.Domain.Models.Tracks;
 /// <summary>
 /// Фабрика музыкальных треков.
 /// </summary>
-public class TrackFabric : AggregateFabric<Track, TrackId, Guid>
+public class TracksFabric : AggregateFabric<Track, TrackId, Guid>
 {
     private readonly string _name;
     private readonly DateTime _releaseDate;
@@ -26,7 +26,7 @@ public class TrackFabric : AggregateFabric<Track, TrackId, Guid>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="genreIds">Идентификаторы жанров музыкальных треков.</param>
-    public TrackFabric(string name, DateTime releaseDate, Guid? trackFileId, IEnumerable<Guid> genreIds)
+    public TracksFabric(string name, DateTime releaseDate, Guid? trackFileId, IEnumerable<Guid> genreIds)
     {
         _name = name;
         _releaseDate = releaseDate;

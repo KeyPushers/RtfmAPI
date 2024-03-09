@@ -25,12 +25,12 @@ public class GenresQueriesRepository : IGenresQueriesRepository
     {
         _dataContext = dataContext;
     }
-    
+
     /// <inheritdoc />
     public async Task<Result<Genre>> GetGenreByIdAsync(GenreId genreId)
     {
         using var connection = _dataContext.CreateOpenedConnection();
-        
+
         const string sql = @"SELECT * FROM Genres WHERE Id = @GenreId";
         var genre = await connection.QuerySingleOrDefaultAsync<GenreDao>(sql, new {GenreId = genreId.Value});
         if (genre is null)
@@ -43,13 +43,11 @@ public class GenresQueriesRepository : IGenresQueriesRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsGenreExistsAsync(GenreId genreId)
+    public Task<bool> IsGenreExistsAsync(GenreId genreId)
     {
-        using var connection = _dataContext.CreateOpenedConnection();
-        var trx = connection.BeginTransaction();
+        var connection = _dataContext.CreateOpenedConnection();
         const string sql = @"SELECT EXISTS(SELECT 1 FROM Genres WHERE Id=@GenreId)";
 
-        var result = await connection.ExecuteScalarAsync<bool>(sql, new {GenreId = genreId.Value}, trx);
-        return result;
+        return connection.ExecuteScalarAsync<bool>(sql, new {GenreId = genreId.Value});
     }
 }

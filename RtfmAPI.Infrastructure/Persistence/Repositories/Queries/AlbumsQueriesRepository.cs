@@ -31,7 +31,7 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
     public async Task<Result<Album>> GetAlbumByIdAsync(AlbumId albumId)
     {
         using var connection = _dataContext.CreateOpenedConnection();
-        const string sql = @"SELECT Id, Name, ReleaseDate FROM Albums WHERE Id = @AlbumId";
+        const string sql = @"SELECT * FROM Albums WHERE Id = @AlbumId";
         var response = await connection.QuerySingleOrDefaultAsync<AlbumDao>(sql, new {AlbumId = albumId.Value});
         if (response is null)
         {
@@ -42,19 +42,17 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
         var trackIds = await connection.QueryAsync<Guid>(sqlTrackIds, new {AlbumId = albumId.Value});
 
         response.TrackIds = trackIds.ToList();
-        
+
         var albumsFabric = new AlbumsFabric(response.Name, response.ReleaseDate, response.TrackIds);
         return albumsFabric.Restore(response.Id);
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsAlbumExistsAsync(AlbumId albumId)
+    public Task<bool> IsAlbumExistsAsync(AlbumId albumId)
     {
-        using var connection = _dataContext.CreateOpenedConnection();
-        var trx = connection.BeginTransaction();
+        var connection = _dataContext.CreateOpenedConnection();
         const string sql = @"SELECT EXISTS(SELECT 1 FROM Albums WHERE Id=@AlbumId)";
 
-        var result = await connection.ExecuteScalarAsync<bool>(sql, new {AlbumId = albumId.Value}, trx);
-        return result;
+        return connection.ExecuteScalarAsync<bool>(sql, new {AlbumId = albumId.Value});
     }
 }
