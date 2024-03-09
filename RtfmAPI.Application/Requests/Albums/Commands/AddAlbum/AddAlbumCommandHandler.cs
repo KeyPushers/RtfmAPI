@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
@@ -32,7 +34,7 @@ public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<Ad
     /// <returns>Музыкальный трек.</returns>
     public async Task<Result<AddedAlbum>> Handle(AddAlbumCommand request, CancellationToken cancellationToken = default)
     {
-        var albumsFabric = new AlbumsFabric(request.Name ?? string.Empty, request.ReleaseDate);
+        var albumsFabric = new AlbumsFabric(request.Name ?? string.Empty, request.ReleaseDate, Enumerable.Empty<Guid>());
         var createAlbumResult = albumsFabric.Create();
         if (createAlbumResult.IsFailed)
         {
@@ -42,6 +44,7 @@ public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<Ad
         var album = createAlbumResult.Value;
 
         await _repository.CommitChangesAsync(album, cancellationToken);
+        
         return new AddedAlbum
         {
             Id = album.Id.Value,

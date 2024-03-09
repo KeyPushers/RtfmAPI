@@ -31,7 +31,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// Файл музыкального трека.
     /// </summary>
     public TrackFileId? TrackFileId { get; private set; }
-    
+
     /// <summary>
     /// Музыкальные жанры.
     /// </summary>
@@ -44,12 +44,9 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
-    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId, IEnumerable<GenreId> genreIds) : base(TrackId.Create())
+    private Track(TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId, IEnumerable<GenreId> genreIds)
+        : this(TrackId.Create(), name, releaseDate, trackFileId, genreIds)
     {
-        Name = name;
-        ReleaseDate = releaseDate;
-        TrackFileId = trackFileId;
-        _genreIds = genreIds.ToHashSet();
     }
 
     /// <summary>
@@ -60,14 +57,15 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
-    private Track(TrackId id, TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId, IEnumerable<GenreId> genreIds) : base(id)
+    private Track(TrackId id, TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId,
+        IEnumerable<GenreId> genreIds) : base(id)
     {
         Name = name;
         ReleaseDate = releaseDate;
         TrackFileId = trackFileId;
         _genreIds = genreIds.ToHashSet();
     }
-    
+
     /// <summary>
     /// Создание музыкального трека.
     /// </summary>
@@ -88,6 +86,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         {
             track.AddDomainEvent(new TrackFileChangedInTrackDomainEvent(track.Id, track.TrackFileId));
         }
+
         track.AddDomainEvent(new GenresAddedToTrackDomainEvent(track.Id, track.GenreIds));
 
         return track;
@@ -102,12 +101,14 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
     /// <returns>Музыкальный трек.</returns>
-    internal static Result<Track> Restore(TrackId id, TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId,
+    internal static Result<Track> Restore(TrackId id, TrackName name, TrackReleaseDate releaseDate,
+        TrackFileId? trackFileId,
         IEnumerable<GenreId> genreIds)
     {
-        return new Track(id, name, releaseDate, trackFileId, genreIds);;
+        return new Track(id, name, releaseDate, trackFileId, genreIds);
+        ;
     }
-    
+
     /// <summary>
     /// Установление названия музыкального трека.
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
@@ -44,7 +45,10 @@ public class BandsQueriesRepository : IBandsQueriesRepository
         const string sqlGenreIds = @"SELECT bg.GenreId FROM BandGenres bg WHERE bg.BandId = @BandId";
         var genreIds = await connection.QueryAsync<Guid>(sqlGenreIds, new {BandId = bandId.Value});
 
-        var bandsFabric = new BandsFabric(band.Name, albumIds, genreIds);
+        band.AlbumIds = albumIds.ToList();
+        band.GenreIds = genreIds.ToList();
+        
+        var bandsFabric = new BandsFabric(band.Name, band.AlbumIds, band.GenreIds);
         return bandsFabric.Restore(band.Id);
     }
 }

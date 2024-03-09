@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using RtfmAPI.Domain.Fabrics;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
+using RtfmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Albums;
@@ -12,16 +15,19 @@ public class AlbumsFabric : AggregateFabric<Album, AlbumId, Guid>
 {
     private readonly string _name;
     private readonly DateTime _releaseDate;
+    private readonly IEnumerable<Guid> _trackIds;
 
     /// <summary>
     /// Создание фабрики музыкальных альбомов.
     /// </summary>
     /// <param name="name">название музыкального альбома.</param>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
-    public AlbumsFabric(string name, DateTime releaseDate)
+    /// <param name="trackIds">Идентификаторы музыкальных треков.</param>
+    public AlbumsFabric(string name, DateTime releaseDate, IEnumerable<Guid> trackIds)
     {
         _name = name;
         _releaseDate = releaseDate;
+        _trackIds = trackIds;
     }
     
     /// <inheritdoc />
@@ -39,7 +45,9 @@ public class AlbumsFabric : AggregateFabric<Album, AlbumId, Guid>
             return getReleaseDateResult.Error;
         }
 
-        return Album.Create(getAlbumNameResult.Value, getReleaseDateResult.Value);
+        var trackIds = _trackIds.Select(TrackId.Create);
+        
+        return Album.Create(getAlbumNameResult.Value, getReleaseDateResult.Value, trackIds);
     }
 
     /// <inheritdoc />
@@ -59,6 +67,8 @@ public class AlbumsFabric : AggregateFabric<Album, AlbumId, Guid>
             return getReleaseDateResult.Error;
         }
 
-        return Album.Restore(albumId, getAlbumNameResult.Value, getReleaseDateResult.Value);
+        var trackIds = _trackIds.Select(TrackId.Create);
+
+        return Album.Restore(albumId, getAlbumNameResult.Value, getReleaseDateResult.Value, trackIds);
     }
 }

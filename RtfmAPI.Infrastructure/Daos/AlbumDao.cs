@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RtfmAPI.Infrastructure.Daos;
 
@@ -21,4 +22,9 @@ public class AlbumDao
     /// Дата выпуска музыкального альбома.
     /// </summary>
     public DateTime ReleaseDate { get; set; }
+
+    /// <summary>
+    /// Идентификаторы музыкальных треков.
+    /// </summary>
+    public List<Guid> TrackIds { get; set; } = new();
 }

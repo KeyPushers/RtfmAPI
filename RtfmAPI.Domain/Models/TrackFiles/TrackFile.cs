@@ -44,8 +44,8 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <param name="extension">Расширение файла музыкального трека.</param>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
     /// <param name="duration">Продолжительность файла музыкального трека.</param>
-    private TrackFile(TrackFileId id, TrackFileName name, TrackFileData data, TrackFileExtension extension, TrackFileMimeType mimeType,
-        TrackFileDuration duration) : base(id)
+    private TrackFile(TrackFileId id, TrackFileName name, TrackFileData data, TrackFileExtension extension,
+        TrackFileMimeType mimeType, TrackFileDuration duration) : base(id)
     {
         Name = name;
         Data = data;
@@ -53,7 +53,7 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
         MimeType = mimeType;
         Duration = duration;
     }
-    
+
     /// <summary>
     /// Создание файла музыкального трека.
     /// </summary>
@@ -63,13 +63,8 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
     /// <param name="duration">Продолжительность файла музыкального трека.</param>
     private TrackFile(TrackFileName name, TrackFileData data, TrackFileExtension extension, TrackFileMimeType mimeType,
-        TrackFileDuration duration) : base(TrackFileId.Create())
+        TrackFileDuration duration) : this(TrackFileId.Create(), name, data, extension, mimeType, duration)
     {
-        Name = name;
-        Data = data;
-        Extension = extension;
-        MimeType = mimeType;
-        Duration = duration;
     }
 
     /// <summary>
@@ -110,7 +105,7 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     {
         return new TrackFile(id, name, data, extension, mimeType, duration);
     }
-    
+
     /// <summary>
     /// Удаление файла музыкального трека.
     /// </summary>

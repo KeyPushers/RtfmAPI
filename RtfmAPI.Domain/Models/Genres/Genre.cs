@@ -29,9 +29,8 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// Создание музыкального жанра.
     /// </summary>
     /// <param name="name">Название музыкального жанра.</param>
-    private Genre(GenreName name) : base(GenreId.Create())
+    private Genre(GenreName name) : this(GenreId.Create(), name)
     {
-        Name = name;
     }
 
     /// <summary>

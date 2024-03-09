@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
@@ -37,7 +38,12 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
             return new InvalidOperationException();
         }
 
-        var albumsFabric = new AlbumsFabric(response.Name, response.ReleaseDate);
+        const string sqlTrackIds = @"SELECT at.TrackId FROM AlbumTracks at WHERE at.AlbumId = @AlbumId";
+        var trackIds = await connection.QueryAsync<Guid>(sqlTrackIds, new {AlbumId = albumId.Value});
+
+        response.TrackIds = trackIds.ToList();
+        
+        var albumsFabric = new AlbumsFabric(response.Name, response.ReleaseDate, response.TrackIds);
         return albumsFabric.Restore(response.Id);
     }
 
