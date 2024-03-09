@@ -93,7 +93,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     {
         var band = domainEvent.Band;
 
-        var sql = @"INSERT INTO Bands (Id) VALUES(@Id)";
+        const string sql = @"INSERT INTO Bands (Id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = string.Empty}, trx);
     }
 
@@ -108,7 +108,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     {
         var band = domainEvent.Band;
 
-        var sql = @"UPDATE Bands SET Name = @Name WHERE Id = @Id";
+        const string sql = @"UPDATE Bands SET Name = @Name WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = band.Name.Value}, trx);
     }
 
@@ -126,7 +126,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
 
         foreach (var albumId in albumIds)
         {
-            var sql = @"INSERT INTO BandAlbums (BandId, AlbumId) VALUES(@BandId, @AlbumId)";
+            const string sql = @"INSERT INTO BandAlbums (BandId, AlbumId) VALUES(@BandId, @AlbumId)";
             await connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumId = albumId.Value}, trx);
         }
     }
@@ -143,7 +143,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
         var bandId = domainEvent.Band.Id;
         var albumIds = domainEvent.RemovedAlbumIds.Select(entity => entity.Value).ToArray();
 
-        var sql = @"DELETE FROM BandAlbums WHERE BandId = @BandId AND AlbumId = ANY(@AlbumIds);";
+        const string sql = @"DELETE FROM BandAlbums WHERE BandId = @BandId AND AlbumId = ANY(@AlbumIds);";
         return connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumIds = albumIds}, trx);
     }
 
@@ -161,7 +161,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
 
         foreach (var genreId in genreIds)
         {
-            var sql = @"INSERT INTO BandGenres (BandId, GenreId) VALUES(@BandId, @GenreId)";
+            const string sql = @"INSERT INTO BandGenres (BandId, GenreId) VALUES(@BandId, @GenreId)";
             await connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreId = genreId.Value}, trx);
         }
     }
@@ -178,7 +178,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
         var bandId = domainEvent.Band.Id;
         var genreIds = domainEvent.RemovedGenreIds.Select(entity => entity.Value).ToList();
 
-        var sql = @"DELETE FROM BandGenres WHERE BandId = @BandId AND GenreId = ANY(@GenreIds)";
+        const string sql = @"DELETE FROM BandGenres WHERE BandId = @BandId AND GenreId = ANY(@GenreIds)";
         return connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreIds = genreIds}, trx);
     }
 }

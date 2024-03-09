@@ -93,7 +93,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     private Task OnTrackCreatedDomainEventAsync(TrackCreatedDomainEvent domainEvent, IDbConnection connection,
         IDbTransaction trx)
     {
-        var sql = @"INSERT INTO Tracks(Id) VALUES(@Id)";
+        const string sql = @"INSERT INTO Tracks(Id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = domainEvent.TrackId.Value}, trx);
     }
 
@@ -106,7 +106,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     private Task OnTrackNameChangedDomainEventAsync(TrackNameChangedDomainEvent domainEvent, IDbConnection connection,
         IDbTransaction trx)
     {
-        var sql = @"UPDATE Tracks SET Name = @Name WHERE Id = @Id";
+        const string sql = @"UPDATE Tracks SET Name = @Name WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = domainEvent.TrackId.Value, Name = domainEvent.Name.Value}, trx);
     }
 
@@ -119,7 +119,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     private Task OnTrackReleaseDateChangedDomainEventAsync(TrackReleaseDateChangedDomainEvent domainEvent,
         IDbConnection connection, IDbTransaction trx)
     {
-        var sql = @"UPDATE Tracks SET ReleaseDate = @ReleaseDate WHERE Id = @Id";
+        const string sql = @"UPDATE Tracks SET ReleaseDate = @ReleaseDate WHERE Id = @Id";
         return connection.ExecuteAsync(sql,
             new {Id = domainEvent.TrackId.Value, ReleaseDate = domainEvent.ReleaseDate.Value}, trx);
     }
@@ -138,7 +138,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
 
         foreach (var genreId in genreIds)
         {
-            var sql = @"INSERT INTO TrackGenres(TrackId, GenreId) VALUES(@TrackId, @GenreId)";
+            const string sql = @"INSERT INTO TrackGenres(TrackId, GenreId) VALUES(@TrackId, @GenreId)";
             await connection.ExecuteAsync(sql, new {TrackId = trackId.Value, GenreId = genreId.Value}, trx);
         }
     }
@@ -155,7 +155,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
         var trackId = domainEvent.TrackId;
         var genreIds = domainEvent.RemovedGenreIds.Select(entity => entity.Value);
 
-        var sql = @"DELETE FROM TrackGenres WHERE TrackId = @TrackId AND GenreId = ANY(@GenreIds)";
+        const string sql = @"DELETE FROM TrackGenres WHERE TrackId = @TrackId AND GenreId = ANY(@GenreIds)";
         return connection.ExecuteAsync(sql, new {TrackId = trackId.Value, GenreIds = genreIds}, trx);
     }
 
@@ -168,7 +168,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     private Task OnTrackFileChangedInTrackDomainEventAsync(TrackFileChangedInTrackDomainEvent domainEvent,
         IDbConnection connection, IDbTransaction trx)
     {
-        var sql = @"UPDATE Tracks SET TrackFileId = @TrackFileId WHERE Id = @Id";
+        const string sql = @"UPDATE Tracks SET TrackFileId = @TrackFileId WHERE Id = @Id";
         return connection.ExecuteAsync(sql,
             new {Id = domainEvent.TrackId.Value, TrackFileId = domainEvent.TrackFileId.Value}, trx);
     }

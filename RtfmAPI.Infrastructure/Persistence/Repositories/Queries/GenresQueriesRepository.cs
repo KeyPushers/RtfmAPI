@@ -47,7 +47,7 @@ public class GenresQueriesRepository : IGenresQueriesRepository
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();
-        var sql = @"SELECT EXISTS(SELECT 1 FROM Genres WHERE Id=@GenreId)";
+        const string sql = @"SELECT EXISTS(SELECT 1 FROM Genres WHERE Id=@GenreId)";
 
         var result = await connection.ExecuteScalarAsync<bool>(sql, new {GenreId = genreId.Value}, trx);
         return result;

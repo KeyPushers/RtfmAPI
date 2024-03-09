@@ -31,7 +31,7 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
     public async Task<Result<Album>> GetAlbumByIdAsync(AlbumId albumId)
     {
         using var connection = _dataContext.CreateOpenedConnection();
-        var sql = @"SELECT Id, Name, ReleaseDate FROM Albums WHERE Id = @AlbumId";
+        const string sql = @"SELECT Id, Name, ReleaseDate FROM Albums WHERE Id = @AlbumId";
         var response = await connection.QuerySingleOrDefaultAsync<AlbumDao>(sql, new {AlbumId = albumId.Value});
         if (response is null)
         {
@@ -52,7 +52,7 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();
-        var sql = @"SELECT EXISTS(SELECT 1 FROM Albums WHERE Id=@AlbumId)";
+        const string sql = @"SELECT EXISTS(SELECT 1 FROM Albums WHERE Id=@AlbumId)";
 
         var result = await connection.ExecuteScalarAsync<bool>(sql, new {AlbumId = albumId.Value}, trx);
         return result;

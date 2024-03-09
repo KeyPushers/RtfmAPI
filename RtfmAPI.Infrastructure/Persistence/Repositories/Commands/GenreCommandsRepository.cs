@@ -68,9 +68,7 @@ public class GenreCommandsRepository : IGenresCommandsRepository
     {
         var genre = domainEvent.Genre;
 
-        var sql = """
-                    INSERT INTO Genres (Id) VALUES(@Id)
-                  """;
+        const string sql = @"INSERT INTO Genres (Id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = genre.Id.Value, Name = string.Empty}, trx);
     }
 
@@ -85,9 +83,7 @@ public class GenreCommandsRepository : IGenresCommandsRepository
     {
         var genre = domainEvent.Genre;
 
-        var sql = """
-                    UPDATE Genres SET Name = @Name WHERE Id = @Id
-                  """;
+        const string sql = @"UPDATE Genres SET Name = @Name WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = genre.Id.Value, Name = genre.Name.Value}, trx);
     }
 }

@@ -90,7 +90,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     {
         var album = domainEvent.Album;
 
-        var sql = @"INSERT INTO Albums (Id) VALUES(@Id)";
+        const string sql = @"INSERT INTO Albums (Id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = album.Id.Value}, transaction);
     }
 
@@ -105,7 +105,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     {
         var album = domainEvent.Album;
 
-        var sql = @"UPDATE Albums SET Name = @Name WHERE Id = @Id";
+        const string sql = @"UPDATE Albums SET Name = @Name WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = album.Id.Value, Name = album.Name.Value}, transaction);
     }
 
@@ -120,7 +120,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     {
         var album = domainEvent.Album;
 
-        var sql = @"UPDATE Albums SET ReleaseDate = @ReleaseDate WHERE Id = @Id";
+        const string sql = @"UPDATE Albums SET ReleaseDate = @ReleaseDate WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = album.Id.Value, ReleaseDate = album.ReleaseDate.Value},
             transaction);
     }
@@ -139,7 +139,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
 
         foreach (var trackId in trackIds)
         {
-            var sql = @"INSERT INTO AlbumTracks (AlbumId, TrackId) VALUES(@AlbumId, @TrackId)";
+            const string sql = @"INSERT INTO AlbumTracks (AlbumId, TrackId) VALUES(@AlbumId, @TrackId)";
             await connection.ExecuteAsync(sql, new {AlbumId = albumId.Value, TrackId = trackId.Value}, transaction);
         }
     }
@@ -156,7 +156,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
         var albumId = domainEvent.AlbumId;
         var trackIds = domainEvent.RemovedTrackIds.Select(entity => entity.Value).ToList();
 
-        var sql = @"DELETE FROM AlbumTracks WHERE AlbumId = @AlbumId AND TrackId = ANY(@TrackIds)";
+        const string sql = @"DELETE FROM AlbumTracks WHERE AlbumId = @AlbumId AND TrackId = ANY(@TrackIds)";
         return connection.ExecuteAsync(sql, new {AlbumId = albumId.Value, TrackIds = trackIds}, transaction);
     }
 }
