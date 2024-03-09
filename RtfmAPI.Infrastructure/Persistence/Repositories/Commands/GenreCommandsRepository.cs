@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -40,11 +41,14 @@ public class GenreCommandsRepository : IGenresCommandsRepository
                     await CreateGenreAsync(genreCreatedDomainEvent, connection, trx);
                     break;
                 }
-
                 case GenreNameChangedDomainEvent genreNameChangedDomainEvent:
                 {
                     await ChangeGenreNameAsync(genreNameChangedDomainEvent, connection, trx);
                     break;
+                }
+                default:
+                {
+                    throw new NotImplementedException();
                 }
             }
         }

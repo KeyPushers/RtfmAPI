@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -71,7 +72,9 @@ public class BandsCommandsRepository : IBandsCommandsRepository
                     throw new NotImplementedException();
                 }
                 default:
-                    throw new InvalidOperationException();
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 
@@ -138,17 +141,14 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
     /// <param name="trx">Транзакция.</param>
-    private async Task RemoveAlbumsFromBandAsync(AlbumsRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
+    private Task RemoveAlbumsFromBandAsync(AlbumsRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
         IDbTransaction trx)
     {
         var bandId = domainEvent.Band.Id;
-        var albumIds = domainEvent.RemovedAlbumIds;
+        var albumIds = domainEvent.RemovedAlbumIds.Select(entity => entity.Value).ToArray();
 
-        foreach (var albumId in albumIds)
-        {
-            var sql = @"DELETE FROM BandAlbums WHERE BandId = @BandId AND AlbumId = @AlbumId";
-            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumId = albumId.Value}, trx);
-        }
+        var sql = @"DELETE FROM BandAlbums WHERE BandId = @BandId AND AlbumId = ANY(@AlbumIds);";
+        return connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumIds = albumIds}, trx);
     }
 
     /// <summary>
@@ -176,16 +176,13 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
     /// <param name="trx">Транзакция.</param>
-    private async Task RemoveGenresFromBandAsync(GenresRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
+    private Task RemoveGenresFromBandAsync(GenresRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
         IDbTransaction trx)
     {
         var bandId = domainEvent.Band.Id;
-        var genreIds = domainEvent.RemovedGenreIds;
+        var genreIds = domainEvent.RemovedGenreIds.Select(entity => entity.Value).ToList();
 
-        foreach (var genreId in genreIds)
-        {
-            var sql = @"DELETE FROM BandGenres WHERE BandId = @BandId AND GenreId = @GenreId";
-            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreId = genreId.Value}, trx);
-        }
+        var sql = @"DELETE FROM BandGenres WHERE BandId = @BandId AND GenreId = ANY(@GenreIds)";
+        return connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreIds = genreIds}, trx);
     }
 }
