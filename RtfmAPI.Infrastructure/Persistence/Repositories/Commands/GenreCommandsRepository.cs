@@ -48,7 +48,7 @@ public class GenreCommandsRepository : IGenresCommandsRepository
                 }
                 default:
                 {
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException(nameof(domainEvent));
                 }
             }
         }

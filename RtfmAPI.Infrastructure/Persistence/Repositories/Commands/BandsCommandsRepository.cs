@@ -73,7 +73,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
                 }
                 default:
                 {
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException(nameof(domainEvent));
                 }
             }
         }
@@ -93,9 +93,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     {
         var band = domainEvent.Band;
 
-        var sql = """
-                    INSERT INTO Bands (Id) VALUES(@Id)
-                  """;
+        var sql = @"INSERT INTO Bands (Id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = string.Empty}, trx);
     }
 
@@ -110,9 +108,7 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     {
         var band = domainEvent.Band;
 
-        var sql = """
-                    UPDATE Bands SET Name = @Name WHERE Id = @Id
-                  """;
+        var sql = @"UPDATE Bands SET Name = @Name WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = band.Name.Value}, trx);
     }
 
