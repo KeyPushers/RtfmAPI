@@ -20,16 +20,22 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<DataContext>();
-        
+
         services.AddScoped<IBandsCommandsRepository, BandsCommandsRepository>();
         services.AddScoped<IBandsQueriesRepository, BandsQueriesRepository>();
-        
+
         services.AddScoped<IAlbumsCommandsRepository, AlbumsCommandsRepository>();
         services.AddScoped<IAlbumsQueriesRepository, AlbumsQueriesRepository>();
-        
-        services.AddScoped<IGenresQueriesRepository, GenresQueriesRepository>();
+
         services.AddScoped<IGenresCommandsRepository, GenreCommandsRepository>();
-        
+        services.AddScoped<IGenresQueriesRepository, GenresQueriesRepository>();
+
+        services.AddScoped<ITrackFilesCommandsRepository, TrackFilesCommandsRepository>();
+        services.AddScoped<ITrackFilesQueriesRepository, TrackFilesQueriesRepository>();
+
+        services.AddScoped<ITracksCommandsRepository, TracksCommandsRepository>();
+        services.AddScoped<ITracksQueriesRepository, TracksQueriesRepository>();
+
         return services;
     }
 }

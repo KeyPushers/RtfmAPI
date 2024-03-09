@@ -8,7 +8,7 @@ namespace RtfmAPI.Domain.Models.TrackFiles;
 /// <summary>
 /// Фабрика доменной модели файла музыкального трека.
 /// </summary>
-public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
+public class TrackFilesFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
 {
     private readonly string _name;
     private readonly byte[] _data;
@@ -19,7 +19,7 @@ public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
     /// <summary>
     /// Созданеи фабрики.
     /// </summary>
-    public TrackFileFabric(string name, byte[] data, string extension, string mimeType, double duration)
+    public TrackFilesFabric(string name, byte[] data, string extension, string mimeType, double duration)
     {
         _name = name;
         _data = data;
@@ -27,7 +27,7 @@ public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
         _mimeType = mimeType;
         _duration = duration;
     }
-    
+
     /// <inheritdoc />
     public override Result<TrackFile> Create()
     {
@@ -36,13 +36,13 @@ public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
         {
             return trackFileNameResult.Error;
         }
-        
+
         var trackFileDataResult = TrackFileData.Create(_data);
         if (trackFileDataResult.IsFailed)
         {
             return trackFileDataResult.Error;
         }
-        
+
         var trackFileExtensionResult = TrackFileExtension.Create(_extension);
         if (trackFileExtensionResult.IsFailed)
         {
@@ -60,7 +60,7 @@ public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
         {
             return trackFileDurationResult.Error;
         }
-        
+
         return TrackFile.Create(trackFileNameResult.Value, trackFileDataResult.Value, trackFileExtensionResult.Value,
             trackFileMimeTypeResult.Value, trackFileDurationResult.Value);
     }
@@ -69,19 +69,19 @@ public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
     public override Result<TrackFile> Restore(Guid id)
     {
         var trackFileId = TrackFileId.Create(id);
-        
+
         var trackFileNameResult = TrackFileName.Create(_name);
         if (trackFileNameResult.IsFailed)
         {
             return trackFileNameResult.Error;
         }
-        
+
         var trackFileDataResult = TrackFileData.Create(_data);
         if (trackFileDataResult.IsFailed)
         {
             return trackFileDataResult.Error;
         }
-        
+
         var trackFileExtensionResult = TrackFileExtension.Create(_extension);
         if (trackFileExtensionResult.IsFailed)
         {
@@ -99,8 +99,9 @@ public class TrackFileFabric : AggregateFabric<TrackFile, TrackFileId, Guid>
         {
             return trackFileDurationResult.Error;
         }
-        
-        return TrackFile.Restore(trackFileId, trackFileNameResult.Value, trackFileDataResult.Value, trackFileExtensionResult.Value,
+
+        return TrackFile.Restore(trackFileId, trackFileNameResult.Value, trackFileDataResult.Value,
+            trackFileExtensionResult.Value,
             trackFileMimeTypeResult.Value, trackFileDurationResult.Value);
     }
 }
