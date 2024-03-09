@@ -22,4 +22,11 @@ public interface ITrackFilesQueriesRepository
     /// </summary>
     /// <param name="trackFileId">Идентифиактор файла музыкального трека.</param>
     Task<bool> IsTrackFileExistsAsync(TrackFileId trackFileId);
+
+    /// <summary>
+    /// получение продолжительности файла музыкального трека.
+    /// </summary>
+    /// <param name="trackFileId">Идентифиактор файла музыкального трека.</param>
+    /// <returns>Продолжительность файла музыкального трека.</returns>
+    Task<double> GetTrackFileDurationAsync(TrackFileId trackFileId);
 }

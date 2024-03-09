@@ -166,7 +166,7 @@ public class DataContext
                         Id UUID PRIMARY KEY,
                         Name VARCHAR,
                         ReleaseDate Date,
-                        TrackFileId UUID REFERENCES TrackFiles(Id) ON UPDATE CASCADE ON DELETE CASCADE);
+                        TrackFileId UUID REFERENCES TrackFiles(Id) ON UPDATE CASCADE);
                   ";
 
         return connection.ExecuteAsync(sql, trx);

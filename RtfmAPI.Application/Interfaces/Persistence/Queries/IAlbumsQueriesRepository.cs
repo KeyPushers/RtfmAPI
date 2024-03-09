@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using RtfmAPI.Domain.Models.Albums;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
+using RtfmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Interfaces.Persistence.Queries;
@@ -22,4 +25,12 @@ public interface IAlbumsQueriesRepository
     /// </summary>
     /// <param name="albumId">Идентификатор музыкального альбома.</param>
     Task<bool> IsAlbumExistsAsync(AlbumId albumId);
+
+    /// <summary>
+    /// Получение альбомов с музыкальным треком.
+    /// </summary>
+    /// <param name="trackId">Идентификатор музыкального трека.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Музыкальные альбомы.</returns>
+    Task<Result<List<Album>>> GetAlbumsByTrackIdAsync(TrackId trackId, CancellationToken cancellationToken = default);
 }

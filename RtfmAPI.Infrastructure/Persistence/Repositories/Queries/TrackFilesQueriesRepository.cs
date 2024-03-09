@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
@@ -30,9 +31,7 @@ public class TrackFilesQueriesRepository : ITrackFilesQueriesRepository
     public async Task<Result<TrackFile>> GetTrackFileByIdAsync(TrackFileId trackFileId)
     {
         var connection = _context.CreateOpenedConnection();
-        const string sql = @"SELECT * From TrackFiles WHERE Id = @TrackFileId";
-        var trackFileDao =
-            await connection.QuerySingleOrDefaultAsync<TrackFileDao>(sql, new {TrackFileId = trackFileId.Value});
+        var trackFileDao = await GetTrackFileDaoAsync(trackFileId.Value, connection);
         if (trackFileDao is null)
         {
             return new InvalidOperationException();
@@ -50,5 +49,25 @@ public class TrackFilesQueriesRepository : ITrackFilesQueriesRepository
         const string sql = @"SELECT EXISTS(SELECT 1 FROM TrackFiles WHERE Id=@TrackFileId)";
 
         return connection.ExecuteScalarAsync<bool>(sql, new {TrackFileId = trackFileId.Value});
+    }
+
+    /// <inheritdoc />
+    public async Task<double> GetTrackFileDurationAsync(TrackFileId trackFileId)
+    {
+        var connection = _context.CreateOpenedConnection();
+        var trackFileDao = await GetTrackFileDaoAsync(trackFileId.Value, connection);
+        return trackFileDao?.Duration ?? 0.0;
+    }
+
+    /// <summary>
+    /// Получение объекта доступа данных файла музыкального трека.
+    /// </summary>
+    /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
+    /// <param name="connection">Соединение.</param>
+    /// <returns>Объект доступа данных файла музыкального трека.</returns>
+    private static Task<TrackFileDao?> GetTrackFileDaoAsync(Guid trackFileId, IDbConnection connection)
+    {
+        const string sql = @"SELECT * From TrackFiles WHERE Id = @TrackFileId";
+        return connection.QuerySingleOrDefaultAsync<TrackFileDao>(sql, new {TrackFileId = trackFileId});
     }
 }

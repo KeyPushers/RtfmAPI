@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using RtfmAPI.Domain.Models.Tracks;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
 using RtfmAPI.Domain.Primitives;
@@ -22,4 +24,10 @@ public interface ITracksQueriesRepository
     /// </summary>
     /// <param name="trackId">Идентификатор музыкального трека.</param>
     Task<bool> IsTrackExistsAsync(TrackId trackId);
+
+    /// <summary>
+    /// Получение музыкальных треков.
+    /// </summary>
+    /// <returns>Музыкальные треки.</returns>
+    Task<Result<List<Track>>> GetTracksAsync(CancellationToken cancellationToken = default);
 }

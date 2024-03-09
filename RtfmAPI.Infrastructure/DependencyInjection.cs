@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using RtfmAPI.Application.Interfaces.AudioHandlers;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Infrastructure.Persistence.Context;
 using RtfmAPI.Infrastructure.Persistence.Repositories.Commands;
 using RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
+using RtfmAPI.Infrastructure.Shared.Services;
 
 namespace RtfmAPI.Infrastructure;
 
@@ -35,6 +37,8 @@ public static class DependencyInjection
 
         services.AddScoped<ITracksCommandsRepository, TracksCommandsRepository>();
         services.AddScoped<ITracksQueriesRepository, TracksQueriesRepository>();
+
+        services.AddScoped<IAudioHandlerFactory, AudioHandlerFactory>();
 
         return services;
     }

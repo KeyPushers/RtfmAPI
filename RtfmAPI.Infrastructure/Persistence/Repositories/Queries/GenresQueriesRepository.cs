@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
@@ -31,8 +32,7 @@ public class GenresQueriesRepository : IGenresQueriesRepository
     {
         using var connection = _dataContext.CreateOpenedConnection();
 
-        const string sql = @"SELECT * FROM Genres WHERE Id = @GenreId";
-        var genre = await connection.QuerySingleOrDefaultAsync<GenreDao>(sql, new {GenreId = genreId.Value});
+        var genre = await GetGenreDaoAsync(genreId.Value, connection);
         if (genre is null)
         {
             return new InvalidOperationException();
@@ -49,5 +49,17 @@ public class GenresQueriesRepository : IGenresQueriesRepository
         const string sql = @"SELECT EXISTS(SELECT 1 FROM Genres WHERE Id=@GenreId)";
 
         return connection.ExecuteScalarAsync<bool>(sql, new {GenreId = genreId.Value});
+    }
+
+    /// <summary>
+    /// Получение объекта доступа данных музыкального жанра.
+    /// </summary>
+    /// <param name="genreId">Идентификатор музыкального жанра.</param>
+    /// <param name="connection">Соединение.</param>
+    /// <returns>Объект доступа данных музыкального жанра.</returns>
+    private static Task<GenreDao?> GetGenreDaoAsync(Guid genreId, IDbConnection connection)
+    {
+        const string sql = @"SELECT * FROM Genres WHERE Id = @GenreId";
+        return connection.QuerySingleOrDefaultAsync<GenreDao>(sql, new {GenreId = genreId});
     }
 }
