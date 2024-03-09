@@ -9,8 +9,7 @@ public abstract class AggregateRoot<TId, TIdType> : Entity<TId> where TId : Aggr
     /// Примитив агрегата.
     /// </summary>
     /// <param name="id">Идентификатор агрената</param>
-    protected AggregateRoot(TId id)
+    protected AggregateRoot(TId id) : base(id)
     {
-        Id = id;
     }
 }
