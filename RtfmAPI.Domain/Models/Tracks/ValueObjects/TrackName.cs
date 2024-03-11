@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using RtfmAPI.Domain.Models.Tracks.Exceptions;
 using RtfmAPI.Domain.Primitives;
 

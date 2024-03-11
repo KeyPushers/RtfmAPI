@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using RtfmAPI.Domain.Models.TrackFiles.Exceptions;
-using RtfmAPI.Domain.Models.Tracks.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
