@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using RtfmAPI.Domain.Models.TrackFiles.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -44,22 +45,22 @@ public sealed class TrackFileName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileNameIsNullOrEmpty();
         }
 
         if (value.Length < MinLength)
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileNameIsTooShort();
         }
 
         if (value.Length > MaxLength)
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileNameIsTooLong();
         }
 
         if (value.Trim().Any(sign => Path.GetInvalidFileNameChars().Contains(sign)))
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileNameIsInvalid();
         }
 
         return new TrackFileName(value);

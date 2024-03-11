@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using RtfmAPI.Domain.Models.TrackFiles.Exceptions;
+using RtfmAPI.Domain.Models.Tracks.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -51,12 +53,12 @@ public sealed class TrackFileMimeType : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileMimeTypeIsNullOrEmpty();
         }
 
         if (!AudioMediaTypes.Contains(value))
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileMimeTypeUnknown();
         }
 
         return new TrackFileMimeType(value);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RtfmAPI.Domain.Models.TrackFiles.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -33,7 +34,7 @@ public sealed class TrackFileData : ValueObject
     {
         if (!value.Any())
         {
-            return new InvalidOperationException();
+            return TrackFileExceptions.TrackFileDataIsEmpty();
         }
 
         return new TrackFileData(value);
