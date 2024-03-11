@@ -159,19 +159,19 @@ public class DataContext
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitTracksTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         var sql = @"CREATE TABLE IF NOT EXISTS Tracks (
                         Id UUID PRIMARY KEY,
                         Name VARCHAR,
                         ReleaseDate Date,
-                        TrackFileId UUID REFERENCES TrackFiles(Id) ON UPDATE CASCADE);
+                        TrackFileId UUID REFERENCES TrackFiles(Id) ON UPDATE CASCADE ON DELETE SET NULL);
                   ";
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitAlbumTracksTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         var sql = @"
@@ -184,7 +184,7 @@ public class DataContext
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitTrackGenresTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         var sql = @"
