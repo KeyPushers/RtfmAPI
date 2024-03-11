@@ -15,9 +15,9 @@ internal static class TrackExceptions
 
     #endregion
 
-    #region TrackReleaseDateExceptions
+    #region TrackReleaseDateException
 
-    internal static TrackNameException InvalidTrackReleaseDate() =>
+    internal static TrackReleaseDateException InvalidTrackReleaseDate() =>
         new("Не определена дата выпуска музыкального трека");
 
     #endregion
