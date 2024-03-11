@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RtfmAPI.Domain.Models.Genres.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Genres.ValueObjects;
@@ -42,17 +43,17 @@ public sealed class GenreName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new InvalidOperationException();
+            return GenreExceptions.GenreNameIsNullOrEmpty();
         }
 
         if (value.Length < MinLength)
         {
-            return new InvalidOperationException();
+            return GenreExceptions.GenreNameIsTooShort();
         }
 
         if (value.Length > MaxLength)
         {
-            return new InvalidOperationException();
+            return GenreExceptions.GenreNameIsTooLong();
         }
 
         return new GenreName(value);
