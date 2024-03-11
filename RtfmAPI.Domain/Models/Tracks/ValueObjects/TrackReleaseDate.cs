@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RtfmAPI.Domain.Models.Tracks.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Tracks.ValueObjects;
@@ -32,10 +33,10 @@ public sealed class TrackReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return new InvalidOperationException();
+            return TrackExceptions.InvalidTrackReleaseDate();
         }
-        
-        var date = value.Kind is DateTimeKind.Unspecified 
+
+        var date = value.Kind is DateTimeKind.Unspecified
             ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
             : value.ToUniversalTime();
         return new TrackReleaseDate(date);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RtfmAPI.Domain.Models.Tracks.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Tracks.ValueObjects;
@@ -42,17 +43,17 @@ public sealed class TrackName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new InvalidOperationException();
+            return TrackExceptions.TrackNameIsNullOrEmpty();
         }
 
         if (value.Length < MinLength)
         {
-            return new InvalidOperationException();
+            return TrackExceptions.TrackNameIsTooShort();
         }
 
         if (value.Length > MaxLength)
         {
-            return new InvalidOperationException();
+            return TrackExceptions.TrackNameIsTooLong();
         }
 
         return new TrackName(value);
