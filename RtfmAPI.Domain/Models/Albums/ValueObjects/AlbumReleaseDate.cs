@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RtfmAPI.Domain.Models.Albums.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Albums.ValueObjects;
@@ -32,7 +33,7 @@ public sealed class AlbumReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return new InvalidOperationException();
+            return AlbumExceptions.AlbumNameReleaseDateIsInvalid();
         }
 
         var date = value.Kind is DateTimeKind.Unspecified
