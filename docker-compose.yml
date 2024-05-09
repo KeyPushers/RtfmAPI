@@ -1,0 +1,26 @@
+﻿services:
+  rtfmapi:
+    container_name: rtfmapi
+    image: ghcr.io/pavelbesedinsky/rtfmapi:latest
+    build:
+      context: .
+      dockerfile: RtfmAPI.Presentation/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Container
+      - ASPNETCORE_HTTP_PORTS=5001
+    ports:
+      - "5001:5001"
+    depends_on:
+      - rtfmapi.db
+
+  rtfmapi.db:
+    container_name: rtfmapi_db
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=rtfmapi_db
+    volumes:
+      - ./.containers/rtfmapi_db:/var/lib/postgresql/data
+    ports:
+      - 5433:5432

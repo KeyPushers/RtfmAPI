@@ -8,6 +8,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Infrastructure", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtfmAPI.Application", "RtfmAPI.Application\RtfmAPI.Application.csproj", "{C890976D-1E39-4F13-9D6E-AF587A62DE8A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{EE02F401-599C-4774-A96A-118DB3A18059}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker-compose", "docker-compose", "{FB4C2A96-446D-42A5-900A-2B3823D8B398}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +37,11 @@ Global
 		{C890976D-1E39-4F13-9D6E-AF587A62DE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C890976D-1E39-4F13-9D6E-AF587A62DE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C890976D-1E39-4F13-9D6E-AF587A62DE8A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C890976D-1E39-4F13-9D6E-AF587A62DE8A} = {EE02F401-599C-4774-A96A-118DB3A18059}
+		{A9727ADA-C188-4410-A81B-40D824E49CAD} = {EE02F401-599C-4774-A96A-118DB3A18059}
+		{526AC3DC-4214-467B-ADDF-2ED417DD31D2} = {EE02F401-599C-4774-A96A-118DB3A18059}
+		{B577DC38-3587-40FD-A2D2-782649535F89} = {EE02F401-599C-4774-A96A-118DB3A18059}
 	EndGlobalSection
 EndGlobal

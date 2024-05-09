@@ -13,6 +13,7 @@
         <PackageReference Include="Npgsql" Version="8.0.2"/>
         <PackageReference Include="System.Data.SqlClient" Version="4.8.6"/>
         <PackageReference Include="TagLibSharp" Version="2.3.0"/>
+        <PackageReference Include="Pilotiv.AuthorizationAPI.Jwt" Version="1.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
