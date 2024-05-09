@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
@@ -31,6 +32,7 @@ public class AlbumsController : ApiControllerBase
     /// <param name="id">Идентификатор музыкального альбома.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Информация о музыкальном альбома.</returns>
+    [Authorize]
     [HttpGet("{id}", Name = nameof(GetAlbumInfoAsync))]
     public async Task<ActionResult<AlbumInfo>> GetAlbumInfoAsync([FromRoute] Guid id,
         CancellationToken cancellationToken = default)
@@ -56,6 +58,7 @@ public class AlbumsController : ApiControllerBase
     /// <param name="releaseDate">Дата выпуска</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Добавленный музыкальный альбом</returns>
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult> AddAlbumAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
         CancellationToken cancellationToken = default)
@@ -81,6 +84,7 @@ public class AlbumsController : ApiControllerBase
     /// <param name="id">Идентификатор музыкального альбома.</param>
     /// <param name="request">Объект переноса данных команды изменения музыкального альбома.</param>
     /// <param name="cancellationToken">Токен отмены</param>
+    [Authorize]
     [HttpPost("{id}/modify")]
     public async Task<ActionResult> ModifyAlbumAsync([FromRoute] Guid id, [FromBody] ModifyingAlbum request,
         CancellationToken cancellationToken = default)

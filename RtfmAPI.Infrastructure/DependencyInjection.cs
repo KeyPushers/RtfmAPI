@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using RtfmAPI.Application.Interfaces.AudioHandlers;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
@@ -17,10 +18,11 @@ public static class DependencyInjection
     /// <summary>
     /// Добавление зависимостей слоя "Инфраструктура"
     /// </summary>
-    /// <param name="services">Коллекция сервисов</param>
     /// <returns>Коллекция сервисов</returns>
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IHostApplicationBuilder AddInfrastructure(this IHostApplicationBuilder builder)
     {
+        var services = builder.Services;
+        
         services.AddSingleton<DataContext>();
 
         services.AddScoped<IBandsCommandsRepository, BandsCommandsRepository>();
@@ -40,6 +42,6 @@ public static class DependencyInjection
 
         services.AddScoped<IAudioHandlerFactory, AudioHandlerFactory>();
 
-        return services;
+        return builder;
     }
 }
