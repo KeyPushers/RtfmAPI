@@ -13,7 +13,7 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories.Commands;
 /// <summary>
 /// Репозиторий команд доменной модели <see cref="TrackFile"/>.
 /// </summary>
-public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
+public class TrackFilesCommandsRepository : BaseCommandsRepository, ITrackFilesCommandsRepository
 {
     private readonly DataContext _context;
 
@@ -30,59 +30,34 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     public async Task CommitChangesAsync(TrackFile value, CancellationToken cancellationToken = default)
     {
         var connection = _context.CreateOpenedConnection();
-        var trx = connection.BeginTransaction();
+        var transaction = connection.BeginTransaction();
 
-        foreach (var domainEvent in value.DomainEvents)
+        await InvokeAsync<ITrackFileDomainEvent>(connection, transaction, value, TrackFileDomainEventsHandlerAsync,
+            cancellationToken);
+
+        transaction.Commit();
+    }
+
+    /// <summary>
+    /// Обработчик событий файла музыкального трека.
+    /// </summary>
+    /// <param name="connection">Соденинения.</param>
+    /// <param name="transaction">Транзакция.</param>
+    /// <param name="domainEvent">Доменное событие.</param>
+    private static Task TrackFileDomainEventsHandlerAsync(IDbConnection connection, IDbTransaction transaction,
+        ITrackFileDomainEvent domainEvent)
+    {
+        return domainEvent switch
         {
-            switch (domainEvent)
-            {
-                case TrackFileCreatedDomainEvent trackFileCreatedDomainEvent:
-                {
-                    await OnTrackFileCreatedDomainEventAsync(trackFileCreatedDomainEvent, connection, trx);
-                    break;
-                }
-                case TrackFileNameChangedDomainEvent trackFileNameChangedDomainEvent:
-                {
-                    await OnTrackFileNameChangedDomainEventAsync(trackFileNameChangedDomainEvent, connection, trx);
-                    break;
-                }
-                case TrackFileDataChangedDomainEvent trackFileDataChangedDomainEvent:
-                {
-                    await OnTrackFileDataChangedDomainEventAsync(trackFileDataChangedDomainEvent, connection, trx);
-                    break;
-                }
-                case TrackFileDurationChangedDomainEvent trackFileDurationChangedDomainEvent:
-                {
-                    await OnTrackFileDurationChangedDomainEventAsync(trackFileDurationChangedDomainEvent, connection,
-                        trx);
-                    break;
-                }
-                case TrackFileExtensionChangedDomainEvent trackFileExtensionChangedDomainEvent:
-                {
-                    await OnTrackFileExtensionChangedDomainEventAsync(trackFileExtensionChangedDomainEvent, connection,
-                        trx);
-                    break;
-                }
-                case TrackFileMimeTypeChangedDomainEvent trackFileMimeTypeChangedDomainEvent:
-                {
-                    await OnTrackFileMimeTypeChangedDomainEventAsync(trackFileMimeTypeChangedDomainEvent, connection,
-                        trx);
-                    break;
-                }
-                case TrackFileDeletedDomainEvent trackFileDeletedDomainEvent:
-                {
-                    await OnTrackFileDeletedDomainEventAsync(trackFileDeletedDomainEvent, connection, trx);
-                    break;
-                }
-                default:
-                {
-                    throw new ArgumentOutOfRangeException(nameof(domainEvent));
-                }
-            }
-        }
-
-        trx.Commit();
-        value.ClearDomainEvents();
+            TrackFileCreatedDomainEvent dEvent => OnTrackFileCreatedDomainEventAsync(dEvent, connection, transaction),
+            TrackFileDataChangedDomainEvent dEvent => OnTrackFileDataChangedDomainEventAsync(dEvent, connection, transaction),
+            TrackFileDeletedDomainEvent dEvent => OnTrackFileDeletedDomainEventAsync(dEvent, connection, transaction),
+            TrackFileDurationChangedDomainEvent dEvent => OnTrackFileDurationChangedDomainEventAsync(dEvent, connection, transaction),
+            TrackFileExtensionChangedDomainEvent dEvent => OnTrackFileExtensionChangedDomainEventAsync(dEvent, connection, transaction),
+            TrackFileMimeTypeChangedDomainEvent dEvent => OnTrackFileMimeTypeChangedDomainEventAsync(dEvent, connection, transaction),
+            TrackFileNameChangedDomainEvent dEvent => OnTrackFileNameChangedDomainEventAsync(dEvent, connection, transaction),
+            _ => throw new ArgumentOutOfRangeException(nameof(domainEvent))
+        };
     }
 
     /// <summary>
@@ -90,12 +65,12 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileCreatedDomainEventAsync(TrackFileCreatedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileCreatedDomainEventAsync(TrackFileCreatedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        const string sql = @"INSERT INTO TrackFiles (Id) VALUES (@Id)";
-        return connection.ExecuteAsync(sql, new {Id = domainEvent.TrackFileId.Value}, trx);
+        const string sql = @"INSERT INTO trackfiles (id) VALUES (@Id)";
+        return connection.ExecuteAsync(sql, new {Id = domainEvent.TrackFileId.Value}, transaction);
     }
 
     /// <summary>
@@ -103,13 +78,13 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileNameChangedDomainEventAsync(TrackFileNameChangedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileNameChangedDomainEventAsync(TrackFileNameChangedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        const string sql = @"UPDATE TrackFiles SET Name = @Name WHERE Id = @Id";
+        const string sql = @"UPDATE trackfiles SET name = @Name WHERE id = @Id";
         return connection.ExecuteAsync(sql,
-            new {Id = domainEvent.TrackFileId.Value, Name = domainEvent.TrackFileName.Value}, trx);
+            new {Id = domainEvent.TrackFileId.Value, Name = domainEvent.TrackFileName.Value}, transaction);
     }
 
     /// <summary>
@@ -117,13 +92,13 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileDataChangedDomainEventAsync(TrackFileDataChangedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileDataChangedDomainEventAsync(TrackFileDataChangedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        const string sql = @"UPDATE TrackFiles SET Data = @Data WHERE Id = @Id";
+        const string sql = @"UPDATE trackfiles SET data = @Data WHERE id = @Id";
         return connection.ExecuteAsync(sql,
-            new {Id = domainEvent.TrackFileId.Value, Data = domainEvent.TrackFileData.Value}, trx);
+            new {Id = domainEvent.TrackFileId.Value, Data = domainEvent.TrackFileData.Value}, transaction);
     }
 
     /// <summary>
@@ -131,13 +106,13 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileDurationChangedDomainEventAsync(TrackFileDurationChangedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileDurationChangedDomainEventAsync(TrackFileDurationChangedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        const string sql = @"UPDATE TrackFiles SET Duration = @Duration WHERE Id = @Id";
+        const string sql = @"UPDATE trackfiles SET duration = @Duration WHERE id = @Id";
         return connection.ExecuteAsync(sql,
-            new {Id = domainEvent.TrackFileId.Value, Duration = domainEvent.TrackFileDuration.Value}, trx);
+            new {Id = domainEvent.TrackFileId.Value, Duration = domainEvent.TrackFileDuration.Value}, transaction);
     }
 
     /// <summary>
@@ -145,13 +120,13 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileExtensionChangedDomainEventAsync(TrackFileExtensionChangedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileExtensionChangedDomainEventAsync(TrackFileExtensionChangedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        const string sql = @"UPDATE TrackFiles SET Extension = @Extension WHERE Id = @Id";
+        const string sql = @"UPDATE trackfiles SET extension = @Extension WHERE id = @Id";
         return connection.ExecuteAsync(sql,
-            new {Id = domainEvent.TrackFileId.Value, Extension = domainEvent.TrackFileExtension.Value}, trx);
+            new {Id = domainEvent.TrackFileId.Value, Extension = domainEvent.TrackFileExtension.Value}, transaction);
     }
 
     /// <summary>
@@ -159,13 +134,13 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileMimeTypeChangedDomainEventAsync(TrackFileMimeTypeChangedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileMimeTypeChangedDomainEventAsync(TrackFileMimeTypeChangedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        const string sql = @"UPDATE TrackFiles SET MimeType = @MimeType WHERE Id = @Id";
+        const string sql = @"UPDATE trackfiles SET mime_type = @MimeType WHERE id = @Id";
         return connection.ExecuteAsync(sql,
-            new {Id = domainEvent.TrackFileId.Value, MimeType = domainEvent.TrackFileMimeType.Value}, trx);
+            new {Id = domainEvent.TrackFileId.Value, MimeType = domainEvent.TrackFileMimeType.Value}, transaction);
     }
 
     /// <summary>
@@ -173,9 +148,9 @@ public class TrackFilesCommandsRepository : ITrackFilesCommandsRepository
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileDeletedDomainEventAsync(TrackFileDeletedDomainEvent domainEvent,
-        IDbConnection connection, IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnTrackFileDeletedDomainEventAsync(TrackFileDeletedDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
         throw new NotImplementedException();
     }

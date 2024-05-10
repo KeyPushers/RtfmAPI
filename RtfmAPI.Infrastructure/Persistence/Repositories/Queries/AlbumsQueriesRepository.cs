@@ -5,12 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using FluentResults;
+using RtfmAPI.Application.Fabrics.Albums;
+using RtfmAPI.Application.Fabrics.Albums.Dao;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.Albums;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
-using RtfmAPI.Infrastructure.Daos;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
@@ -35,79 +36,108 @@ public class AlbumsQueriesRepository : IAlbumsQueriesRepository
     public async Task<Result<Album>> GetAlbumByIdAsync(AlbumId albumId)
     {
         var connection = _dataContext.CreateOpenedConnection();
-        var albumDao = await GetAlbumDaoAsync(albumId.Value, connection);
+
+        const string sql = @"SELECT a.*, at.album_id FROM albums a 
+            LEFT JOIN albums_tracks at on a.id = at.album_id 
+            WHERE a.id = @Id";
+        var albumDao = await QuerySingleOrDefaultAsync(connection, sql, new {Id = albumId.Value});
         if (albumDao is null)
         {
-            return new InvalidOperationException();
+            throw new NotImplementedException();
         }
 
-        var albumsFabric = new AlbumsFabric(albumDao.Name, albumDao.ReleaseDate, albumDao.TrackIds);
-        return albumsFabric.Restore(albumDao.Id);
+        return RestoreAlbumFromDao(albumDao);
     }
 
     /// <inheritdoc />
-    public Task<bool> IsAlbumExistsAsync(AlbumId albumId)
+    public async Task<Result<bool>> IsAlbumExistsAsync(AlbumId albumId)
     {
         var connection = _dataContext.CreateOpenedConnection();
         const string sql = @"SELECT EXISTS(SELECT 1 FROM Albums WHERE Id=@AlbumId)";
 
-        return connection.ExecuteScalarAsync<bool>(sql, new {AlbumId = albumId.Value});
+        return await connection.ExecuteScalarAsync<bool>(sql, new {AlbumId = albumId.Value});
     }
 
     /// <inheritdoc />
     public async Task<Result<List<Album>>> GetAlbumsByTrackIdAsync(TrackId trackId, CancellationToken cancellationToken)
     {
         var connection = _dataContext.CreateOpenedConnection();
-        const string sqlAlbumIds = @"SELECT AlbumId FROM AlbumTracks WHERE TrackId = @TrackId";
-        var albumIds = await connection.QueryAsync<Guid>(sqlAlbumIds, new {TrackId = trackId.Value});
+
+        const string sql = @"SELECT a.*, at.album_id FROM albums a 
+            LEFT JOIN albums_tracks at on a.id = at.album_id 
+            WHERE at.track_id = @Id";
+        var albumDaos = await QueryAsync(connection, sql, new {Id = trackId.Value});
 
         List<Album> albums = new();
-        foreach (var albumId in albumIds)
+        foreach (var albumDao in albumDaos)
         {
-            if (cancellationToken.IsCancellationRequested)
+            var restoreAlbumResult = RestoreAlbumFromDao(albumDao);
+            if (restoreAlbumResult.IsFailed)
             {
-                return new OperationCanceledException(cancellationToken);
+                return restoreAlbumResult.ToResult();
             }
 
-            var albumDao = await GetAlbumDaoAsync(albumId, connection);
-            if (albumDao is null)
-            {
-                return new InvalidOperationException();
-            }
-            
-            var albumsFabric = new AlbumsFabric(albumDao.Name, albumDao.ReleaseDate, albumDao.TrackIds);
-            var getAlbumResult = albumsFabric.Restore(albumDao.Id);
-            if (getAlbumResult.IsFailed)
-            {
-                return getAlbumResult.Error;
-            }
-
-            albums.Add(getAlbumResult.Value);
+            albums.Add(restoreAlbumResult.ValueOrDefault);
         }
 
         return albums;
     }
 
     /// <summary>
-    /// Получение объекта доступа данных музыкального альбома.
+    /// Запрос.
     /// </summary>
-    /// <param name="albumId">Идентификатор музыкального альбома.</param>
     /// <param name="connection">Соединение.</param>
+    /// <param name="sql">Описание запроса.</param>
+    /// <param name="param">Параметр фильтрации.</param>
     /// <returns>Объект доступа данных музыкального альбома.</returns>
-    private static async Task<AlbumDao?> GetAlbumDaoAsync(Guid albumId, IDbConnection connection)
+    private static async Task<List<AlbumDao>> QueryAsync(IDbConnection connection, string sql,
+        object? param = null)
     {
-        const string sql = @"SELECT * FROM Albums WHERE Id = @AlbumId";
-        var albumDao = await connection.QuerySingleOrDefaultAsync<AlbumDao>(sql, new {AlbumId = albumId});
-        if (albumDao is null)
-        {
-            return null;
-        }
+        var queryResult = await connection.QueryAsync<AlbumDao, Guid?, AlbumDao>(sql,
+            (album, trackId) =>
+            {
+                if (trackId is not null)
+                {
+                    album.TrackIds.Add(trackId.Value);
+                }
 
-        const string sqlTrackIds = @"SELECT at.TrackId FROM AlbumTracks at WHERE at.AlbumId = @AlbumId";
-        var trackIds = await connection.QueryAsync<Guid>(sqlTrackIds, new {AlbumId = albumId});
+                return album;
+            }, param);
 
-        albumDao.TrackIds = trackIds.ToList();
+        return queryResult
+            .GroupBy(entity => entity.Id)
+            .Select(entity =>
+            {
+                var album = entity.First();
+                album.TrackIds = entity
+                    .Where(item => item.TrackIds.Any())
+                    .Select(item => item.TrackIds.Single())
+                    .ToList();
+                return album;
+            }).ToList();
+    }
 
-        return albumDao;
+    /// <summary>
+    /// Запрос.
+    /// </summary>
+    /// <param name="connection">Соединение.</param>
+    /// <param name="sql">Описание запроса.</param>
+    /// <param name="param">Параметр фильтрации.</param>
+    /// <returns>Объект доступа данных музыкального альбома.</returns>
+    private static async Task<AlbumDao?> QuerySingleOrDefaultAsync(IDbConnection connection, string sql,
+        object? param = null)
+    {
+        var items = await QueryAsync(connection, sql, param);
+        return items.SingleOrDefault();
+    }
+
+    /// <summary>
+    /// Восстановление музыкального альбома из объекта доступа данных.
+    /// </summary>
+    /// <param name="albumDao">Объект доступа данных музыкального альбома.</param>
+    /// <returns>Музыкальный альбом.</returns>
+    private static Result<Album> RestoreAlbumFromDao(AlbumDao albumDao)
+    {
+        return new AlbumsFactory(albumDao).Restore();
     }
 }

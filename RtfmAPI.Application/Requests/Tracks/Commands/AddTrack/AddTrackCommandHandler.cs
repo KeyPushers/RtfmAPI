@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
+using RtfmAPI.Application.Fabrics.TrackFiles;
+using RtfmAPI.Application.Fabrics.Tracks;
 using RtfmAPI.Application.Interfaces.AudioHandlers;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
 using RtfmAPI.Domain.Models.TrackFiles;
-using RtfmAPI.Domain.Models.Tracks;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack;
 
@@ -45,27 +45,31 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Ad
     {
         if (request.TrackFile is null)
         {
-            return new InvalidOperationException();
+            throw new NotImplementedException();
         }
 
         var createTrackFileResult = CreateTrackFile(request.TrackFile);
         if (createTrackFileResult.IsFailed)
         {
-            return createTrackFileResult.Error;
+            return createTrackFileResult.ToResult();
         }
 
-        var trackFile = createTrackFileResult.Value;
+        var trackFile = createTrackFileResult.ValueOrDefault;
 
-        var tracksFabric = new TracksFabric(request.Name ?? string.Empty, request.ReleaseDate, trackFile.Id.Value,
-            Enumerable.Empty<Guid>());
+        var tracksFactory = new TracksFactory(new()
+        {
+            Name = request.Name,
+            ReleaseDate = request.ReleaseDate,
+            TrackFileId = trackFile.Id.Value,
+        });
 
-        var createTrackResult = tracksFabric.Create();
+        var createTrackResult = tracksFactory.Create();
         if (createTrackResult.IsFailed)
         {
-            return createTrackResult.Error;
+            return createTrackResult.ToResult();
         }
 
-        var track = createTrackResult.Value;
+        var track = createTrackResult.ValueOrDefault;
 
         await _trackFilesCommandsRepository.CommitChangesAsync(trackFile, cancellationToken);
         await _tracksCommandsRepository.CommitChangesAsync(track, cancellationToken);
@@ -89,12 +93,18 @@ public class AddTrackCommandHandler : IRequestHandler<AddTrackCommand, Result<Ad
         var audioHandler = _audioHandlerFactory.Create(trackFile.File, trackFile.MimeType ?? string.Empty);
         if (audioHandler is null)
         {
-            return new InvalidOperationException();
+            throw new NotImplementedException();
         }
 
-        var trackFilesFabric = new TrackFilesFabric(trackFile.FileName ?? string.Empty, trackFile.File.ToArray(),
-            trackFile.Extension ?? string.Empty, trackFile.MimeType ?? string.Empty, audioHandler.GetDuration());
+        var trackFilesFactory = new TrackFilesFactory(new()
+        {
+            Name = trackFile.FileName,
+            Data = trackFile.File.ToArray(),
+            Extension = trackFile.Extension,
+            MimeType = trackFile.MimeType,
+            Duration = audioHandler.GetDuration()
+        });
 
-        return trackFilesFabric.Create();
+        return trackFilesFactory.Create();
     }
 }

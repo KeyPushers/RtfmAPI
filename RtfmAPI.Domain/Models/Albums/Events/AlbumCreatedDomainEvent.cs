@@ -1,9 +1,7 @@
-﻿using RtfmAPI.Domain.Primitives;
-
-namespace RtfmAPI.Domain.Models.Albums.Events;
+﻿namespace RtfmAPI.Domain.Models.Albums.Events;
 
 /// <summary>
 /// Событие удаления музыкального альбома.
 /// </summary>
 /// <param name="Album">Созданный музыкальный альбом.</param>
-public record AlbumCreatedDomainEvent(Album Album) : IDomainEvent;
+public record AlbumCreatedDomainEvent(Album Album) : IAlbumDomainEvent;

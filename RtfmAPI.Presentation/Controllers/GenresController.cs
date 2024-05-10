@@ -40,10 +40,9 @@ public class GenresController : ApiControllerBase
         var commandResult = await Mediator.Send(genreCommand, cancellationToken);
         if (commandResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Errors);
         }
 
-        // TODO: Изменить возвращаемый тип по завершению метода по получению музыкального жанра.
-        return Ok(commandResult.Value);
+        return Ok(commandResult.ValueOrDefault);
     }
 }

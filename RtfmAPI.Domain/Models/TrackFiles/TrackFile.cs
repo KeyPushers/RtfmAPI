@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentResults;
 using RtfmAPI.Domain.Models.TrackFiles.Events;
 using RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RtfmAPI.Domain.Primitives;
@@ -76,7 +77,7 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
     /// <param name="duration">Продолжительность файла музыкального трека.</param>
     /// <returns>Файл музыкального трека.</returns>
-    internal static Result<TrackFile> Create(TrackFileName name, TrackFileData data,
+    public static Result<TrackFile> Create(TrackFileName name, TrackFileData data,
         TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileDuration duration)
     {
         var trackFile = new TrackFile(name, data, extension, mimeType, duration);
@@ -100,7 +101,7 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <param name="mimeType">MIME-тип файла музыкального трека.</param>
     /// <param name="duration">Продолжительность файла музыкального трека.</param>
     /// <returns>Файл музыкального трека.</returns>
-    internal static Result<TrackFile> Restore(TrackFileId id, TrackFileName name, TrackFileData data,
+    public static Result<TrackFile> Restore(TrackFileId id, TrackFileName name, TrackFileData data,
         TrackFileExtension extension, TrackFileMimeType mimeType, TrackFileDuration duration)
     {
         return new TrackFile(id, name, data, extension, mimeType, duration);
@@ -109,9 +110,9 @@ public sealed class TrackFile : AggregateRoot<TrackFileId, Guid>
     /// <summary>
     /// Удаление файла музыкального трека.
     /// </summary>
-    public BaseResult Delete()
+    public Result Delete()
     {
         AddDomainEvent(new TrackFileDeletedDomainEvent(Id));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 }

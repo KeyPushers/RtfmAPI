@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
+using FluentResults;
 using RtfmAPI.Domain.Models.TrackFiles;
 using RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Interfaces.Persistence.Queries;
 
@@ -21,12 +21,12 @@ public interface ITrackFilesQueriesRepository
     /// Получение признака существования файла музыкального трека.
     /// </summary>
     /// <param name="trackFileId">Идентифиактор файла музыкального трека.</param>
-    Task<bool> IsTrackFileExistsAsync(TrackFileId trackFileId);
+    Task<Result<bool>> IsTrackFileExistsAsync(TrackFileId trackFileId);
 
     /// <summary>
     /// получение продолжительности файла музыкального трека.
     /// </summary>
     /// <param name="trackFileId">Идентифиактор файла музыкального трека.</param>
     /// <returns>Продолжительность файла музыкального трека.</returns>
-    Task<double> GetTrackFileDurationAsync(TrackFileId trackFileId);
+    Task<Result<double>> GetTrackFileDurationAsync(TrackFileId trackFileId);
 }

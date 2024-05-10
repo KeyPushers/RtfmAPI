@@ -7,17 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.1.28"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0"/>
+        <PackageReference Include="Dapper" Version="2.1.28" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2"/>
-        <PackageReference Include="Npgsql" Version="8.0.2"/>
-        <PackageReference Include="System.Data.SqlClient" Version="4.8.6"/>
-        <PackageReference Include="TagLibSharp" Version="2.3.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+        <PackageReference Include="Npgsql" Version="8.0.2" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+        <PackageReference Include="TagLibSharp" Version="2.3.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\RtfmAPI.Application\RtfmAPI.Application.csproj"/>
+        <ProjectReference Include="..\RtfmAPI.Application\RtfmAPI.Application.csproj" />
     </ItemGroup>
 
 </Project>

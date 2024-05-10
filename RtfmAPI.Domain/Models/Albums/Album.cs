@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentResults;
 using RtfmAPI.Domain.Models.Albums.Events;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
@@ -61,7 +62,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
     /// <param name="trackIds">Идентификаторы музыкальных треков.</param>
     /// <returns>Музыкальный альбом.</returns>
-    internal static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate, IEnumerable<TrackId> trackIds)
+    public static Result<Album> Create(AlbumName name, AlbumReleaseDate releaseDate, IEnumerable<TrackId> trackIds)
     {
         var album = new Album(name, releaseDate, trackIds);
         album.AddDomainEvent(new AlbumCreatedDomainEvent(album));
@@ -80,7 +81,7 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
     /// <param name="trackIds">Идентификаторы музыкальных треков.</param>
     /// <returns>Музыкальный альбом.</returns>
-    internal static Result<Album> Restore(AlbumId id, AlbumName name, AlbumReleaseDate releaseDate, IEnumerable<TrackId> trackIds)
+    public static Result<Album> Restore(AlbumId id, AlbumName name, AlbumReleaseDate releaseDate, IEnumerable<TrackId> trackIds)
     {
         return new Album(id, name, releaseDate, trackIds);
     }
@@ -89,43 +90,43 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
     /// Изменение названия музыкального альбома.
     /// </summary>
     /// <param name="name">Название альбома.</param>
-    public BaseResult SetName(AlbumName name)
+    public Result SetName(AlbumName name)
     {
         if (Name == name)
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         Name = name;
         AddDomainEvent(new AlbumNameChangedDomainEvent(this, name));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Изменение даты выпуска музыкального альбома.
     /// </summary>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
-    public BaseResult SetReleaseDate(AlbumReleaseDate releaseDate)
+    public Result SetReleaseDate(AlbumReleaseDate releaseDate)
     {
         if (ReleaseDate == releaseDate)
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         ReleaseDate = releaseDate;
         AddDomainEvent(new AlbumReleaseDateChangedDomainEvent(this, releaseDate));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Добавление музыкальных треков.
     /// </summary>
     /// <param name="trackIds">Идентификаторы добавляемых музыкальных треков.</param>
-    public BaseResult AddTracks(IReadOnlyCollection<TrackId> trackIds)
+    public Result AddTracks(IReadOnlyCollection<TrackId> trackIds)
     {
         if (!trackIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<TrackId> addedTrackIds = new();
@@ -141,18 +142,18 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
         }
 
         AddDomainEvent(new TracksAddedToAlbumDomainEvent(Id, addedTrackIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкальных треков.
     /// </summary>
     /// <param name="trackIds">Идентификаторы удаляемых музыкальных треков.</param>
-    public BaseResult RemoveTracks(IReadOnlyCollection<TrackId> trackIds)
+    public Result RemoveTracks(IReadOnlyCollection<TrackId> trackIds)
     {
         if (!trackIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<TrackId> removedTrackIds = new();
@@ -168,15 +169,15 @@ public sealed class Album : AggregateRoot<AlbumId, Guid>
         }
 
         AddDomainEvent(new TracksRemovedFromAlbumDomainEvent(Id, removedTrackIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкального альбома.
     /// </summary>
-    public BaseResult Delete()
+    public Result Delete()
     {
         AddDomainEvent(new AlbumDeletedDomainEvent(this));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 }

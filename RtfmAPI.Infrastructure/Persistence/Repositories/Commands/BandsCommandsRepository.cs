@@ -14,7 +14,7 @@ namespace RtfmAPI.Infrastructure.Persistence.Repositories.Commands;
 /// <summary>
 /// Репозиторий команд доменной модели <see cref="Band"/>.
 /// </summary>
-public class BandsCommandsRepository : IBandsCommandsRepository
+public class BandsCommandsRepository : BaseCommandsRepository, IBandsCommandsRepository
 {
     private readonly DataContext _dataContext;
 
@@ -31,154 +31,145 @@ public class BandsCommandsRepository : IBandsCommandsRepository
     public async Task CommitChangesAsync(Band value, CancellationToken cancellationToken)
     {
         using var connection = _dataContext.CreateOpenedConnection();
-        var trx = connection.BeginTransaction();
+        var transaction = connection.BeginTransaction();
 
-        foreach (var domainEvent in value.DomainEvents)
+        await InvokeAsync<IBandDomainEvent>(connection, transaction, value, BandDomainEventsHandlerAsync,
+            cancellationToken);
+
+        transaction.Commit();
+    }
+
+    /// <summary>
+    /// Обработчик событий музыкальной группы.
+    /// </summary>
+    /// <param name="connection">Соденинения.</param>
+    /// <param name="transaction">Транзакция.</param>
+    /// <param name="domainEvent">Доменное событие.</param>
+    private static Task BandDomainEventsHandlerAsync(IDbConnection connection, IDbTransaction transaction,
+        IBandDomainEvent domainEvent)
+    {
+        return domainEvent switch
         {
-            switch (domainEvent)
-            {
-                case BandCreatedDomainEvent bandCreatedDomainEvent:
-                {
-                    await CreateBandAsync(bandCreatedDomainEvent, connection, trx);
-                    break;
-                }
-                case BandNameChangedDomainEvent bandNameChangedDomainEvent:
-                {
-                    await ChangeBandNameAsync(bandNameChangedDomainEvent, connection, trx);
-                    break;
-                }
-                case AlbumsAddedToBandDomainEvent albumsAddedToBandDomainEvent:
-                {
-                    await AddAlbumsToBandAsync(albumsAddedToBandDomainEvent, connection, trx);
-                    break;
-                }
-                case AlbumsRemovedFromBandDomainEvent albumsRemovedFromBandDomainEvent:
-                {
-                    await RemoveAlbumsFromBandAsync(albumsRemovedFromBandDomainEvent, connection, trx);
-                    break;
-                }
-                case GenresAddedToBandDomainEvent genresAddedToBandDomainEvent:
-                {
-                    await AddGenresToBandAsync(genresAddedToBandDomainEvent, connection, trx);
-                    break;
-                }
-                case GenresRemovedFromBandDomainEvent genresRemovedFromBandDomainEvent:
-                {
-                    await RemoveGenresFromBandAsync(genresRemovedFromBandDomainEvent, connection, trx);
-                    break;
-                }
-                case BandDeletedDomainEvent bandDeletedDomainEvent:
-                {
-                    throw new NotImplementedException();
-                }
-                default:
-                {
-                    throw new ArgumentOutOfRangeException(nameof(domainEvent));
-                }
-            }
-        }
-
-        trx.Commit();
-        value.ClearDomainEvents();
+            AlbumsAddedToBandDomainEvent dEvent => OnAlbumsAddedToBandDomainEventAsync(dEvent, connection, transaction),
+            AlbumsRemovedFromBandDomainEvent dEvent => OnAlbumsRemovedFromBandDomainEventAsync(dEvent, connection, transaction),
+            BandCreatedDomainEvent dEvent => OnBandCreatedDomainEventAsync(dEvent, connection, transaction),
+            BandDeletedDomainEvent dEvent => OnBandDeletedDomainEventAsync(dEvent, connection, transaction),
+            BandNameChangedDomainEvent dEvent => OnBandNameChangedDomainEventAsync(dEvent, connection, transaction),
+            GenresAddedToBandDomainEvent dEvent => OnGenresAddedToBandDomainEventAsync(dEvent, connection, transaction),
+            GenresRemovedFromBandDomainEvent dEvent => OnGenresRemovedFromBandDomainEventAsync(dEvent, connection, transaction),
+            _ => throw new ArgumentOutOfRangeException(nameof(domainEvent))
+        };
     }
 
     /// <summary>
     /// Добавление музыкальной группы.
     /// </summary>
-    /// <param name="domainEvent">Событие.</param>
+    /// <param name="dEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
-    /// <param name="trx">Транзакция.</param>
-    private static Task CreateBandAsync(BandCreatedDomainEvent domainEvent, IDbConnection connection,
-        IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnBandCreatedDomainEventAsync(BandCreatedDomainEvent dEvent, IDbConnection connection,
+        IDbTransaction transaction)
     {
-        var band = domainEvent.Band;
+        var band = dEvent.Band;
 
-        const string sql = @"INSERT INTO Bands (Id) VALUES(@Id)";
-        return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = string.Empty}, trx);
+        const string sql = @"INSERT INTO bands (id) VALUES(@Id)";
+        return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = string.Empty}, transaction);
     }
 
     /// <summary>
     /// Изменение названия музыкальной группы.
     /// </summary>
-    /// <param name="domainEvent">Событие.</param>
+    /// <param name="dEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task ChangeBandNameAsync(BandNameChangedDomainEvent domainEvent, IDbConnection connection,
-        IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnBandNameChangedDomainEventAsync(BandNameChangedDomainEvent dEvent, IDbConnection connection,
+        IDbTransaction transaction)
     {
-        var band = domainEvent.Band;
+        var band = dEvent.Band;
 
-        const string sql = @"UPDATE Bands SET Name = @Name WHERE Id = @Id";
-        return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = band.Name.Value}, trx);
+        const string sql = @"UPDATE bands SET name = @Name WHERE id = @Id";
+        return connection.ExecuteAsync(sql, new {Id = band.Id.Value, Name = band.Name.Value}, transaction);
     }
 
     /// <summary>
     /// Добавление музыкальных альбомов в музыкальную группу.
     /// </summary>
-    /// <param name="domainEvent">Событие.</param>
+    /// <param name="dEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
-    /// <param name="trx">Транзакция.</param>
-    private async Task AddAlbumsToBandAsync(AlbumsAddedToBandDomainEvent domainEvent, IDbConnection connection,
-        IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static async Task OnAlbumsAddedToBandDomainEventAsync(AlbumsAddedToBandDomainEvent dEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        var bandId = domainEvent.Band.Id;
-        var albumIds = domainEvent.AddedAlbumIds;
+        var bandId = dEvent.Band.Id;
+        var albumIds = dEvent.AddedAlbumIds;
 
         foreach (var albumId in albumIds)
         {
-            const string sql = @"INSERT INTO BandAlbums (BandId, AlbumId) VALUES(@BandId, @AlbumId)";
-            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumId = albumId.Value}, trx);
+            const string sql = @"INSERT INTO bands_albums (band_id, album_id) VALUES(@BandId, @AlbumId)";
+            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumId = albumId.Value}, transaction);
         }
+    }
+
+    /// <summary>
+    /// Обработка события удаления музыкальной группы
+    /// </summary>
+    /// <param name="dEvent">Событие.</param>
+    /// <param name="connection">Соединения.</param>
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnBandDeletedDomainEventAsync(BandDeletedDomainEvent dEvent, IDbConnection connection,
+        IDbTransaction transaction)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
     /// Удаление музыкальных альбомов из музыкальной группы.
     /// </summary>
-    /// <param name="domainEvent">Событие.</param>
+    /// <param name="dEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task RemoveAlbumsFromBandAsync(AlbumsRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
-        IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnAlbumsRemovedFromBandDomainEventAsync(AlbumsRemovedFromBandDomainEvent dEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        var bandId = domainEvent.Band.Id;
-        var albumIds = domainEvent.RemovedAlbumIds.Select(entity => entity.Value).ToArray();
+        var bandId = dEvent.Band.Id;
+        var albumIds = dEvent.RemovedAlbumIds.Select(entity => entity.Value).ToArray();
 
-        const string sql = @"DELETE FROM BandAlbums WHERE BandId = @BandId AND AlbumId = ANY(@AlbumIds);";
-        return connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumIds = albumIds}, trx);
+        const string sql = @"DELETE FROM bands_albums WHERE band_id = @BandId AND album_id = ANY(@AlbumIds);";
+        return connection.ExecuteAsync(sql, new {BandId = bandId.Value, AlbumIds = albumIds}, transaction);
     }
 
     /// <summary>
     /// Добавление музыкальных жанров в музыкальную группу.
     /// </summary>
-    /// <param name="domainEvent">Событие.</param>
+    /// <param name="dEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
-    /// <param name="trx">Транзакция.</param>
-    private async Task AddGenresToBandAsync(GenresAddedToBandDomainEvent domainEvent, IDbConnection connection,
-        IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static async Task OnGenresAddedToBandDomainEventAsync(GenresAddedToBandDomainEvent dEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        var bandId = domainEvent.Band.Id;
-        var genreIds = domainEvent.AddedGenreIds;
+        var bandId = dEvent.Band.Id;
+        var genreIds = dEvent.AddedGenreIds;
 
         foreach (var genreId in genreIds)
         {
-            const string sql = @"INSERT INTO BandGenres (BandId, GenreId) VALUES(@BandId, @GenreId)";
-            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreId = genreId.Value}, trx);
+            const string sql = @"INSERT INTO bands_genres (band_id, genre_id) VALUES(@BandId, @GenreId)";
+            await connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreId = genreId.Value}, transaction);
         }
     }
 
     /// <summary>
     /// Удаление музыкальных жанров из музыкальной группы.
     /// </summary>
-    /// <param name="domainEvent">Событие.</param>
+    /// <param name="dEvent">Событие.</param>
     /// <param name="connection">Соединения.</param>
-    /// <param name="trx">Транзакция.</param>
-    private Task RemoveGenresFromBandAsync(GenresRemovedFromBandDomainEvent domainEvent, IDbConnection connection,
-        IDbTransaction trx)
+    /// <param name="transaction">Транзакция.</param>
+    private static Task OnGenresRemovedFromBandDomainEventAsync(GenresRemovedFromBandDomainEvent dEvent,
+        IDbConnection connection, IDbTransaction transaction)
     {
-        var bandId = domainEvent.Band.Id;
-        var genreIds = domainEvent.RemovedGenreIds.Select(entity => entity.Value).ToList();
+        var bandId = dEvent.Band.Id;
+        var genreIds = dEvent.RemovedGenreIds.Select(entity => entity.Value).ToList();
 
-        const string sql = @"DELETE FROM BandGenres WHERE BandId = @BandId AND GenreId = ANY(@GenreIds)";
-        return connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreIds = genreIds}, trx);
+        const string sql = @"DELETE FROM bands_genres WHERE band_id = @BandId AND genre_id = ANY(@GenreIds)";
+        return connection.ExecuteAsync(sql, new {BandId = bandId.Value, GenreIds = genreIds}, transaction);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentResults;
 using RtfmAPI.Domain.Models.Genres.Events;
 using RtfmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Domain.Primitives;
@@ -39,7 +40,7 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// <param name="id">Идентификатор.</param>
     /// <param name="name">Название музыкального жанра.</param>
     /// <returns>Музыкальный жанр.</returns>
-    internal static Genre Restore(GenreId id, GenreName name)
+    public static Genre Restore(GenreId id, GenreName name)
     {
         return new Genre(id, name);
     }
@@ -49,7 +50,7 @@ public sealed class Genre : AggregateRoot<GenreId, Guid>
     /// </summary>
     /// <param name="name">Название музыкального жанра.</param>
     /// <returns>Музыкальный жанр.</returns>
-    internal static Result<Genre> Create(GenreName name)
+    public static Result<Genre> Create(GenreName name)
     {
         var genre = new Genre(name);
         genre.AddDomainEvent(new GenreCreatedDomainEvent(genre));

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using RtfmAPI.Domain.Models.TrackFiles.Exceptions;
+using FluentResults;
+using RtfmAPI.Domain.Models.TrackFiles.Errors;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -32,7 +33,7 @@ public class TrackFileDuration : ValueObject
     {
         if (value < 0)
         {
-            return TrackFileExceptions.TrackFileDurationIsInvalid();
+            return TrackFileErrors.TrackFileDurationIsInvalid();
         }
 
         return new TrackFileDuration(value);

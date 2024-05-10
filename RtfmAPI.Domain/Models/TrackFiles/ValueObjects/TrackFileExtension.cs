@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using RtfmAPI.Domain.Models.TrackFiles.Exceptions;
+using FluentResults;
+using RtfmAPI.Domain.Models.TrackFiles.Errors;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -34,19 +35,19 @@ public sealed class TrackFileExtension : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return TrackFileExceptions.TrackFileExtensionIsNullOrEmpty();
+            return TrackFileErrors.TrackFileExtensionIsNullOrEmpty();
         }
 
         var trimmedValue = value.Trim();
 
         if (trimmedValue.Any(sign => Path.GetInvalidFileNameChars().Contains(sign)))
         {
-            return TrackFileExceptions.TrackFileExtensionIsInvalid();
+            return TrackFileErrors.TrackFileExtensionIsInvalid();
         }
 
         if (trimmedValue.EndsWith("."))
         {
-            return TrackFileExceptions.TrackFileExtensionIsInvalid();
+            return TrackFileErrors.TrackFileExtensionIsInvalid();
         }
 
         return new TrackFileExtension(value);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentResults;
 using RtfmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Domain.Models.TrackFiles;
 using RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
@@ -74,7 +75,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
     /// <returns>Музыкальный трек.</returns>
-    internal static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId,
+    public static Result<Track> Create(TrackName name, TrackReleaseDate releaseDate, TrackFileId? trackFileId,
         IEnumerable<GenreId> genreIds)
     {
         var track = new Track(name, releaseDate, trackFileId, genreIds);
@@ -101,7 +102,7 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
     /// <returns>Музыкальный трек.</returns>
-    internal static Result<Track> Restore(TrackId id, TrackName name, TrackReleaseDate releaseDate,
+    public static Result<Track> Restore(TrackId id, TrackName name, TrackReleaseDate releaseDate,
         TrackFileId? trackFileId,
         IEnumerable<GenreId> genreIds)
     {
@@ -113,60 +114,60 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
     /// Установление названия музыкального трека.
     /// </summary>
     /// <param name="name">Название музыкального трека.</param>
-    public BaseResult SetName(TrackName name)
+    public Result SetName(TrackName name)
     {
         if (Name == name)
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         Name = name;
         AddDomainEvent(new TrackNameChangedDomainEvent(Id, name));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Изменение даты выпуска музыкального трека.
     /// </summary>
     /// <param name="releaseDate">Дата выпуска музыкального трека.</param>
-    public BaseResult SetReleaseDate(TrackReleaseDate releaseDate)
+    public Result SetReleaseDate(TrackReleaseDate releaseDate)
     {
         if (ReleaseDate == releaseDate)
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         ReleaseDate = releaseDate;
         AddDomainEvent(new TrackReleaseDateChangedDomainEvent(Id, releaseDate));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Изменение файла музыкального трека.
     /// </summary>
     /// <param name="file">Файл музыкального трека.</param>
-    public BaseResult SetTrackFile(TrackFile file)
+    public Result SetTrackFile(TrackFile file)
     {
         if (TrackFileId is not null && file.Id == TrackFileId)
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         TrackFileId = file.Id;
 
         AddDomainEvent(new TrackFileChangedInTrackDomainEvent(Id, TrackFileId));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Добавление музыкальных жанров.
     /// </summary>
     /// <param name="genreIds">Идентификаторы добавляемых музыкальных жанров.</param>
-    public BaseResult AddGenres(IReadOnlyCollection<GenreId> genreIds)
+    public Result AddGenres(IReadOnlyCollection<GenreId> genreIds)
     {
         if (!genreIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<GenreId> addedGenreIds = new();
@@ -182,18 +183,18 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         }
 
         AddDomainEvent(new GenresAddedToTrackDomainEvent(Id, addedGenreIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкальных жанров.
     /// </summary>
     /// <param name="genreIds">Идентификаторы удаляемых музыкальных жанров.</param>
-    public BaseResult RemoveGenres(IReadOnlyCollection<GenreId> genreIds)
+    public Result RemoveGenres(IReadOnlyCollection<GenreId> genreIds)
     {
         if (!genreIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<GenreId> removedGenreIds = new();
@@ -209,15 +210,15 @@ public sealed class Track : AggregateRoot<TrackId, Guid>
         }
 
         AddDomainEvent(new GenresRemovedFromTrackDomainEvent(Id, removedGenreIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкального трека.
     /// </summary>
-    public BaseResult Delete()
+    public Result Delete()
     {
         AddDomainEvent(new TrackDeletedDomainEvent(Id));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 }

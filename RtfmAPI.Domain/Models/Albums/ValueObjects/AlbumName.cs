@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using RtfmAPI.Domain.Models.Albums.Exceptions;
+using FluentResults;
+using RtfmAPI.Domain.Models.Albums.Errors;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Albums.ValueObjects;
@@ -42,17 +43,17 @@ public sealed class AlbumName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return AlbumExceptions.AlbumNameIsNullOrEmpty();
+            return AlbumErrors.AlbumNameIsNullOrEmpty();
         }
 
         if (value.Length < MinLength)
         {
-            return AlbumExceptions.AlbumNameIsTooShort();
+            return AlbumErrors.AlbumNameIsTooShort();
         }
 
         if (value.Length > MaxLength)
         {
-            return AlbumExceptions.AlbumNameIsTooLong();
+            return AlbumErrors.AlbumNameIsTooLong();
         }
 
         return new AlbumName(value);

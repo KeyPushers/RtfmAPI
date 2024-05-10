@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentResults;
 using MediatR;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Tracks.Commands.ModifyTrack;
 
 /// <summary>
 /// Команда изменения музыкального трека.
 /// </summary>
-public class ModifyTrackCommand : IRequest<BaseResult>
+public class ModifyTrackCommand : IRequest<Result>
 {
     /// <summary>
     /// Идентификатор музыкального трека.

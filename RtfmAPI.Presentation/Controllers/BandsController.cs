@@ -44,7 +44,7 @@ public class BandsController : ApiControllerBase
         var commandResult = await Mediator.Send(new AddBandCommand(request.Name), cancellationToken);
         if (commandResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Errors);
         }
 
         return CreatedAtRoute(nameof(GetBandInfoAsync), new {commandResult.Value.Id}, commandResult.Value);
@@ -63,7 +63,7 @@ public class BandsController : ApiControllerBase
         var queryResult = await Mediator.Send(new GetBandInfoQuery(id), cancellationToken);
         if (queryResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Errors);
         }
 
         return Ok(queryResult.Value);
@@ -91,7 +91,7 @@ public class BandsController : ApiControllerBase
         var commandResult = await Mediator.Send(command, cancellationToken);
         if (commandResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Errors);
         }
 
         return Ok();

@@ -1,4 +1,5 @@
-﻿using RtfmAPI.Domain.Primitives;
+﻿using FluentResults;
+using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Fabrics;
 

@@ -1,5 +1,4 @@
 ﻿using RtfmAPI.Domain.Models.Bands.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Bands.Events;
 
@@ -8,4 +7,4 @@ namespace RtfmAPI.Domain.Models.Bands.Events;
 /// </summary>
 /// <param name="Band">Музыкальная группа.</param>
 /// <param name="Name">Новое название музыкальной группы.</param>
-public record BandNameChangedDomainEvent(Band Band, BandName Name) : IDomainEvent;
+public record BandNameChangedDomainEvent(Band Band, BandName Name) : IBandDomainEvent;

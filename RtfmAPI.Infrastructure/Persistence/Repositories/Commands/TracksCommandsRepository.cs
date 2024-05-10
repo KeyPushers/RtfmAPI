@@ -65,7 +65,8 @@ public class TracksCommandsRepository : ITracksCommandsRepository
                 }
                 case TrackFileChangedInTrackDomainEvent trackFileChangedInTrackDomainEvent:
                 {
-                    await OnTrackFileChangedInTrackDomainEventAsync(trackFileChangedInTrackDomainEvent, connection, trx);
+                    await OnTrackFileChangedInTrackDomainEventAsync(trackFileChangedInTrackDomainEvent, connection,
+                        trx);
                     break;
                 }
                 case TrackDeletedDomainEvent trackDeletedDomainEvent:
@@ -90,10 +91,10 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
     /// <param name="trx">Транзакция.</param>
-    private Task OnTrackCreatedDomainEventAsync(TrackCreatedDomainEvent domainEvent, IDbConnection connection,
+    private static Task OnTrackCreatedDomainEventAsync(TrackCreatedDomainEvent domainEvent, IDbConnection connection,
         IDbTransaction trx)
     {
-        const string sql = @"INSERT INTO Tracks(Id) VALUES(@Id)";
+        const string sql = @"INSERT INTO tracks(id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = domainEvent.TrackId.Value}, trx);
     }
 
@@ -103,10 +104,11 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
     /// <param name="trx">Транзакция.</param>
-    private Task OnTrackNameChangedDomainEventAsync(TrackNameChangedDomainEvent domainEvent, IDbConnection connection,
+    private static Task OnTrackNameChangedDomainEventAsync(TrackNameChangedDomainEvent domainEvent,
+        IDbConnection connection,
         IDbTransaction trx)
     {
-        const string sql = @"UPDATE Tracks SET Name = @Name WHERE Id = @Id";
+        const string sql = @"UPDATE tracks SET name = @Name WHERE id = @Id";
         return connection.ExecuteAsync(sql, new {Id = domainEvent.TrackId.Value, Name = domainEvent.Name.Value}, trx);
     }
 
@@ -116,10 +118,10 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
     /// <param name="trx">Транзакция.</param>
-    private Task OnTrackReleaseDateChangedDomainEventAsync(TrackReleaseDateChangedDomainEvent domainEvent,
+    private static Task OnTrackReleaseDateChangedDomainEventAsync(TrackReleaseDateChangedDomainEvent domainEvent,
         IDbConnection connection, IDbTransaction trx)
     {
-        const string sql = @"UPDATE Tracks SET ReleaseDate = @ReleaseDate WHERE Id = @Id";
+        const string sql = @"UPDATE tracks SET release_date = @ReleaseDate WHERE Id = @Id";
         return connection.ExecuteAsync(sql,
             new {Id = domainEvent.TrackId.Value, ReleaseDate = domainEvent.ReleaseDate.Value}, trx);
     }
@@ -130,7 +132,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
     /// <param name="trx">Транзакция.</param>
-    private async Task OnGenresAddedToTrackDomainEventAsync(GenresAddedToTrackDomainEvent domainEvent,
+    private static async Task OnGenresAddedToTrackDomainEventAsync(GenresAddedToTrackDomainEvent domainEvent,
         IDbConnection connection, IDbTransaction trx)
     {
         var trackId = domainEvent.TrackId;
@@ -138,7 +140,7 @@ public class TracksCommandsRepository : ITracksCommandsRepository
 
         foreach (var genreId in genreIds)
         {
-            const string sql = @"INSERT INTO TrackGenres(TrackId, GenreId) VALUES(@TrackId, @GenreId)";
+            const string sql = @"INSERT INTO tracks_genres(track_id, genre_id) VALUES(@TrackId, @GenreId)";
             await connection.ExecuteAsync(sql, new {TrackId = trackId.Value, GenreId = genreId.Value}, trx);
         }
     }
@@ -149,13 +151,13 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
     /// <param name="trx">Транзакция.</param>
-    private Task OnGenresRemovedFromTrackDomainEventAsync(GenresRemovedFromTrackDomainEvent domainEvent,
+    private static Task OnGenresRemovedFromTrackDomainEventAsync(GenresRemovedFromTrackDomainEvent domainEvent,
         IDbConnection connection, IDbTransaction trx)
     {
         var trackId = domainEvent.TrackId;
         var genreIds = domainEvent.RemovedGenreIds.Select(entity => entity.Value);
 
-        const string sql = @"DELETE FROM TrackGenres WHERE TrackId = @TrackId AND GenreId = ANY(@GenreIds)";
+        const string sql = @"DELETE FROM tracks_genres WHERE track_id = @TrackId AND genre_id = ANY(@GenreIds)";
         return connection.ExecuteAsync(sql, new {TrackId = trackId.Value, GenreIds = genreIds}, trx);
     }
 
@@ -165,10 +167,10 @@ public class TracksCommandsRepository : ITracksCommandsRepository
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
     /// <param name="trx">Транзакция.</param>
-    private Task OnTrackFileChangedInTrackDomainEventAsync(TrackFileChangedInTrackDomainEvent domainEvent,
+    private static Task OnTrackFileChangedInTrackDomainEventAsync(TrackFileChangedInTrackDomainEvent domainEvent,
         IDbConnection connection, IDbTransaction trx)
     {
-        const string sql = @"UPDATE Tracks SET TrackFileId = @TrackFileId WHERE Id = @Id";
+        const string sql = @"UPDATE tracks SET trackfile_id = @TrackFileId WHERE Id = @Id";
         return connection.ExecuteAsync(sql,
             new {Id = domainEvent.TrackId.Value, TrackFileId = domainEvent.TrackFileId.Value}, trx);
     }

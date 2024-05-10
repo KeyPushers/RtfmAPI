@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
+using FluentResults;
 using RtfmAPI.Domain.Models.Genres;
 using RtfmAPI.Domain.Models.Genres.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Interfaces.Persistence.Queries;
 
@@ -21,5 +21,5 @@ public interface IGenresQueriesRepository
     /// Получение признака существования музыкального жанра.
     /// </summary>
     /// <param name="genreId">Идентификатор музыкального жанра.</param>
-    Task<bool> IsGenreExistsAsync(GenreId genreId);
+    Task<Result<bool>> IsGenreExistsAsync(GenreId genreId);
 }

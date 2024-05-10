@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo.Dtos;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo;
 
@@ -36,7 +36,7 @@ public class GetAlbumInfoQueryHandler : IRequestHandler<GetAlbumInfoQuery, Resul
         var getAlbumResult = await _repository.GetAlbumByIdAsync(id);
         if (getAlbumResult.IsFailed)
         {
-            return getAlbumResult.Error;
+            return getAlbumResult.ToResult();
         }
 
         var album = getAlbumResult.Value;

@@ -1,5 +1,4 @@
 ﻿using RtfmAPI.Domain.Models.Genres.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Genres.Events;
 
@@ -8,4 +7,4 @@ namespace RtfmAPI.Domain.Models.Genres.Events;
 /// </summary>
 /// <param name="Genre">Музыкальный жанр.</param>
 /// <param name="Name">Новое название музыкальной группы.</param>
-public record GenreNameChangedDomainEvent(Genre Genre, GenreName Name) : IDomainEvent;
+public record GenreNameChangedDomainEvent(Genre Genre, GenreName Name) : IGenreDomainEvent;

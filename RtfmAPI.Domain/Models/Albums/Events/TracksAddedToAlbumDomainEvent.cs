@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Albums.Events;
 
@@ -10,4 +9,5 @@ namespace RtfmAPI.Domain.Models.Albums.Events;
 /// </summary>
 /// <param name="AlbumId">Идентификатор музыкального альбома.</param>
 /// <param name="AddedTrackIds">Идентификаторы добавленных музыкальных треков.</param>
-public record TracksAddedToAlbumDomainEvent(AlbumId AlbumId, IReadOnlyCollection<TrackId> AddedTrackIds) : IDomainEvent;
+public record TracksAddedToAlbumDomainEvent
+    (AlbumId AlbumId, IReadOnlyCollection<TrackId> AddedTrackIds) : IAlbumDomainEvent;

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrack.Dtos;
 using RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RtfmAPI.Domain.Models.Tracks;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrack;
 
@@ -53,7 +52,7 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
         var getTrackResult = await _tracksQueriesRepository.GetTrackByIdAsync(trackId);
         if (getTrackResult.IsFailed)
         {
-            return getTrackResult.Error;
+            return getTrackResult.ToResult();
         }
 
         var track = getTrackResult.Value;
@@ -64,18 +63,18 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
         var getAlbumsResult = await getAlbumsResultTask;
         if (getAlbumsResult.IsFailed)
         {
-            return getAlbumsResult.Error;
+            return getAlbumsResult.ToResult();
         }
 
-        var albums = getAlbumsResult.Value;
+        var albums = getAlbumsResult.ValueOrDefault;
 
         var getGenresResult = await getGenresResultTask;
         if (getGenresResult.IsFailed)
         {
-            return getGenresResult.Error;
+            return getGenresResult.ToResult();
         }
 
-        var genres = getGenresResult.Value;
+        var genres = getGenresResult.ValueOrDefault;
 
         var duration = 0.0;
         if (track.TrackFileId is not null)
@@ -83,10 +82,10 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
             var getDurationResult = await GetTrackFileDurationAsync(track.TrackFileId);
             if (getDurationResult.IsFailed)
             {
-                return getDurationResult.Error;
+                return getDurationResult.ToResult();
             }
 
-            duration = getDurationResult.Value;
+            duration = getDurationResult.ValueOrDefault;
         }
 
         return new TrackInfo
@@ -112,18 +111,15 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
         var getAlbumsResult = await _albumsQueriesRepository.GetAlbumsByTrackIdAsync(track.Id, cancellationToken);
         if (getAlbumsResult.IsFailed)
         {
-            return getAlbumsResult.Error;
+            return getAlbumsResult.ToResult();
         }
 
-        var albums = getAlbumsResult.Value;
+        var albums = getAlbumsResult.ValueOrDefault;
 
         List<AlbumOfTrackInfo> result = new();
         foreach (var album in albums)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return new OperationCanceledException(cancellationToken);
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
             result.Add(new AlbumOfTrackInfo
             {
@@ -152,18 +148,15 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
         List<GenreOfTrackInfo> result = new();
         foreach (var genreId in track.GenreIds)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return new OperationCanceledException();
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
             var getGenreResult = await _genresQueriesRepository.GetGenreByIdAsync(genreId);
             if (getGenreResult.IsFailed)
             {
-                return getGenreResult.Error;
+                return getGenreResult.ToResult();
             }
 
-            var genre = getGenreResult.Value;
+            var genre = getGenreResult.ValueOrDefault;
 
             result.Add(new GenreOfTrackInfo
             {
@@ -179,8 +172,8 @@ public class GetTrackQueryHandler : IRequestHandler<GetTrackQuery, Result<TrackI
     /// Получение продолжительности файла музыкального трека.
     /// </summary>
     /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
-    private async Task<Result<double>> GetTrackFileDurationAsync(TrackFileId trackFileId)
+    private Task<Result<double>> GetTrackFileDurationAsync(TrackFileId trackFileId)
     {
-        return await _trackFilesQueriesRepository.GetTrackFileDurationAsync(trackFileId);
+        return _trackFilesQueriesRepository.GetTrackFileDurationAsync(trackFileId);
     }
 }

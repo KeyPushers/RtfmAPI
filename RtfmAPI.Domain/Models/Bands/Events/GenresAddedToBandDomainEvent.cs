@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using RtfmAPI.Domain.Models.Genres.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Bands.Events;
 
@@ -9,4 +8,4 @@ namespace RtfmAPI.Domain.Models.Bands.Events;
 /// </summary>
 /// <param name="Band">Музыкальная группа.</param>
 /// <param name="AddedGenreIds">Идентификаторы добавленных музыкальных жанров.</param>
-public record GenresAddedToBandDomainEvent(Band Band, IReadOnlyCollection<GenreId> AddedGenreIds) : IDomainEvent;
+public record GenresAddedToBandDomainEvent(Band Band, IReadOnlyCollection<GenreId> AddedGenreIds) : IBandDomainEvent;

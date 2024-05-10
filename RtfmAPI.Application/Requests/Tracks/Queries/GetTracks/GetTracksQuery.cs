@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using FluentResults;
+using MediatR;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTracks.Dtos;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTracks;
 

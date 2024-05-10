@@ -43,7 +43,7 @@ public class TracksController : ApiControllerBase
         var queryResult = await Mediator.Send(query, cancellationToken);
         if (queryResult.IsFailed)
         {
-            return BadRequest(queryResult.Error.Message);
+            return BadRequest(queryResult.Errors);
         }
 
         return Ok(queryResult.Value);
@@ -67,7 +67,7 @@ public class TracksController : ApiControllerBase
         var queryResult = await Mediator.Send(query, cancellationToken);
         if (queryResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Errors);
         }
 
         return new FileStreamResult(queryResult.Value.Stream, queryResult.Value.MediaType)
@@ -94,7 +94,7 @@ public class TracksController : ApiControllerBase
         var queryResult = await Mediator.Send(query, cancellationToken);
         if (queryResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, queryResult.Errors);
         }
 
         return Ok(queryResult.Value);
@@ -135,7 +135,7 @@ public class TracksController : ApiControllerBase
             var commandResult = await Mediator.Send(command, cancellationToken);
             if (commandResult.IsFailed)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+                return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Errors);
             }
 
             return CreatedAtRoute(nameof(GetTrackInfoAsync), new {commandResult.Value.Id}, commandResult.Value);
@@ -168,7 +168,7 @@ public class TracksController : ApiControllerBase
         var commandResult = await Mediator.Send(command, cancellationToken);
         if (commandResult.IsFailed)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Errors);
         }
 
         return Ok();

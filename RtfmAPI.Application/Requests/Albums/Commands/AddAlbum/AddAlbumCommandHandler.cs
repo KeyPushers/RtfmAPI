@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
+using RtfmAPI.Application.Fabrics.Albums;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum.Dtos;
-using RtfmAPI.Domain.Models.Albums;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 
@@ -34,14 +32,19 @@ public class AddAlbumCommandHandler : IRequestHandler<AddAlbumCommand, Result<Ad
     /// <returns>Музыкальный трек.</returns>
     public async Task<Result<AddedAlbum>> Handle(AddAlbumCommand request, CancellationToken cancellationToken = default)
     {
-        var albumsFabric = new AlbumsFabric(request.Name ?? string.Empty, request.ReleaseDate, Enumerable.Empty<Guid>());
-        var createAlbumResult = albumsFabric.Create();
+        var albumsFactory = new AlbumsFactory(new ()
+        {
+            Name = request.Name,
+            ReleaseDate = request.ReleaseDate
+        });
+        
+        var createAlbumResult = albumsFactory.Create();
         if (createAlbumResult.IsFailed)
         {
-            return createAlbumResult.Error;
+            return createAlbumResult.ToResult();
         }
 
-        var album = createAlbumResult.Value;
+        var album = createAlbumResult.ValueOrDefault;
 
         await _repository.CommitChangesAsync(album, cancellationToken);
         

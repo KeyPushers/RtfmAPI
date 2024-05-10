@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using RtfmAPI.Application.Properties;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.PipelineBehaviors;
 
@@ -45,11 +45,11 @@ public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
         {
             var response = await next();
 
-            var responseResult = response as BaseResult;
+            var responseResult = response as Result;
             if (responseResult?.IsFailed is true)
             {
                 var failureRequestMessage = string.Format(Resources.LoggingPipelineBehaviorCompletedRequestFailureError,
-                    typeof(TRequest).Name, responseResult.Error.Message, DateTime.UtcNow);
+                    typeof(TRequest).Name, string.Join(",", responseResult.Errors), DateTime.UtcNow);
                 _logger.LogError("{Message}", failureRequestMessage);
             }
 

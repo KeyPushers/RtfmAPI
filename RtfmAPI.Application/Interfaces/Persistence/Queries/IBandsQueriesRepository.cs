@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Bands;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Interfaces.Persistence.Queries;
 

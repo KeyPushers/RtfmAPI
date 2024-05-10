@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using RtfmAPI.Domain.Models.Tracks.Exceptions;
+using FluentResults;
+using RtfmAPI.Domain.Models.Tracks.Errors;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Tracks.ValueObjects;
@@ -33,7 +34,7 @@ public sealed class TrackReleaseDate : ValueObject
     {
         if (value == DateTime.MinValue)
         {
-            return TrackExceptions.InvalidTrackReleaseDate();
+            return TrackErrors.InvalidTrackReleaseDate();
         }
 
         var date = value.Kind is DateTimeKind.Unspecified

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using RtfmAPI.Domain.Models.Tracks;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Interfaces.Persistence.Queries;
 
@@ -23,7 +23,7 @@ public interface ITracksQueriesRepository
     /// Получение признака существования музыкального трека.
     /// </summary>
     /// <param name="trackId">Идентификатор музыкального трека.</param>
-    Task<bool> IsTrackExistsAsync(TrackId trackId);
+    Task<Result<bool>> IsTrackExistsAsync(TrackId trackId);
 
     /// <summary>
     /// Получение музыкальных треков.

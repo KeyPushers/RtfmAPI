@@ -1,5 +1,4 @@
 ﻿using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Tracks.Events;
 
@@ -7,4 +6,4 @@ namespace RtfmAPI.Domain.Models.Tracks.Events;
 /// Событие удаления музыкального трека.
 /// </summary>
 /// <param name="TrackId">Идентификатор музыкального трека.</param>
-public record TrackDeletedDomainEvent(TrackId TrackId) : IDomainEvent;
+public record TrackDeletedDomainEvent(TrackId TrackId) : ITrackDomainEvent;

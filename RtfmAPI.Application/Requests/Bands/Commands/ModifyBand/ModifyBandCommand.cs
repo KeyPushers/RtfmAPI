@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentResults;
 using MediatR;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Bands.Commands.ModifyBand;
 
 /// <summary>
 /// Команда изменения музыкальной группы.
 /// </summary>
-public class ModifyBandCommand : IRequest<BaseResult>
+public class ModifyBandCommand : IRequest<Result>
 {
     /// <summary>
     /// Идентификатор музыкальной группы.

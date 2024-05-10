@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.Albums;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum;
 
 /// <summary>
 /// Обработчик команды изменения музыкального альбома.
 /// </summary>
-public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, BaseResult>
+public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Result>
 {
     private readonly IAlbumsCommandsRepository _albumsCommandsRepository;
     private readonly IAlbumsQueriesRepository _albumsQueriesRepository;
@@ -42,23 +42,23 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
     /// <param name="request">Команда изменения музыкального альбома.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Результат выполнения команды.</returns>
-    public async Task<BaseResult> Handle(ModifyAlbumCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result> Handle(ModifyAlbumCommand request, CancellationToken cancellationToken = default)
     {
         var albumId = AlbumId.Create(request.AlbumId);
         var getAlbumResult = await _albumsQueriesRepository.GetAlbumByIdAsync(albumId);
         if (getAlbumResult.IsFailed)
         {
-            return getAlbumResult.Error;
+            return getAlbumResult.ToResult();
         }
 
-        var album = getAlbumResult.Value;
+        var album = getAlbumResult.ValueOrDefault;
 
         if (request.Name is not null)
         {
             var setAlbumNameResult = SetAlbumName(album, request.Name);
             if (setAlbumNameResult.IsFailed)
             {
-                return setAlbumNameResult.Error;
+                return setAlbumNameResult;
             }
         }
 
@@ -67,7 +67,7 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             var setAlbumReleaseDateResult = SetAlbumReleaseDate(album, request.ReleaseDate.Value);
             if (setAlbumReleaseDateResult.IsFailed)
             {
-                return setAlbumReleaseDateResult.Error;
+                return setAlbumReleaseDateResult;
             }
         }
 
@@ -76,21 +76,21 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
             var addTracksResult = await AddTracksAsync(album, request.AddingTracksIds);
             if (addTracksResult.IsFailed)
             {
-                return addTracksResult.Error;
+                return addTracksResult;
             }
         }
 
         if (request.RemovingTracksIds is not null && request.RemovingTracksIds.Any())
         {
-            var removeTracksResult = await RemoveTracksAsync(album, request.RemovingTracksIds);
+            var removeTracksResult = RemoveTracks(album, request.RemovingTracksIds);
             if (removeTracksResult.IsFailed)
             {
-                return removeTracksResult.Error;
+                return removeTracksResult;
             }
         }
 
         await _albumsCommandsRepository.CommitChangesAsync(album, cancellationToken);
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
@@ -98,16 +98,21 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="name">Название музыкального альбома.</param>
-    private static BaseResult SetAlbumName(Album album, string name)
+    private static Result SetAlbumName(Album album, string name)
     {
         var albumNameCreateResult = AlbumName.Create(name);
         if (albumNameCreateResult.IsFailed)
         {
-            return albumNameCreateResult.Error;
+            return albumNameCreateResult.ToResult();
         }
 
         var setAlbumNameResult = album.SetName(albumNameCreateResult.Value);
-        return setAlbumNameResult.IsFailed ? setAlbumNameResult.Error : BaseResult.Success();
+        if (setAlbumNameResult.IsFailed)
+        {
+            return setAlbumNameResult;
+        }
+
+        return Result.Ok();
     }
 
     /// <summary>
@@ -115,21 +120,21 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="releaseDate">Дата выпуска музыкального альбома.</param>
-    private static BaseResult SetAlbumReleaseDate(Album album, DateTime releaseDate)
+    private static Result SetAlbumReleaseDate(Album album, DateTime releaseDate)
     {
         var albumReleaseDateCreateResult = AlbumReleaseDate.Create(releaseDate);
         if (albumReleaseDateCreateResult.IsFailed)
         {
-            return albumReleaseDateCreateResult.Error;
+            return albumReleaseDateCreateResult.ToResult();
         }
 
         var albumSetReleaseDateRelease = album.SetReleaseDate(albumReleaseDateCreateResult.Value);
         if (albumSetReleaseDateRelease.IsFailed)
         {
-            return albumSetReleaseDateRelease.Error;
+            return albumSetReleaseDateRelease;
         }
 
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
@@ -137,19 +142,30 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="ids">Идентификаторы, добавляемых музыкальных треков.</param>
-    private async Task<BaseResult> AddTracksAsync(Album album, IEnumerable<Guid> ids)
+    private async Task<Result> AddTracksAsync(Album album, IEnumerable<Guid> ids)
     {
         var addingTrackIds = ids.Select(TrackId.Create).ToList();
         foreach (var addingTrackId in addingTrackIds)
         {
-            if (!await _tracksQueriesRepository.IsTrackExistsAsync(addingTrackId))
+            var isTrackExistResult = await _tracksQueriesRepository.IsTrackExistsAsync(addingTrackId);
+            if (isTrackExistResult.IsFailed)
             {
-                return new InvalidOperationException();
+                return isTrackExistResult.ToResult();
+            }
+
+            if (!isTrackExistResult.ValueOrDefault)
+            {
+                throw new NotImplementedException();
             }
         }
 
         var addTracksResult = album.AddTracks(addingTrackIds);
-        return addTracksResult.IsFailed ? addTracksResult.Error : BaseResult.Success();
+        if (addTracksResult.IsFailed)
+        {
+            return addTracksResult;
+        }
+
+        return Result.Ok();
     }
 
     /// <summary>
@@ -157,11 +173,16 @@ public class ModifyAlbumCommandHandler : IRequestHandler<ModifyAlbumCommand, Bas
     /// </summary>
     /// <param name="album">Музыкальный альбом.</param>
     /// <param name="ids">Идентификаторы, удаляемых музыкальных треков.</param>
-    private Task<BaseResult> RemoveTracksAsync(Album album, IEnumerable<Guid> ids)
+    private static Result RemoveTracks(Album album, IEnumerable<Guid> ids)
     {
         var removingTrackIds = ids.Select(TrackId.Create).ToList();
 
         var removeTracksResult = album.RemoveTracks(removingTrackIds);
-        return Task.FromResult(removeTracksResult.IsFailed ? removeTracksResult.Error : BaseResult.Success());
+        if (removeTracksResult.IsFailed)
+        {
+            return removeTracksResult;
+        }
+
+        return Result.Ok();
     }
 }

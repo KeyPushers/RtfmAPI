@@ -5,11 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using FluentResults;
+using RtfmAPI.Application.Fabrics.Tracks;
+using RtfmAPI.Application.Fabrics.Tracks.Daos;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.Tracks;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
-using RtfmAPI.Infrastructure.Daos;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
@@ -34,73 +35,110 @@ public class TracksQueriesRepository : ITracksQueriesRepository
     public async Task<Result<Track>> GetTrackByIdAsync(TrackId trackId)
     {
         var connection = _context.CreateOpenedConnection();
-        var trackDao = await GetTrackDaoAsync(trackId.Value, connection);
+
+        const string sql = @"SELECT t.*, tg.genre_id  From tracks t
+            LEFT JOIN tracks_genres tg on t.id = tg.track_id
+            WHERE t.id = @Id";
+        var trackDao = await QuerySingleOrDefaultAsync(connection, sql, new {Id = trackId.Value});
         if (trackDao is null)
         {
-            return new InvalidOperationException();
+            throw new NotImplementedException();
         }
 
-        var tracksFabric = new TracksFabric(trackDao.Name ?? string.Empty, trackDao.ReleaseDate, trackDao.TrackFileId,
-            trackDao.GenreIds);
-        return tracksFabric.Restore(trackDao.Id);
+        return RestoreTrackFromDao(trackDao);
     }
 
     /// <inheritdoc />
-    public Task<bool> IsTrackExistsAsync(TrackId trackId)
+    public async Task<Result<bool>> IsTrackExistsAsync(TrackId trackId)
     {
         var connection = _context.CreateOpenedConnection();
         const string sql = @"SELECT EXISTS(SELECT 1 FROM Tracks WHERE Id=@TrackId)";
 
-        return connection.ExecuteScalarAsync<bool>(sql, new {TrackId = trackId.Value});
+        return await connection.ExecuteScalarAsync<bool>(sql, new {TrackId = trackId.Value});
     }
 
     /// <inheritdoc />
     public async Task<Result<List<Track>>> GetTracksAsync(CancellationToken cancellationToken = default)
     {
         var connection = _context.CreateOpenedConnection();
-        var sql = @"SELECT Id FROM Tracks";
-        var trackIds = await connection.QueryAsync<Guid>(sql);
+
+        const string sql = @"SELECT t.*, tg.genre_id  From tracks t
+            LEFT JOIN tracks_genres tg on t.id = tg.track_id";
+        var trackDaos = await QueryAsync(connection, sql);
 
         List<Track> result = new();
-        foreach (var trackId in trackIds)
+        foreach (var trackDao in trackDaos)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return new OperationCanceledException(cancellationToken);
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
-
-            var getTrackResult = await GetTrackByIdAsync(TrackId.Create(trackId));
+            var getTrackResult = RestoreTrackFromDao(trackDao);
             if (getTrackResult.IsFailed)
             {
-                return getTrackResult.Error;
+                return getTrackResult.ToResult();
             }
 
-            result.Add(getTrackResult.Value);
+            result.Add(getTrackResult.ValueOrDefault);
         }
 
         return result;
     }
 
     /// <summary>
-    /// Получение объекта доступа данных музыкального трека.
+    /// Запрос.
     /// </summary>
-    /// <param name="trackId">Идентификатор музыкального трека.</param>
     /// <param name="connection">Соединение.</param>
-    /// <returns>Объект доступа данных музыкального трека.</returns>
-    private async Task<TrackDao?> GetTrackDaoAsync(Guid trackId, IDbConnection connection)
+    /// <param name="sql">Описание запроса.</param>
+    /// <param name="param">Параметр фильтрации.</param>
+    /// <returns>Объект доступа данных музыкального альбома.</returns>
+    private static async Task<List<TrackDao>> QueryAsync(IDbConnection connection, string sql,
+        object? param = null)
     {
-        const string trackSql = @"SELECT * From Tracks WHERE Id = @TrackId";
-        var trackDao = await connection.QuerySingleOrDefaultAsync<TrackDao>(trackSql, new {TrackId = trackId});
-        if (trackDao is null)
-        {
-            return null;
-        }
+        var queryResult = await connection.QueryAsync<TrackDao, Guid?, TrackDao>(sql,
+            (track, genreId) =>
+            {
+                if (genreId is not null)
+                {
+                    track.GenreIds.Add(genreId.Value);
+                }
 
-        const string genreIdsSql = @"SELECT tg.GenreId From TrackGenres tg WHERE tg.TrackId = @TrackId";
-        var genreIds = await connection.QueryAsync<Guid>(genreIdsSql, new {TrackId = trackId});
+                return track;
+            }, param);
 
-        trackDao.GenreIds = genreIds.ToList();
-        return trackDao;
+        return queryResult
+            .GroupBy(entity => entity.Id)
+            .Select(entity =>
+            {
+                var track = entity.First();
+                track.GenreIds = entity
+                    .Where(item => item.GenreIds.Any())
+                    .Select(item => item.GenreIds.Single())
+                    .ToList();
+
+                return track;
+            }).ToList();
+    }
+
+    /// <summary>
+    /// Запрос.
+    /// </summary>
+    /// <param name="connection">Соединение.</param>
+    /// <param name="sql">Описание запроса.</param>
+    /// <param name="param">Параметр фильтрации.</param>
+    /// <returns>Объект доступа данных музыкального альбома.</returns>
+    private static async Task<TrackDao?> QuerySingleOrDefaultAsync(IDbConnection connection, string sql,
+        object? param = null)
+    {
+        var items = await QueryAsync(connection, sql, param);
+        return items.SingleOrDefault();
+    }
+
+    /// <summary>
+    /// Восстановление музыкального трека из объекта доступа данных.
+    /// </summary>
+    /// <param name="trackDao">Объект доступа данных музыкального трека.</param>
+    /// <returns>Музыкальный трек.</returns>
+    private static Result<Track> RestoreTrackFromDao(TrackDao trackDao)
+    {
+        return new TracksFactory(trackDao).Restore();
     }
 }

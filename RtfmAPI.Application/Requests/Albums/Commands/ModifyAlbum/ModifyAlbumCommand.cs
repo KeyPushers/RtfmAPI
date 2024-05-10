@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentResults;
 using MediatR;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum;
 
 /// <summary>
 /// Команда изменения музыкального альбома.
 /// </summary>
-public class ModifyAlbumCommand : IRequest<BaseResult>
+public class ModifyAlbumCommand : IRequest<Result>
 {
     /// <summary>
     /// Идентификатор музыкального альбома.

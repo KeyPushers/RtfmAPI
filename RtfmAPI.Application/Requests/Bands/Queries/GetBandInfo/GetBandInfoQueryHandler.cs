@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo.Dtos;
 using RtfmAPI.Domain.Models.Bands;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Bands.Queries.GetBandInfo;
 
@@ -37,10 +37,10 @@ public class GetBandInfoQueryHandler : IRequestHandler<GetBandInfoQuery, Result<
         var getBandResult = await _repository.GetBandByIdAsync(bandId);
         if (getBandResult.IsFailed)
         {
-            return getBandResult.Error;
+            return getBandResult.ToResult();
         }
 
-        var band = getBandResult.Value;
+        var band = getBandResult.ValueOrDefault;
         
         return new BandInfo
         {

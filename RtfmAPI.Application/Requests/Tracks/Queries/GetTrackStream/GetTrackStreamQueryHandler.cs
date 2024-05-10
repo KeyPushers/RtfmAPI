@@ -2,11 +2,11 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentResults;
 using MediatR;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Application.Requests.Tracks.Queries.GetTrackStream.Dtos;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Tracks.Queries.GetTrackStream;
 
@@ -45,23 +45,23 @@ public class GetTrackStreamQueryHandler : IRequestHandler<GetTrackStreamQuery, R
         var getTrackResult = await _tracksQueriesRepository.GetTrackByIdAsync(trackId);
         if (getTrackResult.IsFailed)
         {
-            return getTrackResult.Error;
+            return getTrackResult.ToResult();
         }
 
-        var track = getTrackResult.Value;
+        var track = getTrackResult.ValueOrDefault;
 
         if (track.TrackFileId is null)
         {
-            return new InvalidOperationException();
+            throw new NotImplementedException();
         }
 
         var getTrackFileResult = await _trackFilesQueriesRepository.GetTrackFileByIdAsync(track.TrackFileId);
         if (getTrackFileResult.IsFailed)
         {
-            return getTrackFileResult.Error;
+            return getTrackFileResult.ToResult();
         }
 
-        var trackFile = getTrackFileResult.Value;
+        var trackFile = getTrackFileResult.ValueOrDefault;
 
         var stream = new MemoryStream(trackFile.Data.Value);
         var mediaType = trackFile.MimeType.Value;

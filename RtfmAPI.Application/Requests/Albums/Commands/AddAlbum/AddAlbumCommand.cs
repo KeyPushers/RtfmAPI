@@ -1,7 +1,7 @@
 ﻿using System;
+using FluentResults;
 using MediatR;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum.Dtos;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
 

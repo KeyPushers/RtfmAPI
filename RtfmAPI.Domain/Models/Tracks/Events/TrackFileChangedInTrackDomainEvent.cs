@@ -1,6 +1,5 @@
 ﻿using RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
 using RtfmAPI.Domain.Models.Tracks.ValueObjects;
-using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Tracks.Events;
 
@@ -9,4 +8,4 @@ namespace RtfmAPI.Domain.Models.Tracks.Events;
 /// </summary>
 /// <param name="TrackId">Идентификатор музыкального трека.</param>
 /// <param name="TrackFileId">Идентификатора измененного файла музыкального трека.</param>
-public record TrackFileChangedInTrackDomainEvent(TrackId TrackId, TrackFileId TrackFileId) : IDomainEvent;
+public record TrackFileChangedInTrackDomainEvent(TrackId TrackId, TrackFileId TrackFileId) : ITrackDomainEvent;

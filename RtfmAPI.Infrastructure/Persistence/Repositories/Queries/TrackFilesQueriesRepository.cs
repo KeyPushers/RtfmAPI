@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using FluentResults;
+using RtfmAPI.Application.Fabrics.TrackFiles;
+using RtfmAPI.Application.Fabrics.TrackFiles.Daos;
 using RtfmAPI.Application.Interfaces.Persistence.Queries;
 using RtfmAPI.Domain.Models.TrackFiles;
 using RtfmAPI.Domain.Models.TrackFiles.ValueObjects;
-using RtfmAPI.Domain.Primitives;
-using RtfmAPI.Infrastructure.Daos;
 using RtfmAPI.Infrastructure.Persistence.Context;
 
 namespace RtfmAPI.Infrastructure.Persistence.Repositories.Queries;
@@ -31,43 +34,71 @@ public class TrackFilesQueriesRepository : ITrackFilesQueriesRepository
     public async Task<Result<TrackFile>> GetTrackFileByIdAsync(TrackFileId trackFileId)
     {
         var connection = _context.CreateOpenedConnection();
-        var trackFileDao = await GetTrackFileDaoAsync(trackFileId.Value, connection);
+        
+        const string sql = @"SELECT * From trackfiles t WHERE t.id = @Id";
+
+        var trackFileDao = await QuerySingleOrDefaultAsync(connection, sql, new {Id = trackFileId.Value});
         if (trackFileDao is null)
         {
-            return new InvalidOperationException();
+            throw new NotImplementedException();
         }
 
-        var trackFilesFabric = new TrackFilesFabric(trackFileDao.Name ?? string.Empty, trackFileDao.Data,
-            trackFileDao.Extension ?? string.Empty, trackFileDao.MimeType ?? string.Empty, trackFileDao.Duration);
-        return trackFilesFabric.Restore(trackFileDao.Id);
+        return RestoreTrackFileFromDao(trackFileDao);
     }
 
     /// <inheritdoc />
-    public Task<bool> IsTrackFileExistsAsync(TrackFileId trackFileId)
+    public async Task<Result<bool>> IsTrackFileExistsAsync(TrackFileId trackFileId)
     {
         var connection = _context.CreateOpenedConnection();
-        const string sql = @"SELECT EXISTS(SELECT 1 FROM TrackFiles WHERE Id=@TrackFileId)";
+        const string sql = @"SELECT EXISTS(SELECT 1 FROM trackfiles t WHERE t.id = @TrackFileId)";
 
-        return connection.ExecuteScalarAsync<bool>(sql, new {TrackFileId = trackFileId.Value});
+        return await connection.ExecuteScalarAsync<bool>(sql, new {TrackFileId = trackFileId.Value});
     }
 
     /// <inheritdoc />
-    public async Task<double> GetTrackFileDurationAsync(TrackFileId trackFileId)
+    public async Task<Result<double>> GetTrackFileDurationAsync(TrackFileId trackFileId)
     {
         var connection = _context.CreateOpenedConnection();
-        var trackFileDao = await GetTrackFileDaoAsync(trackFileId.Value, connection);
-        return trackFileDao?.Duration ?? 0.0;
+        
+        const string sql = @"SELECT t.duration From trackfiles t WHERE t.id = @Id";
+        var trackFileDuration = await connection.QuerySingleOrDefaultAsync<double>(sql, new {Id = trackFileId.Value});
+        return trackFileDuration;
+    }
+    
+    /// <summary>
+    /// Запрос.
+    /// </summary>
+    /// <param name="connection">Соединение.</param>
+    /// <param name="sql">Описание запроса.</param>
+    /// <param name="param">Параметр фильтрации.</param>
+    /// <returns>Объект доступа данных музыкального альбома.</returns>
+    private static async Task<List<TrackFileDao>> QueryAsync(IDbConnection connection, string sql, object? param = null)
+    {
+        var queryResult = await connection.QueryAsync<TrackFileDao>(sql, param);
+        return queryResult.ToList();
     }
 
     /// <summary>
-    /// Получение объекта доступа данных файла музыкального трека.
+    /// Запрос.
     /// </summary>
-    /// <param name="trackFileId">Идентификатор файла музыкального трека.</param>
     /// <param name="connection">Соединение.</param>
-    /// <returns>Объект доступа данных файла музыкального трека.</returns>
-    private static Task<TrackFileDao?> GetTrackFileDaoAsync(Guid trackFileId, IDbConnection connection)
+    /// <param name="sql">Описание запроса.</param>
+    /// <param name="param">Параметр фильтрации.</param>
+    /// <returns>Объект доступа данных музыкального альбома.</returns>
+    private static async Task<TrackFileDao?> QuerySingleOrDefaultAsync(IDbConnection connection, string sql,
+        object? param = null)
     {
-        const string sql = @"SELECT * From TrackFiles WHERE Id = @TrackFileId";
-        return connection.QuerySingleOrDefaultAsync<TrackFileDao>(sql, new {TrackFileId = trackFileId});
+        var items = await QueryAsync(connection, sql, param);
+        return items.SingleOrDefault();
+    }
+
+    /// <summary>
+    /// Восстановление файла музыкального трека из объекта доступа данных.
+    /// </summary>
+    /// <param name="trackFileDao">Объект доступа данных файла музыкального трека.</param>
+    /// <returns>Файл музыкального трека.</returns>
+    private static Result<TrackFile> RestoreTrackFileFromDao(TrackFileDao trackFileDao)
+    {
+        return new TrackFilesFactory(trackFileDao).Restore();
     }
 }

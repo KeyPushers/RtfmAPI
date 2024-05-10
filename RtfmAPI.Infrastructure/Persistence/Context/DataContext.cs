@@ -92,9 +92,9 @@ public class DataContext
     private static Task InitBandsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         const string sql = @"
-                        CREATE TABLE IF NOT EXISTS Bands (
-                        Id UUID PRIMARY KEY,
-                        Name VARCHAR
+                        CREATE TABLE IF NOT EXISTS bands (
+                        id UUID PRIMARY KEY,
+                        name VARCHAR
                     );
                     ";
 
@@ -103,10 +103,10 @@ public class DataContext
 
     private static Task InitAlbumsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        const string sql = @"CREATE TABLE IF NOT EXISTS Albums (
-                        Id UUID PRIMARY KEY,
-                        Name VARCHAR,
-                        ReleaseDate Date)";
+        const string sql = @"CREATE TABLE IF NOT EXISTS albums (
+                        id UUID PRIMARY KEY,
+                        name VARCHAR,
+                        released_date Date)";
 
         return connection.ExecuteAsync(sql, trx);
     }
@@ -114,10 +114,10 @@ public class DataContext
     private static Task InitBandAlbumsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         const string sql = @"
-                    CREATE TABLE IF NOT EXISTS BandAlbums (
-                        CONSTRAINT BandAlbumId PRIMARY KEY (BandId, AlbumId),
-                        BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
-                        AlbumId UUID REFERENCES Albums(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    CREATE TABLE IF NOT EXISTS bands_albums (
+                        CONSTRAINT band_album_id PRIMARY KEY (band_id, album_id),
+                        band_id UUID REFERENCES bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        album_id UUID REFERENCES albums(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
                   ";
 
@@ -126,9 +126,9 @@ public class DataContext
 
     private static Task InitGenresTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        const string sql = @"CREATE TABLE IF NOT EXISTS Genres (
-                        Id UUID PRIMARY KEY,
-                        Name VARCHAR)";
+        const string sql = @"CREATE TABLE IF NOT EXISTS genres (
+                        id UUID PRIMARY KEY,
+                        name VARCHAR)";
 
         return connection.ExecuteAsync(sql, trx);
     }
@@ -136,10 +136,10 @@ public class DataContext
     private static Task InitBandGenresTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         const string sql = @"
-                    CREATE TABLE IF NOT EXISTS BandGenres (
-                        CONSTRAINT BandGenreId PRIMARY KEY (BandId, GenreId),
-                        BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
-                        GenreId UUID REFERENCES Genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    CREATE TABLE IF NOT EXISTS bands_genres (
+                        CONSTRAINT band_genre_id PRIMARY KEY (band_id, genre_id),
+                        band_id UUID REFERENCES bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        genre_id UUID REFERENCES genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
                   ";
 
@@ -148,13 +148,13 @@ public class DataContext
 
     private static Task InitTrackFilesTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        const string sql = @"CREATE TABLE IF NOT EXISTS TrackFiles (
-                        Id UUID PRIMARY KEY,
-                        Name VARCHAR,
-                        Data BYTEA,
-                        Extension VARCHAR,
-                        MimeType VARCHAR,
-                        Duration DOUBLE PRECISION);
+        const string sql = @"CREATE TABLE IF NOT EXISTS trackfiles (
+                        id UUID PRIMARY KEY,
+                        name VARCHAR,
+                        data BYTEA,
+                        extension VARCHAR,
+                        mime_type VARCHAR,
+                        duration DOUBLE PRECISION);
                   ";
 
         return connection.ExecuteAsync(sql, trx);
@@ -162,11 +162,11 @@ public class DataContext
 
     private static Task InitTracksTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        const string sql = @"CREATE TABLE IF NOT EXISTS Tracks (
-                        Id UUID PRIMARY KEY,
-                        Name VARCHAR,
-                        ReleaseDate Date,
-                        TrackFileId UUID REFERENCES TrackFiles(Id) ON UPDATE CASCADE ON DELETE SET NULL);
+        const string sql = @"CREATE TABLE IF NOT EXISTS tracks (
+                        id UUID PRIMARY KEY,
+                        name VARCHAR,
+                        release_date Date,
+                        trackfile_id UUID REFERENCES trackfiles(Id) ON UPDATE CASCADE ON DELETE SET NULL);
                   ";
 
         return connection.ExecuteAsync(sql, trx);
@@ -175,10 +175,10 @@ public class DataContext
     private static Task InitAlbumTracksTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         const string sql = @"
-                    CREATE TABLE IF NOT EXISTS AlbumTracks (
-                        CONSTRAINT AlbumTrackId PRIMARY KEY (AlbumId, TrackId),
-                        AlbumId UUID REFERENCES Albums(Id) ON UPDATE CASCADE ON DELETE CASCADE,
-                        TrackId UUID REFERENCES Tracks(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    CREATE TABLE IF NOT EXISTS albums_tracks (
+                        CONSTRAINT album_track_id PRIMARY KEY (album_Id, track_id),
+                        album_Id UUID REFERENCES albums(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        track_id UUID REFERENCES tracks(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
                   ";
 
@@ -188,10 +188,10 @@ public class DataContext
     private static Task InitTrackGenresTableAsync(IDbConnection connection, IDbTransaction trx)
     {
         const string sql = @"
-                    CREATE TABLE IF NOT EXISTS TrackGenres (
-                        CONSTRAINT TrackGenreId PRIMARY KEY (TrackId, GenreId),
-                        TrackId UUID REFERENCES Tracks(Id) ON UPDATE CASCADE ON DELETE CASCADE,
-                        GenreId UUID REFERENCES Genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    CREATE TABLE IF NOT EXISTS tracks_genres (
+                        CONSTRAINT track_genre_id PRIMARY KEY (track_Id, genre_Id),
+                        track_Id UUID REFERENCES tracks(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        genre_Id UUID REFERENCES genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
                   ";
 

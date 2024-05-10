@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using FluentResults;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Bands.Events;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
@@ -63,7 +63,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// </summary>
     /// <param name="name">Название музыкальной группы.</param>
     /// <returns>Музыкальная группа.</returns>
-    internal static Result<Band> Create(BandName name)
+    public static Result<Band> Create(BandName name)
     {
         var band = new Band(name, Enumerable.Empty<AlbumId>(), Enumerable.Empty<GenreId>());
         band.AddDomainEvent(new BandCreatedDomainEvent(band));
@@ -81,7 +81,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// <param name="name">Название музыкальной группы.</param>
     /// <param name="albumIds">Идентификаторы альбомов музыкальной группы.</param>
     /// <param name="genreIds">Идентификаторы жанров музыкальной группы.</param>
-    internal static Result<Band> Restore(BandId id, BandName name, IEnumerable<AlbumId> albumIds,
+    public static Result<Band> Restore(BandId id, BandName name, IEnumerable<AlbumId> albumIds,
         IEnumerable<GenreId> genreIds)
     {
         return new Band(id, name, albumIds.ToList(), genreIds.ToList());
@@ -91,27 +91,27 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// Установление названия музыкальной группы.
     /// </summary>
     /// <param name="name">Название музыкальной группы.</param>
-    public BaseResult SetName(BandName name)
+    public Result SetName(BandName name)
     {
         if (Name == name)
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         Name = name;
         AddDomainEvent(new BandNameChangedDomainEvent(this, name));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Добавление музыкальных альбомов.
     /// </summary>
     /// <param name="albumIds">Идентификаторы добавляемых альбомов.</param>
-    public BaseResult AddAlbums(IReadOnlyCollection<AlbumId> albumIds)
+    public Result AddAlbums(IReadOnlyCollection<AlbumId> albumIds)
     {
         if (!albumIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<AlbumId> addedAlbums = new();
@@ -127,18 +127,18 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         }
 
         AddDomainEvent(new AlbumsAddedToBandDomainEvent(this, addedAlbums));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкальных альбомов.
     /// </summary>
     /// <param name="albumIds">Идентификаторы удаляемых альбомов.</param>
-    public BaseResult RemoveAlbums(IReadOnlyCollection<AlbumId> albumIds)
+    public Result RemoveAlbums(IReadOnlyCollection<AlbumId> albumIds)
     {
         if (!albumIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<AlbumId> removedAlbumIds = new();
@@ -154,18 +154,18 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         }
 
         AddDomainEvent(new AlbumsRemovedFromBandDomainEvent(this, removedAlbumIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Добавление музыкальных жанров.
     /// </summary>
     /// <param name="genreIds">Идентификаторы добавляемых музыкальных жанров.</param>
-    public BaseResult AddGenres(IReadOnlyCollection<GenreId> genreIds)
+    public Result AddGenres(IReadOnlyCollection<GenreId> genreIds)
     {
         if (!genreIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<GenreId> addedGenreIds = new();
@@ -181,18 +181,18 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         }
 
         AddDomainEvent(new GenresAddedToBandDomainEvent(this, addedGenreIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкальных жанров.
     /// </summary>
     /// <param name="genreIds">Идентификаторы удаляемых музыкальных жанров.</param>
-    public BaseResult RemoveGenres(IReadOnlyCollection<GenreId> genreIds)
+    public Result RemoveGenres(IReadOnlyCollection<GenreId> genreIds)
     {
         if (!genreIds.Any())
         {
-            return BaseResult.Success();
+            return Result.Ok();
         }
 
         List<GenreId> removedGenreIds = new();
@@ -208,22 +208,15 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         }
 
         AddDomainEvent(new GenresRemovedFromBandDomainEvent(this, removedGenreIds));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 
     /// <summary>
     /// Удаление музыкальной группы.
     /// </summary>
-    /// <param name="deleteAction">Делегат, отвечающий за удаление музыкальной группы.</param>
-    public async Task<BaseResult> DeleteAsync(Func<Band, Task<bool>> deleteAction)
+    public Result Delete()
     {
-        var deleteActionResult = await deleteAction(this);
-        if (!deleteActionResult)
-        {
-            return new InvalidOperationException();
-        }
-
         AddDomainEvent(new BandDeletedDomainEvent(this));
-        return BaseResult.Success();
+        return Result.Ok();
     }
 }
