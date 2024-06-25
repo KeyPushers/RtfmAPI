@@ -6,7 +6,7 @@ namespace RtfmAPI.Domain.Primitives;
 /// <summary>
 /// Примитив сущности.
 /// </summary>
-public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvents
+public abstract class Entity<TId> : IHasDomainEvents, IEquatable<Entity<TId>>
     where TId : ValueObject
 {
     private readonly List<IDomainEvent> _domainEvents = new();
@@ -23,7 +23,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvents
     /// Добавление доменного события.
     /// </summary>
     /// <param name="domainEvent">Доменное событие.</param>
-    public void AddDomainEvent(IDomainEvent domainEvent)
+    protected void AddDomainEvent(IDomainEvent domainEvent)
     {
         _domainEvents.Add(domainEvent);
     }
@@ -33,17 +33,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvents
     {
         _domainEvents.Clear();
     }
-
-    /// <summary>
-    /// Создание примитива сущности.
-    /// </summary>
-    /// <remarks>Требуется для EF Core.</remarks>
-#pragma warning disable CS8618
-    protected Entity()
-    {
-    }
-#pragma warning restore CS8618
-
+    
     /// <summary>
     /// Создание примитива сущности.
     /// </summary>

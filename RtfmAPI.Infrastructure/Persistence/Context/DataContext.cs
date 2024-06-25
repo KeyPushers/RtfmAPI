@@ -13,7 +13,7 @@ namespace RtfmAPI.Infrastructure.Persistence.Context;
 public class DataContext
 {
     private readonly DbSettingsOptions _dbSettingsOptions;
-    
+
     /// <summary>
     /// Создание контекста базы данных.
     /// </summary>
@@ -32,7 +32,7 @@ public class DataContext
         connection.Open();
         return connection;
     }
-    
+
     /// <summary>
     /// Создание соединения с базой данных.
     /// </summary>
@@ -42,7 +42,7 @@ public class DataContext
             $"Host={_dbSettingsOptions.Server}; Database={_dbSettingsOptions.Database}; Username={_dbSettingsOptions.UserId}; Password={_dbSettingsOptions.Password};";
         return new NpgsqlConnection(connectionString);
     }
-    
+
     /// <summary>
     /// Инициализация соединения.
     /// </summary>
@@ -51,10 +51,10 @@ public class DataContext
         using var connection = CreateConnection();
         connection.Open();
         var trx = connection.BeginTransaction();
-        
+
         await InitDatabaseAsync(connection, trx);
         await InitTablesAsync(connection, trx);
-        
+
         trx.Commit();
     }
 
@@ -81,42 +81,119 @@ public class DataContext
         await InitBandsTableAsync(connection, trx);
         await InitAlbumsTableAsync(connection, trx);
         await InitBandAlbumsTableAsync(connection, trx);
+        await InitGenresTableAsync(connection, trx);
+        await InitBandGenresTableAsync(connection, trx);
+        await InitTrackFilesTableAsync(connection, trx);
+        await InitTracksTableAsync(connection, trx);
+        await InitAlbumTracksTableAsync(connection, trx);
+        await InitTrackGenresTableAsync(connection, trx);
     }
 
     private static Task InitBandsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        var sql = """
-                    CREATE TABLE IF NOT EXISTS Bands (
+        const string sql = @"
+                        CREATE TABLE IF NOT EXISTS Bands (
                         Id UUID PRIMARY KEY,
                         Name VARCHAR
                     );
-                  """;
+                    ";
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitAlbumsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        var sql = """
-                    CREATE TABLE IF NOT EXISTS Albums  (
+        const string sql = @"CREATE TABLE IF NOT EXISTS Albums (
                         Id UUID PRIMARY KEY,
                         Name VARCHAR,
-                        ReleaseDate Date
-                    );
-                  """;
+                        ReleaseDate Date)";
 
         return connection.ExecuteAsync(sql, trx);
     }
-    
+
     private static Task InitBandAlbumsTableAsync(IDbConnection connection, IDbTransaction trx)
     {
-        var sql = """
+        const string sql = @"
                     CREATE TABLE IF NOT EXISTS BandAlbums (
-                        CONSTRAINT Id PRIMARY KEY (BandId, AlbumId),
+                        CONSTRAINT BandAlbumId PRIMARY KEY (BandId, AlbumId),
                         BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
                         AlbumId UUID REFERENCES Albums(Id) ON UPDATE CASCADE ON DELETE CASCADE
                     );
-                  """;
+                  ";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitGenresTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        const string sql = @"CREATE TABLE IF NOT EXISTS Genres (
+                        Id UUID PRIMARY KEY,
+                        Name VARCHAR)";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitBandGenresTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        const string sql = @"
+                    CREATE TABLE IF NOT EXISTS BandGenres (
+                        CONSTRAINT BandGenreId PRIMARY KEY (BandId, GenreId),
+                        BandId UUID REFERENCES Bands(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        GenreId UUID REFERENCES Genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    );
+                  ";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitTrackFilesTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        const string sql = @"CREATE TABLE IF NOT EXISTS TrackFiles (
+                        Id UUID PRIMARY KEY,
+                        Name VARCHAR,
+                        Data BYTEA,
+                        Extension VARCHAR,
+                        MimeType VARCHAR,
+                        Duration DOUBLE PRECISION);
+                  ";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitTracksTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        const string sql = @"CREATE TABLE IF NOT EXISTS Tracks (
+                        Id UUID PRIMARY KEY,
+                        Name VARCHAR,
+                        ReleaseDate Date,
+                        TrackFileId UUID REFERENCES TrackFiles(Id) ON UPDATE CASCADE ON DELETE SET NULL);
+                  ";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitAlbumTracksTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        const string sql = @"
+                    CREATE TABLE IF NOT EXISTS AlbumTracks (
+                        CONSTRAINT AlbumTrackId PRIMARY KEY (AlbumId, TrackId),
+                        AlbumId UUID REFERENCES Albums(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        TrackId UUID REFERENCES Tracks(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    );
+                  ";
+
+        return connection.ExecuteAsync(sql, trx);
+    }
+
+    private static Task InitTrackGenresTableAsync(IDbConnection connection, IDbTransaction trx)
+    {
+        const string sql = @"
+                    CREATE TABLE IF NOT EXISTS TrackGenres (
+                        CONSTRAINT TrackGenreId PRIMARY KEY (TrackId, GenreId),
+                        TrackId UUID REFERENCES Tracks(Id) ON UPDATE CASCADE ON DELETE CASCADE,
+                        GenreId UUID REFERENCES Genres(Id) ON UPDATE CASCADE ON DELETE CASCADE
+                    );
+                  ";
 
         return connection.ExecuteAsync(sql, trx);
     }

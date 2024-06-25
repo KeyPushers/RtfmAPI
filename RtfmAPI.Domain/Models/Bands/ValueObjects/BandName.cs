@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using RtfmAPI.Domain.Models.Bands.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Bands.ValueObjects;
@@ -42,17 +42,17 @@ public sealed class BandName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ArgumentOutOfRangeException();
+            return BandExceptions.BandNameIsNullOrEmpty();
         }
 
         if (value.Length < MinLength)
         {
-            return new ArgumentOutOfRangeException();
+            return BandExceptions.BandNameIsTooShort();
         }
 
         if (value.Length > MaxLength)
         {
-            return new ArgumentOutOfRangeException();
+            return BandExceptions.BandNameIsTooLong();
         }
 
         return new BandName(value);

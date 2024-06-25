@@ -1,4 +1,8 @@
-﻿using NSwag.Generation.AspNetCore;
+﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using NSwag;
+using NSwag.Generation.AspNetCore;
+using NSwag.Generation.Processors.Security;
 using OpenApiContact = NSwag.OpenApiContact;
 using OpenApiInfo = NSwag.OpenApiInfo;
 
@@ -14,6 +18,16 @@ public static class OpenApiSettings
     /// </summary>
     public static void OpenApiDocument(AspNetCoreOpenApiDocumentGeneratorSettings options)
     {
+        options.AddSecurity("Bearer", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Description = "Enter the Bearer Authorization string as following: `Bearer Generated-JWT-Token`",
+            In = OpenApiSecurityApiKeyLocation.Header,
+            Type = OpenApiSecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+            
+        });
+        options.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
         options.PostProcess = PostProcess;
     }
     

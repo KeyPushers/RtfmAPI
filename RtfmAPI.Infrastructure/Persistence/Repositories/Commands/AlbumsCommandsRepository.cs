@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using RtfmAPI.Application.Interfaces.Persistence.Commands;
@@ -26,39 +28,55 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     }
 
     /// <inheritdoc/>
-    public async Task CommitChangesAsync(Album value)
+    public async Task CommitChangesAsync(Album value, CancellationToken cancellationToken)
     {
         using var connection = _dataContext.CreateOpenedConnection();
         var trx = connection.BeginTransaction();
 
         foreach (var domainEvent in value.DomainEvents)
         {
-            if (domainEvent is AlbumCreatedDomainEvent albumCreatedDomainEvent)
+            switch (domainEvent)
             {
-                await OnAlbumCreatedDomainEventAsync(albumCreatedDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is AlbumNameChangedDomainEvent albumNameChangedDomainEvent)
-            {
-                await OnAlbumNameChangedDomainEventAsync(albumNameChangedDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is AlbumReleaseDateChangedDomainEvent albumReleaseDateChangedDomainEvent)
-            {
-                await OnAlbumReleaseDateChangedDomainEventAsync(albumReleaseDateChangedDomainEvent, connection, trx);
-                continue;
-            }
-
-            if (domainEvent is AlbumDeletedDomainEvent albumDeletedDomainEvent)
-            {
-                throw new NotImplementedException();
-                continue;
+                case AlbumCreatedDomainEvent albumCreatedDomainEvent:
+                {
+                    await OnAlbumCreatedDomainEventAsync(albumCreatedDomainEvent, connection, trx);
+                    break;
+                }
+                case AlbumNameChangedDomainEvent albumNameChangedDomainEvent:
+                {
+                    await OnAlbumNameChangedDomainEventAsync(albumNameChangedDomainEvent, connection, trx);
+                    break;
+                }
+                case AlbumReleaseDateChangedDomainEvent albumReleaseDateChangedDomainEvent:
+                {
+                    await OnAlbumReleaseDateChangedDomainEventAsync(albumReleaseDateChangedDomainEvent, connection,
+                        trx);
+                    break;
+                }
+                case TracksAddedToAlbumDomainEvent tracksAddedToAlbumDomainEvent:
+                {
+                    await OnTracksAddedToAlbumDomainEventAsync(tracksAddedToAlbumDomainEvent, connection, trx);
+                    break;
+                }
+                case TracksRemovedFromAlbumDomainEvent tracksRemovedFromAlbumDomainEvent:
+                {
+                    await OnTracksRemovedFromAlbumDomainEventAsync(tracksRemovedFromAlbumDomainEvent, connection, trx);
+                    break;
+                }
+                case AlbumDeletedDomainEvent albumDeletedDomainEvent:
+                {
+                    throw new NotImplementedException();
+                    break;
+                }
+                default:
+                {
+                    throw new ArgumentOutOfRangeException(nameof(domainEvent));
+                }
             }
         }
 
         trx.Commit();
+        value.ClearDomainEvents();
     }
 
     /// <summary>
@@ -72,9 +90,7 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     {
         var album = domainEvent.Album;
 
-        var sql = """
-                    INSERT INTO Albums (Id) VALUES(@Id)
-                  """;
+        const string sql = @"INSERT INTO Albums (Id) VALUES(@Id)";
         return connection.ExecuteAsync(sql, new {Id = album.Id.Value}, transaction);
     }
 
@@ -89,14 +105,12 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     {
         var album = domainEvent.Album;
 
-        var sql = """
-                    UPDATE Albums SET Name = @Name WHERE Id = @Id
-                  """;
+        const string sql = @"UPDATE Albums SET Name = @Name WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = album.Id.Value, Name = album.Name.Value}, transaction);
     }
 
     /// <summary>
-    /// обработка события изменения даты выпуска музыкального альбома.
+    /// Обработка события изменения даты выпуска музыкального альбома.
     /// </summary>
     /// <param name="domainEvent">Событие.</param>
     /// <param name="connection">Соединение.</param>
@@ -106,10 +120,43 @@ public class AlbumsCommandsRepository : IAlbumsCommandsRepository
     {
         var album = domainEvent.Album;
 
-        var sql = """
-                    UPDATE Albums SET ReleaseDate = @ReleaseDate WHERE Id = @Id
-                  """;
+        const string sql = @"UPDATE Albums SET ReleaseDate = @ReleaseDate WHERE Id = @Id";
         return connection.ExecuteAsync(sql, new {Id = album.Id.Value, ReleaseDate = album.ReleaseDate.Value},
             transaction);
+    }
+
+    /// <summary>
+    /// Обработка события добавления музыкальных треков.
+    /// </summary>
+    /// <param name="domainEvent">Событие.</param>
+    /// <param name="connection">Соединение.</param>
+    /// <param name="transaction">Транзакция.</param>
+    private async Task OnTracksAddedToAlbumDomainEventAsync(TracksAddedToAlbumDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
+    {
+        var albumId = domainEvent.AlbumId;
+        var trackIds = domainEvent.AddedTrackIds;
+
+        foreach (var trackId in trackIds)
+        {
+            const string sql = @"INSERT INTO AlbumTracks (AlbumId, TrackId) VALUES(@AlbumId, @TrackId)";
+            await connection.ExecuteAsync(sql, new {AlbumId = albumId.Value, TrackId = trackId.Value}, transaction);
+        }
+    }
+
+    /// <summary>
+    /// Обработка события удаления музыкальных треков.
+    /// </summary>
+    /// <param name="domainEvent">Событие.</param>
+    /// <param name="connection">Соединение.</param>
+    /// <param name="transaction">Транзакция.</param>
+    private Task OnTracksRemovedFromAlbumDomainEventAsync(TracksRemovedFromAlbumDomainEvent domainEvent,
+        IDbConnection connection, IDbTransaction transaction)
+    {
+        var albumId = domainEvent.AlbumId;
+        var trackIds = domainEvent.RemovedTrackIds.Select(entity => entity.Value).ToList();
+
+        const string sql = @"DELETE FROM AlbumTracks WHERE AlbumId = @AlbumId AND TrackId = ANY(@TrackIds)";
+        return connection.ExecuteAsync(sql, new {AlbumId = albumId.Value, TrackIds = trackIds}, transaction);
     }
 }

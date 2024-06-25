@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using RtfmAPI.Domain.Models.Albums.ValueObjects;
 using RtfmAPI.Domain.Models.Bands.Events;
 using RtfmAPI.Domain.Models.Bands.ValueObjects;
+using RtfmAPI.Domain.Models.Genres.ValueObjects;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Bands;
@@ -15,6 +16,7 @@ namespace RtfmAPI.Domain.Models.Bands;
 public sealed class Band : AggregateRoot<BandId, Guid>
 {
     private readonly HashSet<AlbumId> _albumIds;
+    private readonly HashSet<GenreId> _genreIds;
 
     /// <summary>
     /// Название музыкальной группы.
@@ -27,11 +29,18 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     public IReadOnlyCollection<AlbumId> AlbumIds => _albumIds;
 
     /// <summary>
+    /// Музыкальные жанры.
+    /// </summary>
+    public IReadOnlyCollection<GenreId> GenreIds => _genreIds;
+
+    /// <summary>
     /// Создание музыкальной группы.
     /// </summary>
     /// <param name="name">Название музыкальной группы.</param>
     /// <param name="albumIds">Идентификаторы музыкальных альбомов.</param>
-    private Band(BandName name, IEnumerable<AlbumId> albumIds) : this(BandId.Create(), name, albumIds)
+    /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
+    private Band(BandName name, IEnumerable<AlbumId> albumIds, IEnumerable<GenreId> genreIds) : this(BandId.Create(),
+        name, albumIds, genreIds)
     {
     }
 
@@ -41,10 +50,12 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// <param name="id">Идентификатор музыкальной группы.</param>
     /// <param name="name">Название музыкальной группы.</param>
     /// <param name="albumIds">Идентификаторы музыкальных альбомов.</param>
-    private Band(BandId id, BandName name, IEnumerable<AlbumId> albumIds) : base(id)
+    /// <param name="genreIds">Идентификаторы музыкальных жанров.</param>
+    private Band(BandId id, BandName name, IEnumerable<AlbumId> albumIds, IEnumerable<GenreId> genreIds) : base(id)
     {
         Name = name;
         _albumIds = albumIds.ToHashSet();
+        _genreIds = genreIds.ToHashSet();
     }
 
     /// <summary>
@@ -52,12 +63,13 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// </summary>
     /// <param name="name">Название музыкальной группы.</param>
     /// <returns>Музыкальная группа.</returns>
-    public static Result<Band> Create(BandName name)
+    internal static Result<Band> Create(BandName name)
     {
-        var band = new Band(name, new List<AlbumId>());
+        var band = new Band(name, Enumerable.Empty<AlbumId>(), Enumerable.Empty<GenreId>());
         band.AddDomainEvent(new BandCreatedDomainEvent(band));
         band.AddDomainEvent(new BandNameChangedDomainEvent(band, band.Name));
         band.AddDomainEvent(new AlbumsAddedToBandDomainEvent(band, band.AlbumIds));
+        band.AddDomainEvent(new GenresAddedToBandDomainEvent(band, band.GenreIds));
 
         return band;
     }
@@ -68,9 +80,11 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     /// <param name="id">Идентификатор музыкальной группы.</param>
     /// <param name="name">Название музыкальной группы.</param>
     /// <param name="albumIds">Идентификаторы альбомов музыкальной группы.</param>
-    internal static Result<Band> Restore(BandId id, BandName name, IEnumerable<AlbumId> albumIds)
+    /// <param name="genreIds">Идентификаторы жанров музыкальной группы.</param>
+    internal static Result<Band> Restore(BandId id, BandName name, IEnumerable<AlbumId> albumIds,
+        IEnumerable<GenreId> genreIds)
     {
-        return new Band(id, name, albumIds.ToList());
+        return new Band(id, name, albumIds.ToList(), genreIds.ToList());
     }
 
     /// <summary>
@@ -144,6 +158,60 @@ public sealed class Band : AggregateRoot<BandId, Guid>
     }
 
     /// <summary>
+    /// Добавление музыкальных жанров.
+    /// </summary>
+    /// <param name="genreIds">Идентификаторы добавляемых музыкальных жанров.</param>
+    public BaseResult AddGenres(IReadOnlyCollection<GenreId> genreIds)
+    {
+        if (!genreIds.Any())
+        {
+            return BaseResult.Success();
+        }
+
+        List<GenreId> addedGenreIds = new();
+        foreach (var genreId in genreIds)
+        {
+            if (_genreIds.Contains(genreId))
+            {
+                continue;
+            }
+
+            addedGenreIds.Add(genreId);
+            _genreIds.Add(genreId);
+        }
+
+        AddDomainEvent(new GenresAddedToBandDomainEvent(this, addedGenreIds));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
+    /// Удаление музыкальных жанров.
+    /// </summary>
+    /// <param name="genreIds">Идентификаторы удаляемых музыкальных жанров.</param>
+    public BaseResult RemoveGenres(IReadOnlyCollection<GenreId> genreIds)
+    {
+        if (!genreIds.Any())
+        {
+            return BaseResult.Success();
+        }
+
+        List<GenreId> removedGenreIds = new();
+        foreach (var genreId in genreIds)
+        {
+            if (!_genreIds.Contains(genreId))
+            {
+                continue;
+            }
+
+            removedGenreIds.Add(genreId);
+            _genreIds.Remove(genreId);
+        }
+
+        AddDomainEvent(new GenresRemovedFromBandDomainEvent(this, removedGenreIds));
+        return BaseResult.Success();
+    }
+
+    /// <summary>
     /// Удаление музыкальной группы.
     /// </summary>
     /// <param name="deleteAction">Делегат, отвечающий за удаление музыкальной группы.</param>
@@ -152,7 +220,7 @@ public sealed class Band : AggregateRoot<BandId, Guid>
         var deleteActionResult = await deleteAction(this);
         if (!deleteActionResult)
         {
-            return new ArgumentOutOfRangeException();
+            return new InvalidOperationException();
         }
 
         AddDomainEvent(new BandDeletedDomainEvent(this));

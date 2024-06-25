@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using RtfmAPI.Infrastructure.Data;
 
 namespace RtfmAPI.Presentation.Extensions;
@@ -12,13 +12,14 @@ public static class OptionsConfiguration
     /// <summary>
     /// Настройка опций
     /// </summary>
-    /// <param name="services">Службы.</param>
-    /// <param name="webApplicationBuilder">Конструктор приложения..</param>
-    public static IServiceCollection ConfigureOptions(this IServiceCollection services, WebApplicationBuilder webApplicationBuilder)
+    public static IHostApplicationBuilder ConfigureOptions(this IHostApplicationBuilder builder)
     {
-        var dbSettingsOptions = webApplicationBuilder.Configuration.GetSection(DbSettingsOptions.DbSettings);
-        
+        var services = builder.Services;
+
+        var dbSettingsOptions = builder.Configuration.GetSection(DbSettingsOptions.DbSettings);
+
         services.Configure<DbSettingsOptions>(dbSettingsOptions);
-        return services;
+        
+        return builder;
     }
 }

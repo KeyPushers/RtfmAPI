@@ -4,20 +4,28 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>9730ea4e-59f3-4d54-926d-45b9ba5f2537</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
         <PackageReference Include="NSwag.AspNetCore" Version="14.0.3" />
-
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
         <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+        <PackageReference Include="Pilotiv.AuthorizationAPI.Jwt" Version="1.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\RtfmAPI.Application\RtfmAPI.Application.csproj" />
       <ProjectReference Include="..\RtfmAPI.Infrastructure\RtfmAPI.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using RtfmAPI.Presentation.Settings;
 
 namespace RtfmAPI.Presentation;
@@ -11,15 +12,15 @@ public static class DependencyInjection
     /// <summary>
     /// Добавление зависимостей слоя "Приложение"
     /// </summary>
-    /// <param name="services">Коллекция сервисов</param>
-    /// <returns>Коллекция сервисов</returns>
-    public static IServiceCollection AddPresentation(this IServiceCollection services)
+    public static IHostApplicationBuilder AddPresentation(this IHostApplicationBuilder builder)
     {
+        var services = builder.Services;
+        
         services.AddControllers();
         services.AddEndpointsApiExplorer();
 
         services.AddOpenApiDocument(OpenApiSettings.OpenApiDocument);
 
-        return services;
+        return builder;
     }
 }

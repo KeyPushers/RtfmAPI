@@ -1,0 +1,29 @@
+﻿using System;
+
+namespace RtfmAPI.Application.Requests.Tracks.Commands.AddTrack.Dtos;
+
+/// <summary>
+/// Объект переноса данных добавленного музыкального трека.
+/// </summary>
+public sealed class AddedTrack
+{
+    /// <summary>
+    /// Идентификатор музыкального трека.
+    /// </summary>
+    public Guid Id { get; init; }
+    
+    /// <summary>
+    /// Наименование музыкального трека.
+    /// </summary>
+    public string? Name { get; init; }
+
+    /// <summary>
+    /// Продолжительность музыкального трека.
+    /// </summary>
+    public double Duration { get; init; }
+    
+    /// <summary>
+    /// Дата выпуска музыкального трека.
+    /// </summary>
+    public DateTime ReleaseDate { get; init; }
+}

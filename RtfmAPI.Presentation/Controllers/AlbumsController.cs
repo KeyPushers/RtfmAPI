@@ -2,9 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RtfmAPI.Application.Requests.Albums.Commands.AddAlbum;
+using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum;
+using RtfmAPI.Application.Requests.Albums.Commands.ModifyAlbum.Dtos;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo;
 using RtfmAPI.Application.Requests.Albums.Queries.GetAlbumInfo.Dtos;
 
@@ -29,7 +32,8 @@ public class AlbumsController : ApiControllerBase
     /// <param name="id">Идентификатор музыкального альбома.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Информация о музыкальном альбома.</returns>
-    [HttpGet("{id:guid}", Name = nameof(GetAlbumInfoAsync))]
+    [Authorize]
+    [HttpGet("{id}", Name = nameof(GetAlbumInfoAsync))]
     public async Task<ActionResult<AlbumInfo>> GetAlbumInfoAsync([FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -54,6 +58,7 @@ public class AlbumsController : ApiControllerBase
     /// <param name="releaseDate">Дата выпуска</param>
     /// <param name="cancellationToken">Токен отмены</param>
     /// <returns>Добавленный музыкальный альбом</returns>
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult> AddAlbumAsync([FromQuery] string name, [FromQuery] DateTime releaseDate,
         CancellationToken cancellationToken = default)
@@ -71,5 +76,34 @@ public class AlbumsController : ApiControllerBase
         }
 
         return CreatedAtRoute(nameof(GetAlbumInfoAsync), new {commandResult.Value.Id}, commandResult.Value);
+    }
+
+    /// <summary>
+    /// Изменение музыкального альбома.
+    /// </summary>
+    /// <param name="id">Идентификатор музыкального альбома.</param>
+    /// <param name="request">Объект переноса данных команды изменения музыкального альбома.</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    [Authorize]
+    [HttpPost("{id}/modify")]
+    public async Task<ActionResult> ModifyAlbumAsync([FromRoute] Guid id, [FromBody] ModifyingAlbum request,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new ModifyAlbumCommand
+        {
+            AlbumId = id,
+            Name = request.Name,
+            ReleaseDate = request.ReleaseDate,
+            AddingTracksIds = request.AddingTracksIds,
+            RemovingTracksIds = request.RemovingTracksIds,
+        };
+
+        var commandResult = await Mediator.Send(command, cancellationToken);
+        if (commandResult.IsFailed)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, commandResult.Error);
+        }
+
+        return Ok();
     }
 }

@@ -21,4 +21,14 @@ public sealed class ModifyingBand
     /// Идентификаторы удаляемых музыкальных альбомов.
     /// </summary>
     public List<Guid> RemovingAlbumsIds { get; init; } = new();
+    
+    /// <summary>
+    /// Идентификаторы добавляемых музыкальных жанров.
+    /// </summary>
+    public List<Guid> AddingGenresIds { get; init; } = new();
+
+    /// <summary>
+    /// Идентификаторы удаляемых музыкальных жанров.
+    /// </summary>
+    public List<Guid> RemovingGenresIds { get; init; } = new();
 }

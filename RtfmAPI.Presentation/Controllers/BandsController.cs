@@ -56,7 +56,7 @@ public class BandsController : ApiControllerBase
     /// <param name="id">Идентификатор.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Музыкальная группа.</returns>
-    [HttpGet("{id:guid}", Name = nameof(GetBandInfoAsync))]
+    [HttpGet("{id}", Name = nameof(GetBandInfoAsync))]
     public async Task<ActionResult<BandInfo>> GetBandInfoAsync([FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -74,7 +74,7 @@ public class BandsController : ApiControllerBase
     /// <param name="id">Идентификатор музыкальной группы.</param>
     /// <param name="request">Объект переноса данных команды изменения музыкальной группы.</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    [HttpPost("{id:guid}/modify")]
+    [HttpPost("{id}/modify")]
     public async Task<ActionResult> ModifyBandAsync([FromRoute] Guid id, [FromBody] ModifyingBand request,
         CancellationToken cancellationToken = default)
     {
@@ -84,6 +84,8 @@ public class BandsController : ApiControllerBase
             Name = request.Name,
             AddingAlbumsIds = request.AddingAlbumsIds,
             RemovingAlbumsIds = request.RemovingAlbumsIds,
+            AddingGenresIds = request.AddingGenresIds,
+            RemovingGenresIds = request.RemovingGenresIds
         };
 
         var commandResult = await Mediator.Send(command, cancellationToken);

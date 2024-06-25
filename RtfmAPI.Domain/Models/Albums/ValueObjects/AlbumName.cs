@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using RtfmAPI.Domain.Models.Albums.Exceptions;
 using RtfmAPI.Domain.Primitives;
 
 namespace RtfmAPI.Domain.Models.Albums.ValueObjects;
@@ -42,17 +42,17 @@ public sealed class AlbumName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ArgumentOutOfRangeException();
+            return AlbumExceptions.AlbumNameIsNullOrEmpty();
         }
 
         if (value.Length < MinLength)
         {
-            return new ArgumentOutOfRangeException();
+            return AlbumExceptions.AlbumNameIsTooShort();
         }
 
         if (value.Length > MaxLength)
         {
-            return new ArgumentOutOfRangeException();
+            return AlbumExceptions.AlbumNameIsTooLong();
         }
 
         return new AlbumName(value);
